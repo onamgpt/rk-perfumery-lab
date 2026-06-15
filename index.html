@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RK Perfumery Lab</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400;500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --obsidian:#0A0A0F;
+  --deep:#12121A;
+  --surface:#1A1A26;
+  --panel:#20202E;
+  --border:#2A2A3E;
+  --gold:#C8A96E;
+  --gold-dim:#7A6240;
+  --amber:#E8A44A;
+  --violet:#7B6FD4;
+  --violet-dim:#3D3868;
+  --mist:#E8E4F0;
+  --text:#C4C0D4;
+  --text-dim:#6E6A82;
+  --white:#F0EDF8;
+  --top:#52E8;--heart:#E85252;--base:#52A8E8;
+  --top-c:#52E852;--heart-c:#E85252;--base-c:#5295E8;
+  --green:#52E852;--red:#E85252;--blue:#5295E8;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;background:var(--obsidian);color:var(--text);min-height:100vh;overflow-x:hidden}
+
+/* ── HEADER ── */
+header{position:fixed;top:0;left:0;right:0;z-index:100;height:56px;background:rgba(10,10,15,0.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 32px}
+.logo{font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:300;color:var(--gold);letter-spacing:0.2em;text-transform:uppercase}
+.logo span{color:var(--text-dim);font-size:0.7rem;display:block;letter-spacing:0.35em;margin-top:1px}
+.nav-pills{display:flex;gap:4px}
+.nav-pill{background:none;border:none;color:var(--text-dim);font-size:0.72rem;font-family:'DM Mono',monospace;letter-spacing:0.08em;padding:6px 14px;cursor:pointer;border-radius:20px;transition:all 0.2s}
+.nav-pill:hover,.nav-pill.active{background:var(--border);color:var(--gold)}
+
+/* ── HERO ── */
+.hero{min-height:100vh;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;padding-top:56px}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 60% 70% at 50% 40%,rgba(123,111,212,0.08) 0%,transparent 70%)}
+.hero-orb{position:absolute;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(200,169,110,0.04) 0%,transparent 70%);top:50%;left:50%;transform:translate(-50%,-50%);animation:pulse 8s ease-in-out infinite}
+@keyframes pulse{0%,100%{transform:translate(-50%,-50%) scale(1);opacity:0.5}50%{transform:translate(-50%,-50%) scale(1.1);opacity:1}}
+.hero-content{text-align:center;z-index:2;max-width:700px;padding:40px 24px}
+.hero-eyebrow{font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.35em;color:var(--gold-dim);text-transform:uppercase;margin-bottom:32px}
+.hero-title{font-family:'Cormorant Garamond',serif;font-size:clamp(3rem,8vw,6rem);font-weight:300;color:var(--white);line-height:1;margin-bottom:8px}
+.hero-title em{font-style:italic;color:var(--gold)}
+.hero-sub{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:300;color:var(--text-dim);margin-bottom:40px;letter-spacing:0.05em}
+.hero-btn{background:none;border:1px solid var(--gold-dim);color:var(--gold);font-family:'DM Mono',monospace;font-size:0.72rem;letter-spacing:0.2em;padding:14px 36px;cursor:pointer;transition:all 0.3s;text-transform:uppercase}
+.hero-btn:hover{background:var(--gold);color:var(--obsidian);border-color:var(--gold)}
+
+/* ── MAIN LAB ── */
+.lab{padding:80px 24px;max-width:1400px;margin:0 auto}
+.section-label{font-family:'DM Mono',monospace;font-size:0.6rem;letter-spacing:0.35em;color:var(--gold-dim);text-transform:uppercase;margin-bottom:24px;display:flex;align-items:center;gap:16px}
+.section-label::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* ── VISUALIZE PANEL ── */
+.visualize-panel{background:var(--surface);border:1px solid var(--border);padding:32px;margin-bottom:32px;position:relative}
+.visualize-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px}
+.visualize-title{font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:300;color:var(--white)}
+.input-row{display:flex;gap:12px;margin-bottom:24px;flex-wrap:wrap}
+.prompt-input{flex:1;min-width:280px;background:var(--panel);border:1px solid var(--border);color:var(--white);font-family:'Inter',sans-serif;font-size:0.85rem;padding:14px 18px;outline:none;transition:border-color 0.2s}
+.prompt-input:focus{border-color:var(--gold-dim)}
+.prompt-input::placeholder{color:var(--text-dim)}
+.btn-primary{background:var(--gold);color:var(--obsidian);border:none;font-family:'DM Mono',monospace;font-size:0.7rem;letter-spacing:0.15em;padding:14px 28px;cursor:pointer;transition:all 0.2s;text-transform:uppercase;white-space:nowrap}
+.btn-primary:hover{background:var(--amber)}
+.btn-primary:disabled{opacity:0.4;cursor:not-allowed}
+.btn-secondary{background:none;border:1px solid var(--border);color:var(--text);font-family:'DM Mono',monospace;font-size:0.7rem;letter-spacing:0.1em;padding:14px 22px;cursor:pointer;transition:all 0.2s;text-transform:uppercase}
+.btn-secondary:hover{border-color:var(--gold-dim);color:var(--gold)}
+
+/* ── PYRAMID CHART ── */
+.chart-area{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:24px}
+@media(max-width:900px){.chart-area{grid-template-columns:1fr}}
+.chart-box{background:var(--panel);border:1px solid var(--border);padding:24px}
+.chart-title{font-family:'DM Mono',monospace;font-size:0.62rem;letter-spacing:0.25em;color:var(--text-dim);text-transform:uppercase;margin-bottom:16px}
+#pyramidChart,#radarChart,#timelineChart{width:100%;display:block}
+
+/* ── ACCORD BREAKDOWN ── */
+.accord-bars{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.accord-row{display:flex;align-items:center;gap:12px}
+.accord-name{font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--text-dim);width:130px;flex-shrink:0;text-transform:uppercase;letter-spacing:0.05em}
+.accord-bar-wrap{flex:1;height:6px;background:var(--border);border-radius:0}
+.accord-bar-fill{height:100%;border-radius:0;transition:width 1s cubic-bezier(0.4,0,0.2,1)}
+.accord-pct{font-family:'DM Mono',monospace;font-size:0.62rem;color:var(--text-dim);width:36px;text-align:right}
+
+/* ── FORMULATION TABLE ── */
+.formula-section{background:var(--surface);border:1px solid var(--border);padding:32px;margin-bottom:32px}
+.formula-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px}
+.formula-title{font-family:'Cormorant Garamond',serif;font-size:1.4rem;color:var(--white)}
+.formula-actions{display:flex;gap:8px}
+table{width:100%;border-collapse:collapse;font-size:0.82rem}
+thead tr{border-bottom:1px solid var(--border)}
+th{font-family:'DM Mono',monospace;font-size:0.58rem;letter-spacing:0.2em;color:var(--text-dim);text-transform:uppercase;padding:10px 16px;text-align:left;font-weight:400}
+td{padding:12px 16px;border-bottom:1px solid rgba(42,42,62,0.5);color:var(--text);transition:background 0.15s}
+tr:hover td{background:var(--panel)}
+.note-badge{display:inline-block;padding:2px 8px;font-family:'DM Mono',monospace;font-size:0.6rem;letter-spacing:0.1em;border-radius:10px;text-transform:uppercase}
+.note-top{background:rgba(82,232,82,0.12);color:var(--green);border:1px solid rgba(82,232,82,0.2)}
+.note-heart{background:rgba(232,82,82,0.12);color:var(--red);border:1px solid rgba(232,82,82,0.2)}
+.note-base{background:rgba(82,149,232,0.12);color:var(--blue);border:1px solid rgba(82,149,232,0.2)}
+.odor-tag{font-size:0.7rem;color:var(--text-dim);font-style:italic}
+.ifra-ok{color:var(--green);font-size:0.7rem}
+.ifra-warn{color:var(--amber);font-size:0.7rem}
+.conc-input{background:var(--panel);border:1px solid var(--border);color:var(--white);font-family:'DM Mono',monospace;font-size:0.78rem;padding:4px 8px;width:72px;outline:none;text-align:right}
+.conc-input:focus{border-color:var(--gold-dim)}
+.total-row td{font-family:'DM Mono',monospace;font-size:0.75rem;color:var(--gold);border-top:1px solid var(--border);border-bottom:none;padding-top:14px}
+
+/* ── DATABASE PANEL ── */
+.db-panel{background:var(--surface);border:1px solid var(--border);padding:32px;margin-bottom:32px}
+.db-search-row{display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap}
+.db-search{flex:1;min-width:200px;background:var(--panel);border:1px solid var(--border);color:var(--white);font-family:'Inter',sans-serif;font-size:0.82rem;padding:11px 16px;outline:none}
+.db-search:focus{border-color:var(--gold-dim)}
+.filter-pills{display:flex;gap:6px;flex-wrap:wrap}
+.filter-pill{background:none;border:1px solid var(--border);color:var(--text-dim);font-family:'DM Mono',monospace;font-size:0.6rem;letter-spacing:0.1em;padding:5px 12px;cursor:pointer;border-radius:20px;transition:all 0.2s;text-transform:uppercase}
+.filter-pill:hover,.filter-pill.on{background:var(--violet-dim);color:var(--mist);border-color:var(--violet)}
+.db-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;max-height:480px;overflow-y:auto}
+.db-grid::-webkit-scrollbar{width:4px}
+.db-grid::-webkit-scrollbar-track{background:var(--panel)}
+.db-grid::-webkit-scrollbar-thumb{background:var(--border)}
+.mol-card{background:var(--panel);border:1px solid var(--border);padding:16px;cursor:pointer;transition:all 0.2s;position:relative}
+.mol-card:hover{border-color:var(--gold-dim);background:var(--surface)}
+.mol-card.selected{border-color:var(--gold);background:rgba(200,169,110,0.06)}
+.mol-name{font-family:'Cormorant Garamond',serif;font-size:1rem;color:var(--white);margin-bottom:2px}
+.mol-iupac{font-family:'DM Mono',monospace;font-size:0.58rem;color:var(--text-dim);margin-bottom:8px;word-break:break-all}
+.mol-tags{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px}
+.mol-tag{font-size:0.58rem;font-family:'DM Mono',monospace;padding:2px 6px;border-radius:2px;letter-spacing:0.05em}
+.mol-odor{font-size:0.72rem;color:var(--text-dim);font-style:italic;line-height:1.4}
+.mol-add-btn{position:absolute;top:12px;right:12px;background:none;border:1px solid var(--border);color:var(--text-dim);width:24px;height:24px;font-size:0.9rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s}
+.mol-add-btn:hover{border-color:var(--gold);color:var(--gold)}
+
+/* ── SINGLE NOTE COMPLEXITY ── */
+.complexity-meter{display:flex;align-items:center;gap:16px;margin-top:16px}
+.complexity-label{font-family:'DM Mono',monospace;font-size:0.6rem;color:var(--text-dim);letter-spacing:0.15em;text-transform:uppercase;width:100px}
+.complexity-track{flex:1;height:3px;background:var(--border);position:relative}
+.complexity-fill{height:100%;background:linear-gradient(90deg,var(--violet),var(--gold),var(--amber));transition:width 0.8s ease}
+.complexity-val{font-family:'DM Mono',monospace;font-size:0.72rem;color:var(--gold);width:36px;text-align:right}
+
+/* ── STATUS / LOADER ── */
+.status-bar{background:var(--panel);border:1px solid var(--border);padding:12px 20px;font-family:'DM Mono',monospace;font-size:0.72rem;color:var(--text-dim);display:flex;align-items:center;gap:12px;margin-bottom:24px}
+.status-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:blink 1.5s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.2}}
+.status-dot.thinking{background:var(--amber)}
+.status-dot.idle{background:var(--border);animation:none}
+.thinking-text{color:var(--amber)}
+
+/* ── EMPTY STATE ── */
+.empty-state{text-align:center;padding:80px 40px;color:var(--text-dim)}
+.empty-icon{font-size:3rem;margin-bottom:16px;opacity:0.3;display:block}
+.empty-title{font-family:'Cormorant Garamond',serif;font-size:1.4rem;color:var(--text-dim);margin-bottom:8px}
+.empty-sub{font-size:0.82rem;line-height:1.7}
+
+/* ── SINGLE NOTE BADGE ── */
+.single-note-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(123,111,212,0.12);border:1px solid var(--violet-dim);padding:8px 16px;font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.1em;color:var(--violet);margin-top:16px}
+.single-note-badge::before{content:'◆';color:var(--violet)}
+
+/* ── TABS ── */
+.tab-row{display:flex;border-bottom:1px solid var(--border);margin-bottom:24px;gap:0}
+.tab{background:none;border:none;border-bottom:2px solid transparent;color:var(--text-dim);font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.15em;padding:12px 20px;cursor:pointer;transition:all 0.2s;text-transform:uppercase;margin-bottom:-1px}
+.tab:hover{color:var(--text)}
+.tab.active{color:var(--gold);border-bottom-color:var(--gold)}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--panel);border:1px solid var(--border);color:var(--text);padding:12px 20px;font-family:'DM Mono',monospace;font-size:0.72rem;z-index:9999;transform:translateY(80px);transition:transform 0.3s;max-width:320px}
+.toast.show{transform:translateY(0)}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:var(--obsidian)}
+::-webkit-scrollbar-thumb{background:var(--border)}
+
+@media(max-width:768px){
+  header{padding:0 16px}.lab{padding:60px 16px}
+  .input-row{flex-direction:column}.prompt-input{min-width:unset}
+  .db-grid{grid-template-columns:1fr}
+  .chart-area{grid-template-columns:1fr}
+  .nav-pills{display:none}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">RK Perfumery Lab<span>Fine Fragrance Formulation</span></div>
+  <div class="nav-pills">
+    <button class="nav-pill active" onclick="showSection('visualize')">Visualise</button>
+    <button class="nav-pill" onclick="showSection('database')">Database</button>
+    <button class="nav-pill" onclick="showSection('formula')">Formula</button>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero" id="heroSection">
+  <div class="hero-bg"></div>
+  <div class="hero-orb"></div>
+  <div class="hero-content">
+    <div class="hero-eyebrow">RK Perfumery Lab &nbsp;·&nbsp; Expert Formulation Tool</div>
+    <h1 class="hero-title">Compose a<br><em>Fragrance</em></h1>
+    <p class="hero-sub">From molecule to accord to single complex note</p>
+    <button class="hero-btn" onclick="startLab()">Enter the Lab</button>
+  </div>
+</section>
+
+<!-- LAB -->
+<div class="lab" id="labSection" style="display:none">
+
+  <!-- STATUS -->
+  <div class="status-bar" id="statusBar">
+    <div class="status-dot idle" id="statusDot"></div>
+    <span id="statusText">Ready — describe a fragrance vision or browse the database</span>
+  </div>
+
+  <!-- SECTION: VISUALIZE -->
+  <div id="sec-visualize">
+    <div class="section-label">01 &nbsp; Visualise a Fragrance</div>
+
+    <div class="visualize-panel">
+      <div class="visualize-header">
+        <div class="visualize-title">Describe your fragrance vision</div>
+      </div>
+      <div class="input-row">
+        <input class="prompt-input" id="fragrancePrompt" placeholder="e.g. A dark resinous amber with smoky vetiver, animalic civet undertone, and a whisper of rose — single complex note" />
+        <button class="btn-primary" id="visualizeBtn" onclick="visualizeFragrance()">Visualise</button>
+        <button class="btn-secondary" onclick="clearAll()">Clear</button>
+      </div>
+
+      <!-- Quick presets -->
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px">
+        <span style="font-family:'DM Mono',monospace;font-size:0.6rem;color:var(--text-dim);padding-top:6px">PRESETS:</span>
+        <button class="filter-pill" onclick="setPreset('Smoky vetiver with castoreum and labdanum — dark animalic base')">Dark Animalic</button>
+        <button class="filter-pill" onclick="setPreset('Aldehydic rose with iso E super, musk ambrette and sandalwood — powdery floral complex')">Powdery Floral</button>
+        <button class="filter-pill" onclick="setPreset('Marine ozone with calone, hedione and bergamot — fresh aquatic single note')">Fresh Aquatic</button>
+        <button class="filter-pill" onclick="setPreset('Oud with saffron, rose absolute and ambergris — oriental luxury complex')">Oriental Oud</button>
+        <button class="filter-pill" onclick="setPreset('Green tea, violet leaf, galbanum and oakmoss — chypre green aromatic')">Chypre Green</button>
+      </div>
+
+      <!-- Charts -->
+      <div id="chartArea" style="display:none">
+        <div class="chart-area">
+          <div class="chart-box">
+            <div class="chart-title">Fragrance Pyramid</div>
+            <svg id="pyramidChart" height="260"></svg>
+          </div>
+          <div class="chart-box">
+            <div class="chart-title">Accord Radar</div>
+            <svg id="radarChart" height="260"></svg>
+          </div>
+        </div>
+        <div class="chart-box" style="margin-bottom:24px">
+          <div class="chart-title">Evaporation Timeline</div>
+          <svg id="timelineChart" height="120"></svg>
+        </div>
+        <div class="accord-bars" id="accordBars"></div>
+        <div id="singleNoteBadge"></div>
+
+        <div style="margin-top:24px;padding-top:24px;border-top:1px solid var(--border)">
+          <div class="complexity-meter">
+            <div class="complexity-label">Complexity</div>
+            <div class="complexity-track"><div class="complexity-fill" id="complexityFill" style="width:0%"></div></div>
+            <div class="complexity-val" id="complexityVal">—</div>
+          </div>
+          <div class="complexity-meter">
+            <div class="complexity-label">Longevity</div>
+            <div class="complexity-track"><div class="complexity-fill" id="longevityFill" style="width:0%"></div></div>
+            <div class="complexity-val" id="longevityVal">—</div>
+          </div>
+          <div class="complexity-meter">
+            <div class="complexity-label">Sillage</div>
+            <div class="complexity-track"><div class="complexity-fill" id="silllageFill" style="width:0%"></div></div>
+            <div class="complexity-val" id="silllageVal">—</div>
+          </div>
+        </div>
+      </div>
+
+      <div id="emptyViz" class="empty-state">
+        <span class="empty-icon">⬡</span>
+        <div class="empty-title">No fragrance visualised yet</div>
+        <div class="empty-sub">Describe your vision above and the lab will map it across the olfactory pyramid, plot accord strengths on a radar, and trace the evaporation curve over time.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION: DATABASE -->
+  <div id="sec-database" style="display:none">
+    <div class="section-label">02 &nbsp; Aroma Chemical Database</div>
+    <div class="db-panel">
+      <div class="db-search-row">
+        <input class="db-search" id="dbSearch" placeholder="Search by name, odour, or CAS..." oninput="filterDB()">
+        <div class="filter-pills">
+          <button class="filter-pill on" data-filter="all" onclick="setFilter('all',this)">All</button>
+          <button class="filter-pill" data-filter="top" onclick="setFilter('top',this)">Top</button>
+          <button class="filter-pill" data-filter="heart" onclick="setFilter('heart',this)">Heart</button>
+          <button class="filter-pill" data-filter="base" onclick="setFilter('base',this)">Base</button>
+          <button class="filter-pill" data-filter="floral" onclick="setFilter('floral',this)">Floral</button>
+          <button class="filter-pill" data-filter="woody" onclick="setFilter('woody',this)">Woody</button>
+          <button class="filter-pill" data-filter="animalic" onclick="setFilter('animalic',this)">Animalic</button>
+          <button class="filter-pill" data-filter="resinous" onclick="setFilter('resinous',this)">Resinous</button>
+          <button class="filter-pill" data-filter="fresh" onclick="setFilter('fresh',this)">Fresh</button>
+          <button class="filter-pill" data-filter="musky" onclick="setFilter('musky',this)">Musky</button>
+        </div>
+      </div>
+      <div class="db-grid" id="dbGrid"></div>
+    </div>
+  </div>
+
+  <!-- SECTION: FORMULA -->
+  <div id="sec-formula" style="display:none">
+    <div class="section-label">03 &nbsp; Formulation</div>
+    <div class="formula-section">
+      <div class="formula-header">
+        <div class="formula-title" id="formulaTitle">Working Formula</div>
+        <div class="formula-actions">
+          <button class="btn-secondary" onclick="exportFormula()">Export CSV</button>
+          <button class="btn-primary" onclick="generateFormula()">AI Suggest Formula</button>
+        </div>
+      </div>
+      <div id="formulaEmpty" class="empty-state">
+        <span class="empty-icon">⚗</span>
+        <div class="empty-title">No formula yet</div>
+        <div class="empty-sub">Visualise a fragrance or add molecules from the database to start building your formula.</div>
+      </div>
+      <div id="formulaTable" style="display:none">
+        <table>
+          <thead>
+            <tr>
+              <th>Ingredient</th>
+              <th>Note</th>
+              <th>Odour Profile</th>
+              <th>Conc. %</th>
+              <th>In 10g (drops)</th>
+              <th>IFRA</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="formulaBody"></tbody>
+          <tfoot>
+            <tr class="total-row">
+              <td colspan="3">TOTAL CONCENTRATE</td>
+              <td id="totalPct">0.00%</td>
+              <td></td>
+              <td></td>
+              <td></td>
+            </tr>
+          </tfoot>
+        </table>
+        <div style="margin-top:24px;padding:16px;background:var(--panel);border:1px solid var(--border)">
+          <div style="font-family:'DM Mono',monospace;font-size:0.6rem;color:var(--text-dim);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:12px">Perfumer's Notes</div>
+          <div id="perfumerNotes" style="font-family:'Cormorant Garamond',serif;font-size:1rem;color:var(--text);line-height:1.7;font-style:italic"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ── DATABASE ─────────────────────────────────────────────────────────────────
+var DB = [
+  // TOP NOTES
+  {id:'bergamot',name:'Bergamot',cas:'89957-91-5',note:'top',tags:['fresh','citrus'],odor:'Fresh citrus, slightly floral with tea nuances',ifra:0.4,family:'citrus',volatility:95},
+  {id:'lemon',name:'Lemon Terpenes',cas:'84929-31-7',note:'top',tags:['fresh','citrus'],odor:'Bright zesty lemon, clean and sparkling',ifra:2.0,family:'citrus',volatility:98},
+  {id:'grapefruit',name:'Grapefruit CO2',cas:'8016-20-4',note:'top',tags:['fresh','citrus'],odor:'Fresh, bitter citrus, slightly green',ifra:4.0,family:'citrus',volatility:96},
+  {id:'calone',name:'Calone 1951',cas:'28645-51-4',note:'top',tags:['fresh','marine'],odor:'Powerful marine, watermelon, ozonic freshness',ifra:0.3,family:'marine',volatility:85},
+  {id:'iso-e-super',name:'Iso E Super',cas:'54464-57-2',note:'top',tags:['woody','fresh'],odor:'Woody cedar, diffusive amber, slightly smoky — volatile',ifra:14.7,family:'woody',volatility:80},
+  {id:'aldehydeC12',name:'Aldehyde C-12 MNA',cas:'13361-31-4',note:'top',tags:['aldehydic','waxy'],odor:'Clean powdery, waxy aldehydic, like hot metal',ifra:0.15,family:'aldehydic',volatility:90},
+  {id:'galbanum',name:'Galbanum Resinoid',cas:'8023-91-4',note:'top',tags:['green','fresh'],odor:'Intensely green, bitter, pine-like, diffusive',ifra:4.0,family:'green',volatility:75},
+  {id:'violet-leaf',name:'Violet Leaf Absolute',cas:'68917-02-2',note:'top',tags:['green','fresh'],odor:'Metallic green, cucumber-like, watery freshness',ifra:0.3,family:'green',volatility:78},
+  {id:'litsea',name:'Litsea Cubeba',cas:'68855-99-2',note:'top',tags:['citrus','fresh'],odor:'Fresh lemon-verbena, slightly floral green',ifra:0.7,family:'citrus',volatility:92},
+
+  // HEART NOTES
+  {id:'rose-absolute',name:'Rose Absolute',cas:'8007-01-0',note:'heart',tags:['floral'],odor:'Intensely floral, honeyed, rich damascene rose',ifra:2.0,family:'floral',volatility:50},
+  {id:'jasmine-absolute',name:'Jasmine Absolute',cas:'8022-96-6',note:'heart',tags:['floral','animalic'],odor:'Rich floral, indolic, slightly fruity jasmine',ifra:0.7,family:'floral',volatility:45},
+  {id:'hedione',name:'Hedione HC',cas:'24851-98-7',note:'heart',tags:['floral','fresh'],odor:'Transparent jasmine, diffusive, radiant freshness',ifra:14.7,family:'floral',volatility:55},
+  {id:'geranium',name:'Geranium Bourbon',cas:'8000-46-2',note:'heart',tags:['floral','green'],odor:'Rose-like, slightly minty, green floral',ifra:5.8,family:'floral',volatility:60},
+  {id:'ylang',name:'Ylang Ylang Extra',cas:'8006-81-3',note:'heart',tags:['floral'],odor:'Intensely sweet floral, banana nuance, narcotic',ifra:0.8,family:'floral',volatility:48},
+  {id:'dihydrojasmone',name:'Dihydrojasmone',cas:'1128-08-1',note:'heart',tags:['floral','fruity'],odor:'Fruity floral, peach-jasmine, diffusive',ifra:14.7,family:'floral',volatility:52},
+  {id:'methyl-ionone',name:'Methyl Ionone',cas:'1335-46-2',note:'heart',tags:['violet','woody'],odor:'Orris-like, powdery violet, woody nuances',ifra:14.7,family:'floral',volatility:42},
+  {id:'labdanum',name:'Labdanum Absolute',cas:'8016-26-0',note:'heart',tags:['resinous','animalic'],odor:'Warm ambery resin, animalic, leathery-sweet',ifra:6.0,family:'resinous',volatility:30},
+  {id:'saffron-absolute',name:'Saffron Absolute',cas:'84604-17-1',note:'heart',tags:['spicy','animalic'],odor:'Warm spicy, leathery, earthy and hay-like',ifra:0.05,family:'spicy',volatility:35},
+
+  // BASE NOTES
+  {id:'vetiver',name:'Vetiver Haiti',cas:'8016-96-4',note:'base',tags:['woody','earthy'],odor:'Smoky, earthy, rooty, dry woody depth',ifra:14.7,family:'woody',volatility:8},
+  {id:'sandalwood',name:'Sandalwood Mysore',cas:'8006-87-9',note:'base',tags:['woody','creamy'],odor:'Creamy sandalwood, milky, soft cedar undertone',ifra:14.7,family:'woody',volatility:10},
+  {id:'oud',name:'Oud CO2 (Agarwood)',cas:'94891-34-6',note:'base',tags:['woody','animalic','resinous'],odor:'Complex oud: woody, animalic, smoky, balsamic depth',ifra:0.2,family:'woody',volatility:5},
+  {id:'ambergris',name:'Ambroxan (Ambergris)',cas:'6790-58-5',note:'base',tags:['musky','woody','marine'],odor:'Ambergris: warm, velvety, mineral, skin-like depth',ifra:14.7,family:'musky',volatility:12},
+  {id:'civet-synth',name:'Civetone (Synthetic)',cas:'542-46-1',note:'base',tags:['animalic','musky'],odor:'Animalic, musky, fecal at high doses, smooth at low',ifra:0.1,family:'animalic',volatility:6},
+  {id:'castoreum',name:'Castoreum Absolute',cas:'8023-83-4',note:'base',tags:['animalic','leathery'],odor:'Leathery, smoky, animalic, birch-like',ifra:2.0,family:'animalic',volatility:7},
+  {id:'musk-ambrette',name:'Musk Ambrette Synth',cas:'83-66-9',note:'base',tags:['musky','floral'],odor:'Powdery musk, slightly floral, skin-like warmth',ifra:14.7,family:'musky',volatility:15},
+  {id:'coumarin',name:'Coumarin',cas:'91-64-5',note:'base',tags:['musky','sweet','gourmand'],odor:'Sweet hay, almond-like, warm vanilla-adjacent',ifra:5.0,family:'musky',volatility:20},
+  {id:'benzyl-benzoate',name:'Benzyl Benzoate',cas:'120-51-4',note:'base',tags:['balsamic','sweet'],odor:'Sweet balsamic, faint rose, fixative character',ifra:2.8,family:'resinous',volatility:18},
+  {id:'oakmoss',name:'Oakmoss Absolute',cas:'90028-68-5',note:'base',tags:['green','earthy','chypre'],odor:'Classic chypre: mossy, earthy, forest floor depth',ifra:0.001,family:'green',volatility:9},
+  {id:'tonka',name:'Tonka Bean Absolute',cas:'91-64-5',note:'base',tags:['sweet','musky','gourmand'],odor:'Rich coumarinic, almond, vanilla, tobacco warmth',ifra:0.6,family:'musky',volatility:14},
+  {id:'benzoin',name:'Benzoin Siam Resinoid',cas:'9000-05-9',note:'base',tags:['resinous','sweet','balsamic'],odor:'Warm vanilla-balsamic, sweet, powdery resin',ifra:2.8,family:'resinous',volatility:11},
+  {id:'frankincense',name:'Frankincense CO2',cas:'89957-98-2',note:'base',tags:['resinous','fresh','spicy'],odor:'Citrus-pine opening, warm incense, dry resinous base',ifra:14.7,family:'resinous',volatility:22},
+  {id:'patchouli',name:'Patchouli Heart',cas:'8014-09-3',note:'base',tags:['earthy','woody','musky'],odor:'Dark earthy, camphoraceous, sweet wooden depth',ifra:14.7,family:'woody',volatility:6},
+];
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+var formula = [];
+var currentFilter = 'all';
+var currentSection = 'visualize';
+var vizData = null;
+
+// ── NAV ───────────────────────────────────────────────────────────────────────
+function startLab(){
+  document.getElementById('heroSection').style.display = 'none';
+  document.getElementById('labSection').style.display = 'block';
+  renderDB();
+}
+
+function showSection(sec){
+  currentSection = sec;
+  var secs = ['visualize','database','formula'];
+  for(var i=0;i<secs.length;i++){
+    var el = document.getElementById('sec-'+secs[i]);
+    if(el) el.style.display = secs[i]==sec ? 'block' : 'none';
+  }
+  var pills = document.querySelectorAll('.nav-pill');
+  for(var i=0;i<pills.length;i++){
+    pills[i].classList.remove('active');
+    if(pills[i].textContent.trim().toLowerCase().indexOf(sec.substring(0,4)) >= 0){
+      pills[i].classList.add('active');
+    }
+  }
+  if(sec=='formula') renderFormula();
+  if(sec=='database') renderDB();
+}
+
+// ── VISUALIZE ────────────────────────────────────────────────────────────────
+function setPreset(text){
+  document.getElementById('fragrancePrompt').value = text;
+}
+
+function clearAll(){
+  document.getElementById('fragrancePrompt').value = '';
+  document.getElementById('chartArea').style.display = 'none';
+  document.getElementById('emptyViz').style.display = 'block';
+  vizData = null;
+}
+
+function setStatus(state, text){
+  var dot = document.getElementById('statusDot');
+  var txt = document.getElementById('statusText');
+  dot.className = 'status-dot ' + state;
+  txt.textContent = text;
+  txt.className = state == 'thinking' ? 'thinking-text' : '';
+}
+
+async function visualizeFragrance(){
+  var prompt = document.getElementById('fragrancePrompt').value.trim();
+  if(!prompt){showToast('Describe a fragrance first');return;}
+
+  var btn = document.getElementById('visualizeBtn');
+  btn.disabled = true;
+  btn.textContent = 'Analysing...';
+  setStatus('thinking','AI analysing olfactory structure...');
+  document.getElementById('emptyViz').style.display = 'none';
+  document.getElementById('chartArea').style.display = 'none';
+
+  try{
+    var response = await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-6',
+        max_tokens:1000,
+        system:'You are an expert perfumer and fragrance chemist. Analyse the fragrance description and return ONLY valid JSON, no markdown, no preamble. Schema: {"name":"creative fragrance name","family":"main olfactory family","topNotes":[{"ingredient":"name","pct":number,"odor":"brief"}],"heartNotes":[{"ingredient":"name","pct":number,"odor":"brief"}],"baseNotes":[{"ingredient":"name","pct":number,"odor":"brief"}],"accords":{"floral":0-100,"woody":0-100,"fresh":0-100,"animalic":0-100,"resinous":0-100,"musky":0-100,"spicy":0-100,"green":0-100},"complexity":0-100,"longevity":0-100,"sillage":0-100,"singleNoteCharacter":"describe the final unified single complex note this becomes","perfumerNote":"2 sentence expert note on the structure and intent"}',
+        messages:[{role:'user',content:'Analyse this fragrance vision for olfactory pyramid, accords, and complexity: ' + prompt}]
+      })
+    });
+    var data = await response.json();
+    var text = data.content[0].text;
+    text = text.replace(/```json/g,'').replace(/```/g,'').trim();
+    vizData = JSON.parse(text);
+    renderViz(vizData);
+    setStatus('idle','Analysis complete — ' + vizData.name);
+  }catch(e){
+    console.error(e);
+    setStatus('idle','Analysis failed — check console');
+    showToast('Error: ' + e.message);
+  }
+  btn.disabled = false;
+  btn.textContent = 'Visualise';
+}
+
+function renderViz(d){
+  document.getElementById('chartArea').style.display = 'block';
+  renderPyramid(d);
+  renderRadar(d);
+  renderTimeline(d);
+  renderAccordBars(d);
+  // complexity meters
+  animateFill('complexityFill','complexityVal',d.complexity,'%');
+  animateFill('longevityFill','longevityVal',d.longevity,'%');
+  animateFill('silllageFill','silllageVal',d.sillage,'%');
+  // single note badge
+  var badge = document.getElementById('singleNoteBadge');
+  badge.innerHTML = '<div class="single-note-badge">SINGLE NOTE: ' + (d.singleNoteCharacter||'') + '</div>';
+}
+
+function animateFill(fillId, valId, pct, suffix){
+  setTimeout(function(){
+    document.getElementById(fillId).style.width = pct + '%';
+    document.getElementById(valId).textContent = pct + (suffix||'');
+  },100);
+}
+
+function renderPyramid(d){
+  var svg = d3.select('#pyramidChart');
+  var W = document.getElementById('pyramidChart').parentElement.clientWidth - 48;
+  var H = 260;
+  svg.attr('width',W).attr('height',H);
+  svg.selectAll('*').remove();
+
+  var tiers = [
+    {label:'TOP', notes:d.topNotes||[], color:'var(--green)', y:0, h:H*0.28},
+    {label:'HEART', notes:d.heartNotes||[], color:'var(--red)', y:H*0.28, h:H*0.36},
+    {label:'BASE', notes:d.baseNotes||[], color:'var(--blue)', y:H*0.64, h:H*0.36},
+  ];
+
+  var tierWidths = [0.55, 0.75, 1.0];
+  tiers.forEach(function(tier,i){
+    var tw = W * tierWidths[i];
+    var tx = (W - tw) / 2;
+    // background trapezoid shape using rect for simplicity
+    svg.append('rect')
+      .attr('x',tx).attr('y',tier.y)
+      .attr('width',tw).attr('height',tier.h - 2)
+      .attr('fill',tier.color).attr('opacity',0.07)
+      .attr('rx',0);
+
+    svg.append('rect')
+      .attr('x',tx).attr('y',tier.y)
+      .attr('width',tw).attr('height',2)
+      .attr('fill',tier.color).attr('opacity',0.3);
+
+    svg.append('text')
+      .attr('x',tx + 8).attr('y',tier.y + 16)
+      .attr('fill',tier.color).attr('opacity',0.7)
+      .attr('font-family','DM Mono').attr('font-size',8)
+      .attr('letter-spacing',2).text(tier.label);
+
+    var names = (tier.notes||[]).map(function(n){return n.ingredient;}).join('  ·  ');
+    svg.append('text')
+      .attr('x',tx + tw/2).attr('y',tier.y + tier.h/2 + 6)
+      .attr('fill','#C4C0D4').attr('font-family','Cormorant Garamond')
+      .attr('font-size',13).attr('text-anchor','middle')
+      .attr('font-style','italic').text(names.substring(0,60)+(names.length>60?'…':''));
+  });
+}
+
+function renderRadar(d){
+  var svg = d3.select('#radarChart');
+  var W = document.getElementById('radarChart').parentElement.clientWidth - 48;
+  var H = 260;
+  svg.attr('width',W).attr('height',H);
+  svg.selectAll('*').remove();
+
+  var accords = d.accords || {};
+  var keys = Object.keys(accords);
+  if(!keys.length) return;
+
+  var cx = W/2, cy = H/2, R = Math.min(cx,cy) - 30;
+  var n = keys.length;
+  var angleStep = (2*Math.PI)/n;
+
+  // Grid circles
+  [0.25,0.5,0.75,1].forEach(function(r){
+    var pts = keys.map(function(_,i){
+      var a = i*angleStep - Math.PI/2;
+      return [cx + R*r*Math.cos(a), cy + R*r*Math.sin(a)];
+    });
+    svg.append('polygon')
+      .attr('points',pts.map(function(p){return p.join(',');}).join(' '))
+      .attr('fill','none').attr('stroke','rgba(42,42,62,0.8)').attr('stroke-width',1);
+  });
+
+  // Axis lines & labels
+  keys.forEach(function(k,i){
+    var a = i*angleStep - Math.PI/2;
+    svg.append('line')
+      .attr('x1',cx).attr('y1',cy)
+      .attr('x2',cx+R*Math.cos(a)).attr('y2',cy+R*Math.sin(a))
+      .attr('stroke','rgba(42,42,62,0.6)').attr('stroke-width',1);
+    var lx = cx+(R+18)*Math.cos(a), ly = cy+(R+18)*Math.sin(a);
+    svg.append('text')
+      .attr('x',lx).attr('y',ly+4)
+      .attr('text-anchor','middle')
+      .attr('font-family','DM Mono').attr('font-size',8)
+      .attr('fill','rgba(110,106,130,0.9)').attr('letter-spacing',1)
+      .text(k.toUpperCase());
+  });
+
+  // Data polygon
+  var dataPoints = keys.map(function(k,i){
+    var v = (accords[k]||0)/100;
+    var a = i*angleStep - Math.PI/2;
+    return [cx+R*v*Math.cos(a), cy+R*v*Math.sin(a)];
+  });
+  svg.append('polygon')
+    .attr('points',dataPoints.map(function(p){return p.join(',');}).join(' '))
+    .attr('fill','rgba(123,111,212,0.18)')
+    .attr('stroke','rgba(123,111,212,0.7)').attr('stroke-width',1.5);
+
+  // Dots
+  dataPoints.forEach(function(p){
+    svg.append('circle').attr('cx',p[0]).attr('cy',p[1]).attr('r',3)
+      .attr('fill','var(--violet)');
+  });
+}
+
+function renderTimeline(d){
+  var svg = d3.select('#timelineChart');
+  var W = document.getElementById('timelineChart').parentElement.clientWidth - 48;
+  var H = 120;
+  svg.attr('width',W).attr('height',H);
+  svg.selectAll('*').remove();
+
+  // Evaporation curves for top/heart/base
+  var hours = [0,0.5,1,2,3,4,6,8,12,24];
+  var curves = [
+    {label:'Top',color:'var(--green)',vals:[100,90,60,20,5,2,0,0,0,0]},
+    {label:'Heart',color:'var(--red)',vals:[20,40,80,90,80,60,35,15,5,0]},
+    {label:'Base',color:'var(--blue)',vals:[5,8,15,25,40,55,70,80,75,50]},
+  ];
+
+  var xScale = d3.scaleLinear().domain([0,24]).range([40,W-10]);
+  var yScale = d3.scaleLinear().domain([0,100]).range([H-20,10]);
+
+  // X axis
+  [0,3,6,12,24].forEach(function(h){
+    svg.append('line').attr('x1',xScale(h)).attr('y1',H-20).attr('x2',xScale(h)).attr('y2',10)
+      .attr('stroke','rgba(42,42,62,0.5)').attr('stroke-width',1);
+    svg.append('text').attr('x',xScale(h)).attr('y',H-6)
+      .attr('text-anchor','middle').attr('font-family','DM Mono').attr('font-size',7)
+      .attr('fill','rgba(110,106,130,0.7)').text(h+'h');
+  });
+
+  // Y label
+  svg.append('text').attr('x',6).attr('y',H/2+4).attr('font-family','DM Mono').attr('font-size',7)
+    .attr('fill','rgba(110,106,130,0.6)').attr('transform','rotate(-90,14,'+H/2+')').text('%');
+
+  curves.forEach(function(c){
+    var line = d3.line().x(function(_,i){return xScale(hours[i]);}).y(function(v){return yScale(v);}).curve(d3.curveCatmullRom);
+    svg.append('path').datum(c.vals).attr('d',line)
+      .attr('fill','none').attr('stroke',c.color).attr('stroke-width',1.5).attr('opacity',0.7);
+    // Legend
+    var li = curves.indexOf(c);
+    svg.append('rect').attr('x',40+li*60).attr('y',H-18).attr('width',8).attr('height',3).attr('fill',c.color).attr('opacity',0.7);
+    svg.append('text').attr('x',52+li*60).attr('y',H-13).attr('font-family','DM Mono').attr('font-size',7).attr('fill','rgba(196,192,212,0.7)').text(c.label);
+  });
+}
+
+function renderAccordBars(d){
+  var el = document.getElementById('accordBars');
+  var accords = d.accords || {};
+  var keys = Object.keys(accords).sort(function(a,b){return accords[b]-accords[a];});
+  var colors = {floral:'#E85252',woody:'#C8A96E',fresh:'#52E852',animalic:'#E8A44A',resinous:'#C8745A',musky:'#9B8FD4',spicy:'#E85298',green:'#52C852'};
+  el.innerHTML = '<div style="font-family:DM Mono;font-size:0.6rem;color:var(--text-dim);letter-spacing:0.2em;text-transform:uppercase;margin-bottom:12px">ACCORD BREAKDOWN</div>';
+  keys.forEach(function(k){
+    var v = accords[k]||0;
+    var c = colors[k]||'var(--text)';
+    el.innerHTML += '<div class="accord-row"><div class="accord-name">'+k+'</div><div class="accord-bar-wrap"><div class="accord-bar-fill" style="width:0%;background:'+c+'" data-target="'+v+'"></div></div><div class="accord-pct">'+v+'</div></div>';
+  });
+  // animate
+  setTimeout(function(){
+    document.querySelectorAll('.accord-bar-fill').forEach(function(bar){
+      bar.style.width = bar.getAttribute('data-target') + '%';
+    });
+  },100);
+}
+
+// ── DATABASE ─────────────────────────────────────────────────────────────────
+function filterDB(){
+  var q = document.getElementById('dbSearch').value.toLowerCase();
+  var cards = document.querySelectorAll('.mol-card');
+  cards.forEach(function(c){
+    var name = c.getAttribute('data-name').toLowerCase();
+    var odor = c.getAttribute('data-odor').toLowerCase();
+    var tags = c.getAttribute('data-tags').toLowerCase();
+    var note = c.getAttribute('data-note').toLowerCase();
+    var matchQ = !q || name.indexOf(q)>=0 || odor.indexOf(q)>=0 || tags.indexOf(q)>=0;
+    var matchF = currentFilter=='all' || note==currentFilter || tags.indexOf(currentFilter)>=0;
+    c.style.display = (matchQ && matchF) ? 'block' : 'none';
+  });
+}
+
+function setFilter(f, btn){
+  currentFilter = f;
+  document.querySelectorAll('.filter-pill').forEach(function(p){p.classList.remove('on');});
+  btn.classList.add('on');
+  filterDB();
+}
+
+function renderDB(){
+  var grid = document.getElementById('dbGrid');
+  grid.innerHTML = '';
+  DB.forEach(function(mol){
+    var inFormula = formula.some(function(f){return f.id==mol.id;});
+    var noteColors = {top:'#52E852',heart:'#E85252',base:'#5295E8'};
+    var tagColors = {floral:'#E85252',woody:'#C8A96E',fresh:'#52E852',animalic:'#E8A44A',resinous:'#C8745A',musky:'#9B8FD4',spicy:'#E85298',green:'#52C852',marine:'#52C8E8',citrus:'#E8D452',earthy:'#A87840',aldehydic:'#D4D452',violet:'#B47BD4',sweet:'#E898A0',balsamic:'#C87850',leathery:'#9A6440',gourmand:'#E8B452',chypre:'#52A870'};
+    var tagHtml = mol.tags.map(function(t){return '<span class="mol-tag" style="background:rgba(255,255,255,0.05);color:'+(tagColors[t]||'#999')+'">'+t+'</span>';}).join('');
+    var noteBadge = '<span class="note-badge note-'+mol.note+'">'+mol.note.toUpperCase()+'</span>';
+    grid.innerHTML += '<div class="mol-card'+(inFormula?' selected':'')+'" data-id="'+mol.id+'" data-name="'+mol.name.toLowerCase()+'" data-odor="'+mol.odor.toLowerCase()+'" data-tags="'+mol.tags.join(',')+'" data-note="'+mol.note+'">'
+      +'<button class="mol-add-btn" onclick="addToFormula(\''+mol.id+'\')" title="Add to formula">'+(inFormula?'✓':'+')+'</button>'
+      +'<div class="mol-name">'+mol.name+'</div>'
+      +'<div class="mol-iupac">CAS: '+mol.cas+' &nbsp;·&nbsp; IFRA: '+mol.ifra+'%</div>'
+      +'<div class="mol-tags">'+noteBadge+' '+tagHtml+'</div>'
+      +'<div class="mol-odor">'+mol.odor+'</div>'
+      +'</div>';
+  });
+}
+
+function addToFormula(id){
+  var mol = DB.find(function(m){return m.id==id;});
+  if(!mol) return;
+  if(formula.some(function(f){return f.id==id;})){
+    showToast(mol.name+' already in formula');return;
+  }
+  formula.push({id:mol.id,name:mol.name,note:mol.note,odor:mol.odor,ifra:mol.ifra,pct:2.0});
+  renderDB();
+  showToast(mol.name+' added to formula');
+}
+
+// ── FORMULA ───────────────────────────────────────────────────────────────────
+function renderFormula(){
+  var empty = document.getElementById('formulaEmpty');
+  var table = document.getElementById('formulaTable');
+  if(!formula.length){empty.style.display='block';table.style.display='none';return;}
+  empty.style.display='none';table.style.display='block';
+
+  var body = document.getElementById('formulaBody');
+  body.innerHTML='';
+  var total=0;
+  formula.forEach(function(item,idx){
+    total+=item.pct;
+    var drops = Math.round(item.pct/100*10*20); // 20 drops per gram
+    var ifraOk = item.pct <= item.ifra;
+    body.innerHTML+='<tr>'
+      +'<td style="font-family:Cormorant Garamond,serif;font-size:1rem">'+item.name+'</td>'
+      +'<td><span class="note-badge note-'+item.note+'">'+item.note.toUpperCase()+'</span></td>'
+      +'<td><span class="odor-tag">'+item.odor.substring(0,50)+(item.odor.length>50?'…':'')+'</span></td>'
+      +'<td><input class="conc-input" type="number" min="0.01" max="'+item.ifra+'" step="0.1" value="'+item.pct.toFixed(2)+'" onchange="updatePct('+idx+',this.value)"></td>'
+      +'<td style="font-family:DM Mono;font-size:0.75rem;color:var(--text-dim)">~'+drops+' drops</td>'
+      +'<td class="'+(ifraOk?'ifra-ok':'ifra-warn')+'">'+(ifraOk?'✓ safe':'⚠ over limit')+'</td>'
+      +'<td><button onclick="removeFromFormula('+idx+')" style="background:none;border:none;color:var(--text-dim);cursor:pointer;font-size:0.75rem;padding:4px 8px">✕</button></td>'
+      +'</tr>';
+  });
+  document.getElementById('totalPct').textContent=total.toFixed(2)+'%';
+}
+
+function updatePct(idx,val){
+  formula[idx].pct=parseFloat(val)||0;
+  renderFormula();
+}
+
+function removeFromFormula(idx){
+  formula.splice(idx,1);
+  renderDB();
+  renderFormula();
+}
+
+async function generateFormula(){
+  if(!vizData && !formula.length){
+    showToast('Visualise a fragrance first or add ingredients from the database');return;
+  }
+  setStatus('thinking','AI generating professional formula...');
+  var prompt = vizData
+    ? 'Create a professional perfume formula for: '+document.getElementById('fragrancePrompt').value+'. Available chemicals: '+DB.map(function(m){return m.name+'('+m.note+',IFRA:'+m.ifra+'%)';}).join(', ')
+    : 'Optimise this perfume formula for single complex note character: '+formula.map(function(f){return f.name+' '+f.pct+'%';}).join(', ');
+
+  try{
+    var response = await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-6',
+        max_tokens:1000,
+        system:'You are a master perfumer. Return ONLY valid JSON, no markdown. Schema: {"formula":[{"ingredient":"exact name from DB","pct":number}],"perfumerNote":"expert 3-sentence note on structure, evolution, and single-note character achieved"}',
+        messages:[{role:'user',content:prompt}]
+      })
+    });
+    var data = await response.json();
+    var text = data.content[0].text.replace(/```json/g,'').replace(/```/g,'').trim();
+    var result = JSON.parse(text);
+    // Map to DB
+    formula = [];
+    (result.formula||[]).forEach(function(item){
+      var mol = DB.find(function(m){return m.name.toLowerCase().indexOf(item.ingredient.toLowerCase())>=0||item.ingredient.toLowerCase().indexOf(m.name.toLowerCase().split(' ')[0])>=0;});
+      if(mol){formula.push({id:mol.id,name:mol.name,note:mol.note,odor:mol.odor,ifra:mol.ifra,pct:item.pct});}
+    });
+    document.getElementById('perfumerNotes').textContent = result.perfumerNote||'';
+    renderFormula();
+    showSection('formula');
+    setStatus('idle','Formula generated — '+formula.length+' ingredients');
+  }catch(e){
+    setStatus('idle','Generation failed');
+    showToast('Error: '+e.message);
+  }
+}
+
+function exportFormula(){
+  if(!formula.length){showToast('No formula to export');return;}
+  var csv='Ingredient,Note,Conc%,In 10g drops,IFRA Limit,IFRA Status\n';
+  formula.forEach(function(f){
+    var drops=Math.round(f.pct/100*10*20);
+    csv+=f.name+','+f.note+','+f.pct.toFixed(2)+','+drops+','+f.ifra+'%,'+(f.pct<=f.ifra?'Safe':'Over limit')+'\n';
+  });
+  var blob = new Blob([csv],{type:'text/csv'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'RK-Perfumery-Formula.csv';
+  a.click();
+  showToast('Formula exported');
+}
+
+// ── UTILS ─────────────────────────────────────────────────────────────────────
+function showToast(msg){
+  var t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(function(){t.classList.remove('show');},2800);
+}
+</script>
+</body>
+</html>
