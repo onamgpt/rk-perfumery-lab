@@ -6,9 +6,9 @@ exports.handler = async function(event) {
     return {statusCode:405,body:'Method Not Allowed'};
   }
   
-  var apiKey = process.env.ANTHROPIC_API_KEY;
+  var apiKey = process.env.ANTHROPIC_API_KEY_rk;
   if(!apiKey){
-    return {statusCode:500,headers:{'Access-Control-Allow-Origin':'*'},body:JSON.stringify({error:{message:'ANTHROPIC_API_KEY not set in environment variables'}})};
+    return {statusCode:500,headers:{'Access-Control-Allow-Origin':'*'},body:JSON.stringify({error:{message:'ANTHROPIC_API_KEY_rk not set in environment variables'}})};
   }
 
   try {
