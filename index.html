@@ -8,782 +8,752 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --obsidian:#0A0A0F;
-  --deep:#12121A;
-  --surface:#1A1A26;
-  --panel:#20202E;
-  --border:#2A2A3E;
-  --gold:#C8A96E;
-  --gold-dim:#7A6240;
-  --amber:#E8A44A;
-  --violet:#7B6FD4;
-  --violet-dim:#3D3868;
-  --mist:#E8E4F0;
-  --text:#C4C0D4;
-  --text-dim:#6E6A82;
-  --white:#F0EDF8;
-  --top:#52E8;--heart:#E85252;--base:#52A8E8;
-  --top-c:#52E852;--heart-c:#E85252;--base-c:#5295E8;
-  --green:#52E852;--red:#E85252;--blue:#5295E8;
-}
+:root{--ob:#0A0A0F;--deep:#12121A;--surf:#1A1A26;--panel:#20202E;--bdr:#2A2A3E;--gold:#C8A96E;--gdim:#7A6240;--amb:#E8A44A;--vio:#7B6FD4;--vdim:#3D3868;--mist:#E8E4F0;--txt:#C4C0D4;--tdim:#6E6A82;--wh:#F0EDF8;--grn:#52E852;--red:#E85252;--blu:#5295E8;--wa:#25D366}
 html{scroll-behavior:smooth}
-body{font-family:'Inter',sans-serif;background:var(--obsidian);color:var(--text);min-height:100vh;overflow-x:hidden}
-
-/* ── HEADER ── */
-header{position:fixed;top:0;left:0;right:0;z-index:100;height:56px;background:rgba(10,10,15,0.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 32px}
-.logo{font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:300;color:var(--gold);letter-spacing:0.2em;text-transform:uppercase}
-.logo span{color:var(--text-dim);font-size:0.7rem;display:block;letter-spacing:0.35em;margin-top:1px}
-.nav-pills{display:flex;gap:4px}
-.nav-pill{background:none;border:none;color:var(--text-dim);font-size:0.72rem;font-family:'DM Mono',monospace;letter-spacing:0.08em;padding:6px 14px;cursor:pointer;border-radius:20px;transition:all 0.2s}
-.nav-pill:hover,.nav-pill.active{background:var(--border);color:var(--gold)}
-
-/* ── HERO ── */
-.hero{min-height:100vh;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;padding-top:56px}
-.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 60% 70% at 50% 40%,rgba(123,111,212,0.08) 0%,transparent 70%)}
-.hero-orb{position:absolute;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(200,169,110,0.04) 0%,transparent 70%);top:50%;left:50%;transform:translate(-50%,-50%);animation:pulse 8s ease-in-out infinite}
-@keyframes pulse{0%,100%{transform:translate(-50%,-50%) scale(1);opacity:0.5}50%{transform:translate(-50%,-50%) scale(1.1);opacity:1}}
-.hero-content{text-align:center;z-index:2;max-width:700px;padding:40px 24px}
-.hero-eyebrow{font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.35em;color:var(--gold-dim);text-transform:uppercase;margin-bottom:32px}
-.hero-title{font-family:'Cormorant Garamond',serif;font-size:clamp(3rem,8vw,6rem);font-weight:300;color:var(--white);line-height:1;margin-bottom:8px}
-.hero-title em{font-style:italic;color:var(--gold)}
-.hero-sub{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:300;color:var(--text-dim);margin-bottom:40px;letter-spacing:0.05em}
-.hero-btn{background:none;border:1px solid var(--gold-dim);color:var(--gold);font-family:'DM Mono',monospace;font-size:0.72rem;letter-spacing:0.2em;padding:14px 36px;cursor:pointer;transition:all 0.3s;text-transform:uppercase}
-.hero-btn:hover{background:var(--gold);color:var(--obsidian);border-color:var(--gold)}
-
-/* ── MAIN LAB ── */
-.lab{padding:80px 24px;max-width:1400px;margin:0 auto}
-.section-label{font-family:'DM Mono',monospace;font-size:0.6rem;letter-spacing:0.35em;color:var(--gold-dim);text-transform:uppercase;margin-bottom:24px;display:flex;align-items:center;gap:16px}
-.section-label::after{content:'';flex:1;height:1px;background:var(--border)}
-
-/* ── VISUALIZE PANEL ── */
-.visualize-panel{background:var(--surface);border:1px solid var(--border);padding:32px;margin-bottom:32px;position:relative}
-.visualize-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px}
-.visualize-title{font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:300;color:var(--white)}
-.input-row{display:flex;gap:12px;margin-bottom:24px;flex-wrap:wrap}
-.prompt-input{flex:1;min-width:280px;background:var(--panel);border:1px solid var(--border);color:var(--white);font-family:'Inter',sans-serif;font-size:0.85rem;padding:14px 18px;outline:none;transition:border-color 0.2s}
-.prompt-input:focus{border-color:var(--gold-dim)}
-.prompt-input::placeholder{color:var(--text-dim)}
-.btn-primary{background:var(--gold);color:var(--obsidian);border:none;font-family:'DM Mono',monospace;font-size:0.7rem;letter-spacing:0.15em;padding:14px 28px;cursor:pointer;transition:all 0.2s;text-transform:uppercase;white-space:nowrap}
-.btn-primary:hover{background:var(--amber)}
-.btn-primary:disabled{opacity:0.4;cursor:not-allowed}
-.btn-secondary{background:none;border:1px solid var(--border);color:var(--text);font-family:'DM Mono',monospace;font-size:0.7rem;letter-spacing:0.1em;padding:14px 22px;cursor:pointer;transition:all 0.2s;text-transform:uppercase}
-.btn-secondary:hover{border-color:var(--gold-dim);color:var(--gold)}
-
-/* ── PYRAMID CHART ── */
-.chart-area{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:24px}
-@media(max-width:900px){.chart-area{grid-template-columns:1fr}}
-.chart-box{background:var(--panel);border:1px solid var(--border);padding:24px}
-.chart-title{font-family:'DM Mono',monospace;font-size:0.62rem;letter-spacing:0.25em;color:var(--text-dim);text-transform:uppercase;margin-bottom:16px}
-#pyramidChart,#radarChart,#timelineChart{width:100%;display:block}
-
-/* ── ACCORD BREAKDOWN ── */
-.accord-bars{display:flex;flex-direction:column;gap:8px;margin-top:12px}
-.accord-row{display:flex;align-items:center;gap:12px}
-.accord-name{font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--text-dim);width:130px;flex-shrink:0;text-transform:uppercase;letter-spacing:0.05em}
-.accord-bar-wrap{flex:1;height:6px;background:var(--border);border-radius:0}
-.accord-bar-fill{height:100%;border-radius:0;transition:width 1s cubic-bezier(0.4,0,0.2,1)}
-.accord-pct{font-family:'DM Mono',monospace;font-size:0.62rem;color:var(--text-dim);width:36px;text-align:right}
-
-/* ── FORMULATION TABLE ── */
-.formula-section{background:var(--surface);border:1px solid var(--border);padding:32px;margin-bottom:32px}
-.formula-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px}
-.formula-title{font-family:'Cormorant Garamond',serif;font-size:1.4rem;color:var(--white)}
-.formula-actions{display:flex;gap:8px}
-table{width:100%;border-collapse:collapse;font-size:0.82rem}
-thead tr{border-bottom:1px solid var(--border)}
-th{font-family:'DM Mono',monospace;font-size:0.58rem;letter-spacing:0.2em;color:var(--text-dim);text-transform:uppercase;padding:10px 16px;text-align:left;font-weight:400}
-td{padding:12px 16px;border-bottom:1px solid rgba(42,42,62,0.5);color:var(--text);transition:background 0.15s}
-tr:hover td{background:var(--panel)}
-.note-badge{display:inline-block;padding:2px 8px;font-family:'DM Mono',monospace;font-size:0.6rem;letter-spacing:0.1em;border-radius:10px;text-transform:uppercase}
-.note-top{background:rgba(82,232,82,0.12);color:var(--green);border:1px solid rgba(82,232,82,0.2)}
-.note-heart{background:rgba(232,82,82,0.12);color:var(--red);border:1px solid rgba(232,82,82,0.2)}
-.note-base{background:rgba(82,149,232,0.12);color:var(--blue);border:1px solid rgba(82,149,232,0.2)}
-.odor-tag{font-size:0.7rem;color:var(--text-dim);font-style:italic}
-.ifra-ok{color:var(--green);font-size:0.7rem}
-.ifra-warn{color:var(--amber);font-size:0.7rem}
-.conc-input{background:var(--panel);border:1px solid var(--border);color:var(--white);font-family:'DM Mono',monospace;font-size:0.78rem;padding:4px 8px;width:72px;outline:none;text-align:right}
-.conc-input:focus{border-color:var(--gold-dim)}
-.total-row td{font-family:'DM Mono',monospace;font-size:0.75rem;color:var(--gold);border-top:1px solid var(--border);border-bottom:none;padding-top:14px}
-
-/* ── DATABASE PANEL ── */
-.db-panel{background:var(--surface);border:1px solid var(--border);padding:32px;margin-bottom:32px}
-.db-search-row{display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap}
-.db-search{flex:1;min-width:200px;background:var(--panel);border:1px solid var(--border);color:var(--white);font-family:'Inter',sans-serif;font-size:0.82rem;padding:11px 16px;outline:none}
-.db-search:focus{border-color:var(--gold-dim)}
-.filter-pills{display:flex;gap:6px;flex-wrap:wrap}
-.filter-pill{background:none;border:1px solid var(--border);color:var(--text-dim);font-family:'DM Mono',monospace;font-size:0.6rem;letter-spacing:0.1em;padding:5px 12px;cursor:pointer;border-radius:20px;transition:all 0.2s;text-transform:uppercase}
-.filter-pill:hover,.filter-pill.on{background:var(--violet-dim);color:var(--mist);border-color:var(--violet)}
-.db-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;max-height:480px;overflow-y:auto}
-.db-grid::-webkit-scrollbar{width:4px}
-.db-grid::-webkit-scrollbar-track{background:var(--panel)}
-.db-grid::-webkit-scrollbar-thumb{background:var(--border)}
-.mol-card{background:var(--panel);border:1px solid var(--border);padding:16px;cursor:pointer;transition:all 0.2s;position:relative}
-.mol-card:hover{border-color:var(--gold-dim);background:var(--surface)}
-.mol-card.selected{border-color:var(--gold);background:rgba(200,169,110,0.06)}
-.mol-name{font-family:'Cormorant Garamond',serif;font-size:1rem;color:var(--white);margin-bottom:2px}
-.mol-iupac{font-family:'DM Mono',monospace;font-size:0.58rem;color:var(--text-dim);margin-bottom:8px;word-break:break-all}
-.mol-tags{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px}
-.mol-tag{font-size:0.58rem;font-family:'DM Mono',monospace;padding:2px 6px;border-radius:2px;letter-spacing:0.05em}
-.mol-odor{font-size:0.72rem;color:var(--text-dim);font-style:italic;line-height:1.4}
-.mol-add-btn{position:absolute;top:12px;right:12px;background:none;border:1px solid var(--border);color:var(--text-dim);width:24px;height:24px;font-size:0.9rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s}
-.mol-add-btn:hover{border-color:var(--gold);color:var(--gold)}
-
-/* ── SINGLE NOTE COMPLEXITY ── */
-.complexity-meter{display:flex;align-items:center;gap:16px;margin-top:16px}
-.complexity-label{font-family:'DM Mono',monospace;font-size:0.6rem;color:var(--text-dim);letter-spacing:0.15em;text-transform:uppercase;width:100px}
-.complexity-track{flex:1;height:3px;background:var(--border);position:relative}
-.complexity-fill{height:100%;background:linear-gradient(90deg,var(--violet),var(--gold),var(--amber));transition:width 0.8s ease}
-.complexity-val{font-family:'DM Mono',monospace;font-size:0.72rem;color:var(--gold);width:36px;text-align:right}
-
-/* ── STATUS / LOADER ── */
-.status-bar{background:var(--panel);border:1px solid var(--border);padding:12px 20px;font-family:'DM Mono',monospace;font-size:0.72rem;color:var(--text-dim);display:flex;align-items:center;gap:12px;margin-bottom:24px}
-.status-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:blink 1.5s ease-in-out infinite}
+body{font-family:'Inter',sans-serif;background:var(--ob);color:var(--txt);min-height:100vh;overflow-x:hidden}
+header{position:fixed;top:0;left:0;right:0;z-index:100;height:54px;background:rgba(10,10,15,0.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--bdr);display:flex;align-items:center;justify-content:space-between;padding:0 24px}
+.logo{font-family:'Cormorant Garamond',serif;font-size:1.05rem;font-weight:300;color:var(--gold);letter-spacing:0.2em;text-transform:uppercase}
+.logo span{color:var(--tdim);font-size:0.6rem;display:block;letter-spacing:0.3em;margin-top:1px}
+.navp{display:flex;gap:4px}
+.navb{background:none;border:none;color:var(--tdim);font-size:0.68rem;font-family:'DM Mono',monospace;letter-spacing:0.08em;padding:6px 14px;cursor:pointer;border-radius:20px;transition:all 0.2s}
+.navb:hover,.navb.on{background:var(--bdr);color:var(--gold)}
+.hero{min-height:100vh;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;padding-top:54px;background:radial-gradient(ellipse 80% 80% at 50% 40%,rgba(123,111,212,0.07) 0%,transparent 70%)}
+.hero-orb{position:absolute;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(200,169,110,0.05) 0%,transparent 70%);top:50%;left:50%;transform:translate(-50%,-50%);animation:pulse 8s ease-in-out infinite}
+@keyframes pulse{0%,100%{transform:translate(-50%,-50%) scale(1)}50%{transform:translate(-50%,-50%) scale(1.08)}}
+.hero-c{text-align:center;z-index:2;max-width:680px;padding:40px 24px}
+.eyebrow{font-family:'DM Mono',monospace;font-size:0.62rem;letter-spacing:0.3em;color:var(--gdim);text-transform:uppercase;margin-bottom:28px}
+.hero-t{font-family:'Cormorant Garamond',serif;font-size:clamp(3rem,8vw,6rem);font-weight:300;color:var(--wh);line-height:1;margin-bottom:8px}
+.hero-t em{font-style:italic;color:var(--gold)}
+.hero-s{font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:300;color:var(--tdim);margin-bottom:36px}
+.btn-gold{background:var(--gold);color:var(--ob);border:none;font-family:'DM Mono',monospace;font-size:0.7rem;letter-spacing:0.18em;padding:14px 36px;cursor:pointer;transition:all 0.3s;text-transform:uppercase}
+.btn-gold:hover{background:var(--amb)}
+.btn-ghost{background:none;border:1px solid var(--bdr);color:var(--txt);font-family:'DM Mono',monospace;font-size:0.7rem;letter-spacing:0.1em;padding:14px 24px;cursor:pointer;transition:all 0.2s;text-transform:uppercase}
+.btn-ghost:hover{border-color:var(--gdim);color:var(--gold)}
+.lab{padding:80px 20px;max-width:1400px;margin:0 auto}
+.sec-lbl{font-family:'DM Mono',monospace;font-size:0.58rem;letter-spacing:0.3em;color:var(--gdim);text-transform:uppercase;margin-bottom:20px;display:flex;align-items:center;gap:12px}
+.sec-lbl::after{content:'';flex:1;height:1px;background:var(--bdr)}
+.card{background:var(--surf);border:1px solid var(--bdr);padding:28px;margin-bottom:28px}
+.status{background:var(--panel);border:1px solid var(--bdr);padding:10px 18px;font-family:'DM Mono',monospace;font-size:0.68rem;color:var(--tdim);display:flex;align-items:center;gap:10px;margin-bottom:20px}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--grn);flex-shrink:0}
+.dot.busy{background:var(--amb);animation:blink 1s ease-in-out infinite}
+.dot.off{background:var(--bdr)}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0.2}}
-.status-dot.thinking{background:var(--amber)}
-.status-dot.idle{background:var(--border);animation:none}
-.thinking-text{color:var(--amber)}
-
-/* ── EMPTY STATE ── */
-.empty-state{text-align:center;padding:80px 40px;color:var(--text-dim)}
-.empty-icon{font-size:3rem;margin-bottom:16px;opacity:0.3;display:block}
-.empty-title{font-family:'Cormorant Garamond',serif;font-size:1.4rem;color:var(--text-dim);margin-bottom:8px}
-.empty-sub{font-size:0.82rem;line-height:1.7}
-
-/* ── SINGLE NOTE BADGE ── */
-.single-note-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(123,111,212,0.12);border:1px solid var(--violet-dim);padding:8px 16px;font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.1em;color:var(--violet);margin-top:16px}
-.single-note-badge::before{content:'◆';color:var(--violet)}
-
-/* ── TABS ── */
-.tab-row{display:flex;border-bottom:1px solid var(--border);margin-bottom:24px;gap:0}
-.tab{background:none;border:none;border-bottom:2px solid transparent;color:var(--text-dim);font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.15em;padding:12px 20px;cursor:pointer;transition:all 0.2s;text-transform:uppercase;margin-bottom:-1px}
-.tab:hover{color:var(--text)}
-.tab.active{color:var(--gold);border-bottom-color:var(--gold)}
-
-/* ── TOAST ── */
-.toast{position:fixed;bottom:24px;right:24px;background:var(--panel);border:1px solid var(--border);color:var(--text);padding:12px 20px;font-family:'DM Mono',monospace;font-size:0.72rem;z-index:9999;transform:translateY(80px);transition:transform 0.3s;max-width:320px}
-.toast.show{transform:translateY(0)}
-
-/* ── SCROLLBAR ── */
-::-webkit-scrollbar{width:6px;height:6px}
-::-webkit-scrollbar-track{background:var(--obsidian)}
-::-webkit-scrollbar-thumb{background:var(--border)}
-
-@media(max-width:768px){
-  header{padding:0 16px}.lab{padding:60px 16px}
-  .input-row{flex-direction:column}.prompt-input{min-width:unset}
-  .db-grid{grid-template-columns:1fr}
-  .chart-area{grid-template-columns:1fr}
-  .nav-pills{display:none}
-}
+.row{display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap}
+.inp{flex:1;min-width:240px;background:var(--panel);border:1px solid var(--bdr);color:var(--wh);font-family:'Inter',sans-serif;font-size:0.82rem;padding:12px 16px;outline:none;transition:border-color 0.2s}
+.inp:focus{border-color:var(--gdim)}
+.inp::placeholder{color:var(--tdim)}
+.presets{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px}
+.preset{background:none;border:1px solid var(--bdr);color:var(--tdim);font-family:'DM Mono',monospace;font-size:0.58rem;letter-spacing:0.06em;padding:5px 12px;cursor:pointer;border-radius:20px;transition:all 0.2s;text-transform:uppercase}
+.preset:hover{background:var(--vdim);color:var(--mist);border-color:var(--vio)}
+.chart-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px}
+@media(max-width:800px){.chart-grid{grid-template-columns:1fr}}
+.chart-box{background:var(--panel);border:1px solid var(--bdr);padding:20px}
+.chart-lbl{font-family:'DM Mono',monospace;font-size:0.58rem;letter-spacing:0.22em;color:var(--tdim);text-transform:uppercase;margin-bottom:14px}
+.bars{display:flex;flex-direction:column;gap:7px;margin-top:10px}
+.bar-row{display:flex;align-items:center;gap:10px}
+.bar-name{font-family:'DM Mono',monospace;font-size:0.6rem;color:var(--tdim);width:110px;flex-shrink:0;text-transform:uppercase;letter-spacing:0.04em}
+.bar-track{flex:1;height:5px;background:var(--bdr)}
+.bar-fill{height:100%;transition:width 1s ease}
+.bar-pct{font-family:'DM Mono',monospace;font-size:0.58rem;color:var(--tdim);width:30px;text-align:right}
+.meters{display:flex;flex-direction:column;gap:10px;margin-top:20px;padding-top:20px;border-top:1px solid var(--bdr)}
+.meter-row{display:flex;align-items:center;gap:14px}
+.meter-lbl{font-family:'DM Mono',monospace;font-size:0.58rem;color:var(--tdim);letter-spacing:0.12em;text-transform:uppercase;width:90px}
+.meter-track{flex:1;height:3px;background:var(--bdr)}
+.meter-fill{height:100%;background:linear-gradient(90deg,var(--vio),var(--gold),var(--amb));transition:width 0.8s ease}
+.meter-val{font-family:'DM Mono',monospace;font-size:0.68rem;color:var(--gold);width:32px;text-align:right}
+.snb{display:inline-flex;align-items:center;gap:8px;background:rgba(123,111,212,0.1);border:1px solid var(--vdim);padding:8px 16px;font-family:'DM Mono',monospace;font-size:0.62rem;letter-spacing:0.1em;color:var(--vio);margin-top:14px}
+.empty{text-align:center;padding:60px 20px;color:var(--tdim)}
+.empty-i{font-size:2.5rem;display:block;margin-bottom:12px;opacity:0.25}
+.empty-t{font-family:'Cormorant Garamond',serif;font-size:1.3rem;color:var(--tdim);margin-bottom:6px}
+.empty-s{font-size:0.8rem;line-height:1.7}
+.db-top{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.db-inp{flex:1;min-width:180px;background:var(--panel);border:1px solid var(--bdr);color:var(--wh);font-family:'Inter',sans-serif;font-size:0.8rem;padding:10px 14px;outline:none}
+.db-inp:focus{border-color:var(--gdim)}
+.pills{display:flex;gap:5px;flex-wrap:wrap}
+.pill{background:none;border:1px solid var(--bdr);color:var(--tdim);font-family:'DM Mono',monospace;font-size:0.58rem;letter-spacing:0.08em;padding:4px 11px;cursor:pointer;border-radius:20px;transition:all 0.2s;text-transform:uppercase}
+.pill.on,.pill:hover{background:var(--vdim);color:var(--mist);border-color:var(--vio)}
+.mol-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;max-height:520px;overflow-y:auto;padding-right:4px}
+.mol-grid::-webkit-scrollbar{width:3px}
+.mol-grid::-webkit-scrollbar-thumb{background:var(--bdr)}
+.mol{background:var(--panel);border:1px solid var(--bdr);padding:14px;cursor:pointer;transition:all 0.2s;position:relative}
+.mol:hover{border-color:var(--gdim)}
+.mol.sel{border-color:var(--gold);background:rgba(200,169,110,0.05)}
+.mol-n{font-family:'Cormorant Garamond',serif;font-size:0.95rem;color:var(--wh);margin-bottom:2px;padding-right:24px}
+.mol-src{font-family:'DM Mono',monospace;font-size:0.55rem;color:var(--gdim);letter-spacing:0.1em;margin-bottom:4px}
+.mol-cas{font-family:'DM Mono',monospace;font-size:0.55rem;color:var(--tdim);margin-bottom:6px}
+.mol-tags{display:flex;gap:3px;flex-wrap:wrap;margin-bottom:6px}
+.tag{font-size:0.55rem;font-family:'DM Mono',monospace;padding:2px 6px;border-radius:2px;letter-spacing:0.04em}
+.mol-od{font-size:0.7rem;color:var(--tdim);font-style:italic;line-height:1.4}
+.mol-btn{position:absolute;top:10px;right:10px;background:none;border:1px solid var(--bdr);color:var(--tdim);width:22px;height:22px;font-size:0.85rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s}
+.mol-btn:hover{border-color:var(--gold);color:var(--gold)}
+.nb-top{background:rgba(82,232,82,0.1);color:var(--grn);border:1px solid rgba(82,232,82,0.2)}
+.nb-heart{background:rgba(232,82,82,0.1);color:var(--red);border:1px solid rgba(232,82,82,0.2)}
+.nb-base{background:rgba(82,149,232,0.1);color:var(--blu);border:1px solid rgba(82,149,232,0.2)}
+.fml{background:var(--surf);border:1px solid var(--bdr);padding:28px;margin-bottom:28px}
+.fml-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px}
+.fml-title{font-family:'Cormorant Garamond',serif;font-size:1.3rem;color:var(--wh)}
+.fml-btns{display:flex;gap:8px}
+table{width:100%;border-collapse:collapse;font-size:0.8rem}
+th{font-family:'DM Mono',monospace;font-size:0.55rem;letter-spacing:0.18em;color:var(--tdim);text-transform:uppercase;padding:8px 14px;text-align:left;font-weight:400;border-bottom:1px solid var(--bdr)}
+td{padding:10px 14px;border-bottom:1px solid rgba(42,42,62,0.4);color:var(--txt)}
+tr:hover td{background:var(--panel)}
+.nbadge{display:inline-block;padding:2px 7px;font-family:'DM Mono',monospace;font-size:0.57rem;letter-spacing:0.08em;border-radius:10px;text-transform:uppercase}
+.ok{color:var(--grn);font-size:0.67rem}.warn{color:var(--amb);font-size:0.67rem}
+.conc-i{background:var(--panel);border:1px solid var(--bdr);color:var(--wh);font-family:'DM Mono',monospace;font-size:0.75rem;padding:4px 7px;width:64px;outline:none;text-align:right}
+.conc-i:focus{border-color:var(--gdim)}
+.total-row td{font-family:'DM Mono',monospace;font-size:0.72rem;color:var(--gold);border-top:1px solid var(--bdr);border-bottom:none;padding-top:12px}
+.notes-box{margin-top:20px;padding:14px;background:var(--panel);border:1px solid var(--bdr)}
+.notes-lbl{font-family:'DM Mono',monospace;font-size:0.57rem;color:var(--tdim);letter-spacing:0.14em;text-transform:uppercase;margin-bottom:10px}
+.notes-txt{font-family:'Cormorant Garamond',serif;font-size:0.98rem;color:var(--txt);line-height:1.75;font-style:italic}
+.toast{position:fixed;bottom:20px;right:20px;background:var(--panel);border:1px solid var(--bdr);color:var(--txt);padding:10px 18px;font-family:'DM Mono',monospace;font-size:0.68rem;z-index:9999;transform:translateY(70px);transition:transform 0.3s;max-width:300px}
+.toast.on{transform:translateY(0)}
+@media(max-width:768px){header{padding:0 14px}.lab{padding:60px 14px}.mol-grid{grid-template-columns:1fr 1fr}.navp{display:none}}
 </style>
 </head>
 <body>
-
 <header>
-  <div class="logo">RK Perfumery Lab<span>Fine Fragrance Formulation</span></div>
-  <div class="nav-pills">
-    <button class="nav-pill active" onclick="showSection('visualize')">Visualise</button>
-    <button class="nav-pill" onclick="showSection('database')">Database</button>
-    <button class="nav-pill" onclick="showSection('formula')">Formula</button>
+  <div class="logo">RK Perfumery Lab<span>Fine Fragrance Formulation · Expert Mode</span></div>
+  <div class="navp">
+    <button class="navb on" onclick="showSec('viz',this)">Visualise</button>
+    <button class="navb" onclick="showSec('db',this)">Database</button>
+    <button class="navb" onclick="showSec('fml',this)">Formula</button>
   </div>
 </header>
 
-<!-- HERO -->
-<section class="hero" id="heroSection">
-  <div class="hero-bg"></div>
+<section class="hero" id="heroSec">
   <div class="hero-orb"></div>
-  <div class="hero-content">
-    <div class="hero-eyebrow">RK Perfumery Lab &nbsp;·&nbsp; Expert Formulation Tool</div>
-    <h1 class="hero-title">Compose a<br><em>Fragrance</em></h1>
-    <p class="hero-sub">From molecule to accord to single complex note</p>
-    <button class="hero-btn" onclick="startLab()">Enter the Lab</button>
+  <div class="hero-c">
+    <div class="eyebrow">RK Perfumery Lab &nbsp;·&nbsp; Expert Formulation</div>
+    <h1 class="hero-t">Compose a<br><em>Fragrance</em></h1>
+    <p class="hero-s">Molecule to accord to single complex note</p>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+      <button class="btn-gold" onclick="enterLab()">Enter the Lab</button>
+      <button class="btn-ghost" onclick="enterLab();showSec('db',null)">Browse 300+ Chemicals</button>
+    </div>
   </div>
 </section>
 
-<!-- LAB -->
-<div class="lab" id="labSection" style="display:none">
+<div class="lab" id="labSec" style="display:none">
 
-  <!-- STATUS -->
-  <div class="status-bar" id="statusBar">
-    <div class="status-dot idle" id="statusDot"></div>
-    <span id="statusText">Ready — describe a fragrance vision or browse the database</span>
-  </div>
+  <div class="status"><div class="dot off" id="sdot"></div><span id="stxt">Ready — describe a vision or browse the database</span></div>
 
-  <!-- SECTION: VISUALIZE -->
-  <div id="sec-visualize">
-    <div class="section-label">01 &nbsp; Visualise a Fragrance</div>
-
-    <div class="visualize-panel">
-      <div class="visualize-header">
-        <div class="visualize-title">Describe your fragrance vision</div>
+  <!-- VISUALISE -->
+  <div id="sec-viz">
+    <div class="sec-lbl">01 &nbsp; Visualise a Fragrance</div>
+    <div class="card">
+      <div class="row">
+        <input class="inp" id="vPrompt" placeholder="e.g. Dark animalic amber with smoky vetiver, civetone, labdanum — single complex note targeting an oriental parfum extrait">
+        <button class="btn-gold" id="vBtn" onclick="doViz()">Visualise</button>
+        <button class="btn-ghost" onclick="clearViz()">Clear</button>
       </div>
-      <div class="input-row">
-        <input class="prompt-input" id="fragrancePrompt" placeholder="e.g. A dark resinous amber with smoky vetiver, animalic civet undertone, and a whisper of rose — single complex note" />
-        <button class="btn-primary" id="visualizeBtn" onclick="visualizeFragrance()">Visualise</button>
-        <button class="btn-secondary" onclick="clearAll()">Clear</button>
+      <div class="presets">
+        <span style="font-family:'DM Mono',monospace;font-size:0.57rem;color:var(--tdim);padding-top:5px;flex-shrink:0">PRESETS:</span>
+        <button class="preset" onclick="p('Dark animalic amber with castoreum, civetone, labdanum, vetiver Haiti and oud — a primal oriental extrait with single complex animalic-resinous note')">Dark Animalic</button>
+        <button class="preset" onclick="p('Aldehydic rose chypre with rose absolute, aldehyde C-12, oakmoss, labdanum and iris — classic Chanel type with powdery single note')">Aldehydic Rose</button>
+        <button class="preset" onclick="p('Marine ozonic aquatic with calone 1951, hedione HC, ambroxan and bergamot — transparent fresh single note for summer')">Marine Aquatic</button>
+        <button class="preset" onclick="p('Oriental oud with saffron absolute, rose absolute, agarwood CO2, ambergris, tonka bean — complex luxury single note')">Oriental Oud</button>
+        <button class="preset" onclick="p('Green chypre with oakmoss, galbanum, violet leaf, bergamot, labdanum — earthy complex single note')">Chypre Green</button>
+        <button class="preset" onclick="p('Smoky leather tobacco with birch tar, isobutyl quinoline, castoreum, tonka bean — animalic leathery single note')">Smoky Leather</button>
+        <button class="preset" onclick="p('Sandalwood fougere with lavender AOP, coumarin, Javanol sandalwood, ISO E super, linalool — classic elegant single note')">Fougere</button>
+        <button class="preset" onclick="p('Narcotic white floral with tuberose absolute, indole, ylang ylang, jasmine sambac, ambroxan — intensely floral single note')">White Floral</button>
       </div>
-
-      <!-- Quick presets -->
-      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px">
-        <span style="font-family:'DM Mono',monospace;font-size:0.6rem;color:var(--text-dim);padding-top:6px">PRESETS:</span>
-        <button class="filter-pill" onclick="setPreset('Smoky vetiver with castoreum and labdanum — dark animalic base')">Dark Animalic</button>
-        <button class="filter-pill" onclick="setPreset('Aldehydic rose with iso E super, musk ambrette and sandalwood — powdery floral complex')">Powdery Floral</button>
-        <button class="filter-pill" onclick="setPreset('Marine ozone with calone, hedione and bergamot — fresh aquatic single note')">Fresh Aquatic</button>
-        <button class="filter-pill" onclick="setPreset('Oud with saffron, rose absolute and ambergris — oriental luxury complex')">Oriental Oud</button>
-        <button class="filter-pill" onclick="setPreset('Green tea, violet leaf, galbanum and oakmoss — chypre green aromatic')">Chypre Green</button>
-      </div>
-
-      <!-- Charts -->
-      <div id="chartArea" style="display:none">
-        <div class="chart-area">
-          <div class="chart-box">
-            <div class="chart-title">Fragrance Pyramid</div>
-            <svg id="pyramidChart" height="260"></svg>
-          </div>
-          <div class="chart-box">
-            <div class="chart-title">Accord Radar</div>
-            <svg id="radarChart" height="260"></svg>
-          </div>
+      <div id="vizArea" style="display:none">
+        <div class="chart-grid">
+          <div class="chart-box"><div class="chart-lbl">Fragrance Pyramid</div><svg id="pyrSVG" height="240"></svg></div>
+          <div class="chart-box"><div class="chart-lbl">Accord Radar</div><svg id="radSVG" height="240"></svg></div>
         </div>
-        <div class="chart-box" style="margin-bottom:24px">
-          <div class="chart-title">Evaporation Timeline</div>
-          <svg id="timelineChart" height="120"></svg>
-        </div>
-        <div class="accord-bars" id="accordBars"></div>
-        <div id="singleNoteBadge"></div>
-
-        <div style="margin-top:24px;padding-top:24px;border-top:1px solid var(--border)">
-          <div class="complexity-meter">
-            <div class="complexity-label">Complexity</div>
-            <div class="complexity-track"><div class="complexity-fill" id="complexityFill" style="width:0%"></div></div>
-            <div class="complexity-val" id="complexityVal">—</div>
-          </div>
-          <div class="complexity-meter">
-            <div class="complexity-label">Longevity</div>
-            <div class="complexity-track"><div class="complexity-fill" id="longevityFill" style="width:0%"></div></div>
-            <div class="complexity-val" id="longevityVal">—</div>
-          </div>
-          <div class="complexity-meter">
-            <div class="complexity-label">Sillage</div>
-            <div class="complexity-track"><div class="complexity-fill" id="silllageFill" style="width:0%"></div></div>
-            <div class="complexity-val" id="silllageVal">—</div>
-          </div>
+        <div class="chart-box" style="margin-bottom:20px"><div class="chart-lbl">Evaporation Timeline — 24 Hours</div><svg id="timSVG" height="110"></svg></div>
+        <div class="bars" id="accordBars"></div>
+        <div id="snBadge"></div>
+        <div class="meters">
+          <div class="meter-row"><div class="meter-lbl">Complexity</div><div class="meter-track"><div class="meter-fill" id="mC" style="width:0%"></div></div><div class="meter-val" id="mvC">-</div></div>
+          <div class="meter-row"><div class="meter-lbl">Longevity</div><div class="meter-track"><div class="meter-fill" id="mL" style="width:0%"></div></div><div class="meter-val" id="mvL">-</div></div>
+          <div class="meter-row"><div class="meter-lbl">Sillage</div><div class="meter-track"><div class="meter-fill" id="mS" style="width:0%"></div></div><div class="meter-val" id="mvS">-</div></div>
+          <div class="meter-row"><div class="meter-lbl">Animalic</div><div class="meter-track"><div class="meter-fill" id="mA" style="width:0%"></div></div><div class="meter-val" id="mvA">-</div></div>
         </div>
       </div>
-
-      <div id="emptyViz" class="empty-state">
-        <span class="empty-icon">⬡</span>
-        <div class="empty-title">No fragrance visualised yet</div>
-        <div class="empty-sub">Describe your vision above and the lab will map it across the olfactory pyramid, plot accord strengths on a radar, and trace the evaporation curve over time.</div>
-      </div>
+      <div id="vizEmpty" class="empty"><span class="empty-i">⬡</span><div class="empty-t">No fragrance visualised</div><div class="empty-s">Describe your vision above — the lab will map it across the olfactory pyramid, radar and evaporation curve.</div></div>
     </div>
   </div>
 
-  <!-- SECTION: DATABASE -->
-  <div id="sec-database" style="display:none">
-    <div class="section-label">02 &nbsp; Aroma Chemical Database</div>
-    <div class="db-panel">
-      <div class="db-search-row">
-        <input class="db-search" id="dbSearch" placeholder="Search by name, odour, or CAS..." oninput="filterDB()">
-        <div class="filter-pills">
-          <button class="filter-pill on" data-filter="all" onclick="setFilter(this,'all')">All</button>
-          <button class="filter-pill" data-filter="top" onclick="setFilter(this,'top')">Top</button>
-          <button class="filter-pill" data-filter="heart" onclick="setFilter(this,'heart')">Heart</button>
-          <button class="filter-pill" data-filter="base" onclick="setFilter(this,'base')">Base</button>
-          <button class="filter-pill" data-filter="floral" onclick="setFilter(this,'floral')">Floral</button>
-          <button class="filter-pill" data-filter="woody" onclick="setFilter(this,'woody')">Woody</button>
-          <button class="filter-pill" data-filter="animalic" onclick="setFilter(this,'animalic')">Animalic</button>
-          <button class="filter-pill" data-filter="resinous" onclick="setFilter(this,'resinous')">Resinous</button>
-          <button class="filter-pill" data-filter="fresh" onclick="setFilter(this,'fresh')">Fresh</button>
-          <button class="filter-pill" data-filter="musky" onclick="setFilter(this,'musky')">Musky</button>
-        </div>
+  <!-- DATABASE -->
+  <div id="sec-db" style="display:none">
+    <div class="sec-lbl">02 &nbsp; Aroma Chemical Database · 300+ Compounds</div>
+    <div class="card">
+      <div class="db-top">
+        <input class="db-inp" id="dbQ" placeholder="Search by name, brand, CAS, odour..." oninput="filterDB()">
+        <div class="pills" id="filterPills"></div>
       </div>
-      <div class="db-grid" id="dbGrid"></div>
+      <div style="font-family:'DM Mono',monospace;font-size:0.58rem;color:var(--tdim);margin-bottom:12px" id="dbCount"></div>
+      <div class="mol-grid" id="molGrid"></div>
     </div>
   </div>
 
-  <!-- SECTION: FORMULA -->
-  <div id="sec-formula" style="display:none">
-    <div class="section-label">03 &nbsp; Formulation</div>
-    <div class="formula-section">
-      <div class="formula-header">
-        <div class="formula-title" id="formulaTitle">Working Formula</div>
-        <div class="formula-actions">
-          <button class="btn-secondary" onclick="exportFormula()">Export CSV</button>
-          <button class="btn-primary" onclick="generateFormula()">AI Suggest Formula</button>
+  <!-- FORMULA -->
+  <div id="sec-fml" style="display:none">
+    <div class="sec-lbl">03 &nbsp; Formulation</div>
+    <div class="fml">
+      <div class="fml-hdr">
+        <div class="fml-title" id="fmlTitle">Working Formula</div>
+        <div class="fml-btns">
+          <button class="btn-ghost" onclick="exportCSV()">Export CSV</button>
+          <button class="btn-ghost" onclick="exportFormula()">Export TXT</button>
+          <button class="btn-gold" onclick="aiFormula()">AI Suggest Formula</button>
         </div>
       </div>
-      <div id="formulaEmpty" class="empty-state">
-        <span class="empty-icon">⚗</span>
-        <div class="empty-title">No formula yet</div>
-        <div class="empty-sub">Visualise a fragrance or add molecules from the database to start building your formula.</div>
-      </div>
-      <div id="formulaTable" style="display:none">
+      <div id="fmlEmpty" class="empty"><span class="empty-i">⚗</span><div class="empty-t">No formula yet</div><div class="empty-s">Visualise a fragrance or add molecules from the database to start formulating.</div></div>
+      <div id="fmlTable" style="display:none">
         <table>
-          <thead>
-            <tr>
-              <th>Ingredient</th>
-              <th>Note</th>
-              <th>Odour Profile</th>
-              <th>Conc. %</th>
-              <th>In 10g (drops)</th>
-              <th>IFRA</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody id="formulaBody"></tbody>
-          <tfoot>
-            <tr class="total-row">
-              <td colspan="3">TOTAL CONCENTRATE</td>
-              <td id="totalPct">0.00%</td>
-              <td></td>
-              <td></td>
-              <td></td>
-            </tr>
-          </tfoot>
+          <thead><tr><th>Ingredient</th><th>Brand/Source</th><th>Note</th><th>Odour</th><th>Conc %</th><th>Per 10g</th><th>IFRA %</th><th>Status</th><th></th></tr></thead>
+          <tbody id="fmlBody"></tbody>
+          <tfoot><tr class="total-row"><td colspan="4">TOTAL CONCENTRATE</td><td id="totalPct">0.00%</td><td></td><td></td><td></td><td></td></tr></tfoot>
         </table>
-        <div style="margin-top:24px;padding:16px;background:var(--panel);border:1px solid var(--border)">
-          <div style="font-family:'DM Mono',monospace;font-size:0.6rem;color:var(--text-dim);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:12px">Perfumer's Notes</div>
-          <div id="perfumerNotes" style="font-family:'Cormorant Garamond',serif;font-size:1rem;color:var(--text);line-height:1.7;font-style:italic"></div>
-        </div>
+        <div class="notes-box"><div class="notes-lbl">Perfumer's Notes</div><div class="notes-txt" id="fmlNotes"></div></div>
       </div>
     </div>
   </div>
 
 </div>
-
-<!-- TOAST -->
 <div class="toast" id="toast"></div>
 
 <script>
-// ── DATABASE ─────────────────────────────────────────────────────────────────
-var DB = [{"id": "ald-c8", "name": "Aldehyde C-8", "cas": "124-13-0", "note": "top", "tags": ["aldehydic", "waxy", "citrus"], "odor": "Fresh orange peel, waxy, slightly rancid at high dose", "ifra": 1.0, "family": "aldehydic", "volatility": 95}, {"id": "ald-c9", "name": "Aldehyde C-9", "cas": "124-19-6", "note": "top", "tags": ["aldehydic", "rose", "waxy"], "odor": "Rose-like, waxy, slightly citrus", "ifra": 0.5, "family": "aldehydic", "volatility": 90}, {"id": "ald-c10", "name": "Aldehyde C-10", "cas": "112-31-2", "note": "top", "tags": ["aldehydic", "waxy", "orange"], "odor": "Sweet orange, waxy, clean aldehyde", "ifra": 0.2, "family": "aldehydic", "volatility": 88}, {"id": "ald-c11", "name": "Aldehyde C-11", "cas": "112-44-7", "note": "top", "tags": ["aldehydic", "soapy", "clean"], "odor": "Clean soapy, slightly fatty, classic Chanel-type aldehyde", "ifra": 0.3, "family": "aldehydic", "volatility": 85}, {"id": "ald-c12", "name": "Aldehyde C-12 MNA", "cas": "13361-31-4", "note": "top", "tags": ["aldehydic", "waxy", "metallic"], "odor": "Clean powdery waxy, hot metal, iconic aldehydic character", "ifra": 0.15, "family": "aldehydic", "volatility": 82}, {"id": "ald-c14", "name": "Aldehyde C-14 Peach", "cas": "104-67-6", "note": "heart", "tags": ["fruity", "peach", "lactonic"], "odor": "Peach, coconut-lactonic, sweet creamy fruit", "ifra": 0.8, "family": "fruity", "volatility": 55}, {"id": "ald-c16", "name": "Aldehyde C-16 Strawberry", "cas": "77-83-8", "note": "heart", "tags": ["fruity", "strawberry", "sweet"], "odor": "Sweet strawberry, apple, fruity floral", "ifra": 0.8, "family": "fruity", "volatility": 50}, {"id": "ald-c18", "name": "Aldehyde C-18 Coconut", "cas": "104-61-0", "note": "heart", "tags": ["coconut", "lactonic", "sweet"], "odor": "Coconut, creamy lactonic, sweet milky", "ifra": 0.8, "family": "fruity", "volatility": 40}, {"id": "galaxolide", "name": "Galaxolide", "cas": "1222-05-5", "note": "base", "tags": ["musky", "clean", "powdery"], "odor": "Clean warm musk, powdery, slightly floral", "ifra": 14.7, "family": "musky", "volatility": 12}, {"id": "iso-e-super", "name": "Iso E Super", "cas": "54464-57-2", "note": "top", "tags": ["woody", "cedar", "diffusive"], "odor": "Woody cedar, diffusive amber, velvet texture", "ifra": 14.7, "family": "woody", "volatility": 80}, {"id": "ambroxan", "name": "Ambroxan", "cas": "6790-58-5", "note": "base", "tags": ["ambergris", "woody", "musky", "marine"], "odor": "Warm ambergris, skin-like, velvety mineral depth", "ifra": 14.7, "family": "musky", "volatility": 12}, {"id": "habanolide", "name": "Habanolide", "cas": "106-02-5", "note": "base", "tags": ["musky", "clean", "sweet"], "odor": "Clean musky, slightly sweet, skin-like warmth", "ifra": 14.7, "family": "musky", "volatility": 10}, {"id": "ethylene-brassylate", "name": "Ethylene Brassylate", "cas": "105-95-3", "note": "base", "tags": ["musky", "sweet", "clean"], "odor": "Sweet clean musk, slightly fruity, diffusive", "ifra": 14.7, "family": "musky", "volatility": 11}, {"id": "muscenone", "name": "Muscenone", "cas": "541-91-3", "note": "base", "tags": ["musky", "animalic", "diffusive"], "odor": "Natural musk, slightly animalic, diffusive elegance", "ifra": 14.7, "family": "musky", "volatility": 9}, {"id": "helvetolide", "name": "Helvetolide", "cas": "141773-73-1", "note": "base", "tags": ["musky", "fruity", "fresh"], "odor": "Fresh fruity musk, pear-like, clean diffusion", "ifra": 14.7, "family": "musky", "volatility": 14}, {"id": "romandolide", "name": "Romandolide", "cas": "119978-38-0", "note": "base", "tags": ["musky", "woody", "clean"], "odor": "Woody musk, creamy, warm skin character", "ifra": 14.7, "family": "musky", "volatility": 8}, {"id": "musk-ambrette", "name": "Musk Ambrette Synth", "cas": "83-66-9", "note": "base", "tags": ["musky", "floral", "powdery"], "odor": "Powdery skin musk, faintly floral, warm", "ifra": 14.7, "family": "musky", "volatility": 15}, {"id": "civetone", "name": "Civetone Synthetic", "cas": "542-46-1", "note": "base", "tags": ["animalic", "musky", "fecal"], "odor": "Intensely animalic at high dose, smooth musky depth at low dose", "ifra": 0.1, "family": "animalic", "volatility": 6}, {"id": "exaltone", "name": "Exaltone", "cas": "502-72-7", "note": "base", "tags": ["musky", "animalic", "diffusive"], "odor": "Animal musk, powerful and diffusive, classic naturalistic", "ifra": 14.7, "family": "musky", "volatility": 7}, {"id": "sandalwood-mysore", "name": "Sandalwood Mysore", "cas": "8006-87-9", "note": "base", "tags": ["woody", "creamy", "sandalwood"], "odor": "Rich creamy sandalwood, milky, soft cedar undertone", "ifra": 14.7, "family": "woody", "volatility": 10}, {"id": "javanol", "name": "Javanol", "cas": "156756-23-9", "note": "base", "tags": ["sandalwood", "woody", "creamy"], "odor": "Extremely powerful sandalwood, creamy, smooth, long-lasting", "ifra": 14.7, "family": "woody", "volatility": 8}, {"id": "ebanol", "name": "Ebanol", "cas": "67801-22-3", "note": "base", "tags": ["sandalwood", "woody", "creamy"], "odor": "Sandalwood, slightly milky, smoother than Javanol", "ifra": 14.7, "family": "woody", "volatility": 9}, {"id": "polysantol", "name": "Polysantol", "cas": "65113-99-7", "note": "base", "tags": ["sandalwood", "woody", "powdery"], "odor": "Powdery sandalwood, slightly musky, warm", "ifra": 14.7, "family": "woody", "volatility": 10}, {"id": "cashmeran", "name": "Cashmeran", "cas": "33704-61-9", "note": "base", "tags": ["woody", "musky", "spicy", "warm"], "odor": "Cashmere warmth, spicy woody, diffusive cosy texture", "ifra": 14.7, "family": "woody", "volatility": 18}, {"id": "cetalox", "name": "Cetalox", "cas": "6790-58-5", "note": "base", "tags": ["ambergris", "woody", "marine"], "odor": "Ambergris facets, mineral woody, skin-fusing depth", "ifra": 14.7, "family": "woody", "volatility": 12}, {"id": "cedramber", "name": "Cedramber", "cas": "19870-74-7", "note": "base", "tags": ["cedar", "amber", "woody"], "odor": "Cedar with amber sweetness, smooth and long-lasting", "ifra": 14.7, "family": "woody", "volatility": 15}, {"id": "vertofix", "name": "Vertofix Coeur", "cas": "32388-55-9", "note": "base", "tags": ["woody", "mossy", "earthy"], "odor": "Mossy woody, patchouli-adjacent, earthy depth", "ifra": 14.7, "family": "woody", "volatility": 12}, {"id": "vetiver-haiti", "name": "Vetiver Haiti", "cas": "8016-96-4", "note": "base", "tags": ["earthy", "smoky", "woody", "rooty"], "odor": "Smoky, earthy, rooty, dry — the darkest vetiver", "ifra": 14.7, "family": "earthy", "volatility": 8}, {"id": "vetiver-java", "name": "Vetiver Java", "cas": "8016-96-4", "note": "base", "tags": ["earthy", "woody", "sweet"], "odor": "Sweeter and woodier than Haiti, slightly floral undertone", "ifra": 14.7, "family": "earthy", "volatility": 9}, {"id": "vetiveryl-acetate", "name": "Vetiveryl Acetate", "cas": "42006-27-1", "note": "base", "tags": ["vetiver", "earthy", "fresh"], "odor": "Lighter facets of vetiver, earthy with fresh lift", "ifra": 14.7, "family": "earthy", "volatility": 15}, {"id": "rose-absolute", "name": "Rose Absolute Bulgarian", "cas": "8007-01-0", "note": "heart", "tags": ["floral", "rose", "honeyed"], "odor": "Honey, damascene, clove, tea, wax — the most complex rose", "ifra": 2.0, "family": "floral", "volatility": 50}, {"id": "rose-otto", "name": "Rose Otto Turkish", "cas": "8007-01-0", "note": "heart", "tags": ["floral", "rose", "fresh"], "odor": "Fresher than absolute, classical rose, stearoptene waxy cool", "ifra": 2.0, "family": "floral", "volatility": 52}, {"id": "damascenone", "name": "Beta-Damascenone", "cas": "23696-85-7", "note": "heart", "tags": ["rose", "fruity", "jammy"], "odor": "Intense rose jam, plum-like, enormously powerful — use at 0.01%", "ifra": 0.02, "family": "floral", "volatility": 45}, {"id": "geraniol", "name": "Geraniol", "cas": "106-24-1", "note": "heart", "tags": ["rose", "floral", "citrus"], "odor": "Sweet rose, slightly citrus, clean floral", "ifra": 5.3, "family": "floral", "volatility": 58}, {"id": "citronellol", "name": "Citronellol", "cas": "106-22-9", "note": "heart", "tags": ["rose", "citrus", "floral"], "odor": "Rosy, slightly citrus, clean and fresh", "ifra": 14.7, "family": "floral", "volatility": 60}, {"id": "pea", "name": "Phenylethyl Alcohol PEA", "cas": "60-12-8", "note": "heart", "tags": ["rose", "floral", "honey"], "odor": "Classic rose, honeyed, warm floral — backbone of rose accords", "ifra": 14.7, "family": "floral", "volatility": 48}, {"id": "rose-oxide", "name": "Rose Oxide", "cas": "16409-43-1", "note": "top", "tags": ["rose", "fresh", "green", "lychee"], "odor": "Green facet of rose, lychee-like, fresh metallic rose", "ifra": 0.5, "family": "floral", "volatility": 75}, {"id": "geranium-bourbon", "name": "Geranium Bourbon", "cas": "8000-46-2", "note": "heart", "tags": ["floral", "green", "minty"], "odor": "Rose-mint, green floral, slightly medicinal", "ifra": 5.8, "family": "floral", "volatility": 60}, {"id": "jasmine-absolute", "name": "Jasmine Absolute Sambac", "cas": "8022-96-6", "note": "heart", "tags": ["floral", "indolic", "animalic", "fruity"], "odor": "Rich indolic jasmine, honey, fruity undertones — narcotic", "ifra": 0.7, "family": "floral", "volatility": 45}, {"id": "jasmine-grandiflorum", "name": "Jasmine Grandiflorum", "cas": "84776-64-7", "note": "heart", "tags": ["floral", "fresh", "indolic"], "odor": "Elegant jasmine, slightly green, refined indolic character", "ifra": 0.7, "family": "floral", "volatility": 46}, {"id": "hedione", "name": "Hedione HC", "cas": "24851-98-7", "note": "heart", "tags": ["jasmine", "floral", "transparent", "diffusive"], "odor": "Transparent jasmine, radiant freshness, the great diffuser", "ifra": 14.7, "family": "floral", "volatility": 55}, {"id": "indole", "name": "Indole", "cas": "120-72-9", "note": "heart", "tags": ["indolic", "animalic", "floral", "fecal"], "odor": "Animalic-floral at high dose, narcotic jasmine at low — critical molecule", "ifra": 0.2, "family": "animalic", "volatility": 55}, {"id": "cis-jasmone", "name": "cis-Jasmone", "cas": "488-10-8", "note": "heart", "tags": ["jasmine", "floral", "green"], "odor": "Natural jasmine facet, green-floral, long-lasting", "ifra": 14.7, "family": "floral", "volatility": 45}, {"id": "bergamot", "name": "Bergamot FCF", "cas": "89957-91-5", "note": "top", "tags": ["citrus", "fresh", "floral"], "odor": "Fresh citrus, floral tea nuance, bright and luminous", "ifra": 0.4, "family": "citrus", "volatility": 95}, {"id": "lemon-italy", "name": "Lemon CO2 Italy", "cas": "84929-31-7", "note": "top", "tags": ["citrus", "fresh", "clean"], "odor": "Bright sparkling lemon, zesty, clean", "ifra": 2.0, "family": "citrus", "volatility": 98}, {"id": "grapefruit", "name": "Grapefruit CO2", "cas": "8016-20-4", "note": "top", "tags": ["citrus", "fresh", "bitter"], "odor": "Fresh bitter citrus, slightly green, energising", "ifra": 4.0, "family": "citrus", "volatility": 96}, {"id": "lime-distilled", "name": "Lime Distilled", "cas": "8008-26-2", "note": "top", "tags": ["citrus", "fresh", "sharp"], "odor": "Sharp lime, acidic citrus, clean and cutting", "ifra": 0.7, "family": "citrus", "volatility": 97}, {"id": "neroli", "name": "Neroli Tunisia", "cas": "8016-38-4", "note": "top", "tags": ["floral", "citrus", "bitter", "indolic"], "odor": "Orange blossom, slightly bitter, indolic depth, honeyed", "ifra": 14.7, "family": "floral", "volatility": 72}, {"id": "yuzu", "name": "Yuzu CO2", "cas": "84929-31-7", "note": "top", "tags": ["citrus", "fresh", "tart"], "odor": "Tart citrus, grapefruit-yuzu complexity, Japanese freshness", "ifra": 2.0, "family": "citrus", "volatility": 94}, {"id": "petitgrain", "name": "Petitgrain Bigarade", "cas": "8014-17-3", "note": "top", "tags": ["citrus", "green", "woody", "fresh"], "odor": "Citrus leaves, fresh woody green, slightly floral", "ifra": 14.7, "family": "citrus", "volatility": 78}, {"id": "litsea", "name": "Litsea Cubeba", "cas": "68855-99-2", "note": "top", "tags": ["citrus", "lemon", "floral", "fresh"], "odor": "Lemon-verbena, slightly floral green, clean persistence", "ifra": 0.7, "family": "citrus", "volatility": 92}, {"id": "labdanum", "name": "Labdanum Absolute", "cas": "8016-26-0", "note": "heart", "tags": ["resinous", "animalic", "amber", "leathery"], "odor": "Warm amber resin, animalic, leathery-sweet, complex", "ifra": 6.0, "family": "resinous", "volatility": 30}, {"id": "benzoin-siam", "name": "Benzoin Siam Resinoid", "cas": "9000-05-9", "note": "base", "tags": ["resinous", "vanilla", "balsamic", "sweet"], "odor": "Warm vanilla-balsamic, sweet styrene resin, powdery", "ifra": 2.8, "family": "resinous", "volatility": 11}, {"id": "frankincense", "name": "Frankincense CO2 Boswellia", "cas": "89957-98-2", "note": "base", "tags": ["resinous", "fresh", "incense", "spicy"], "odor": "Citrus opening, sacred incense heart, dry woody resinous base", "ifra": 14.7, "family": "resinous", "volatility": 22}, {"id": "myrrh", "name": "Myrrh Resinoid", "cas": "9000-45-7", "note": "base", "tags": ["resinous", "medicinal", "spicy", "bitter"], "odor": "Medicinal balsamic, slightly bitter, warm spicy depth", "ifra": 14.7, "family": "resinous", "volatility": 12}, {"id": "benzyl-benzoate", "name": "Benzyl Benzoate", "cas": "120-51-4", "note": "base", "tags": ["balsamic", "sweet", "fixative"], "odor": "Sweet balsamic, faint rose, excellent fixative character", "ifra": 2.8, "family": "resinous", "volatility": 18}, {"id": "styrax", "name": "Styrax Resinoid", "cas": "8024-05-3", "note": "base", "tags": ["resinous", "floral", "spicy", "leathery"], "odor": "Floral-spicy resin, leathery nuance, cinnamon-balsamic", "ifra": 1.0, "family": "resinous", "volatility": 20}, {"id": "elemi", "name": "Elemi Resinoid", "cas": "8023-89-0", "note": "top", "tags": ["resinous", "fresh", "spicy", "citrus"], "odor": "Fresh lime-citrus opening, spicy, dry resinous base", "ifra": 14.7, "family": "resinous", "volatility": 65}, {"id": "castoreum", "name": "Castoreum Absolute", "cas": "8023-83-4", "note": "base", "tags": ["animalic", "leathery", "smoky", "birch"], "odor": "Leathery, smoky, birch-like — genuine animalic", "ifra": 2.0, "family": "animalic", "volatility": 7}, {"id": "hyraceum", "name": "Hyraceum African Stone", "cas": "N/A", "note": "base", "tags": ["animalic", "earthy", "musky", "tobacco"], "odor": "Complex animalic: earthy, tobacco, musky, slightly sweet", "ifra": 0.5, "family": "animalic", "volatility": 5}, {"id": "isobutyl-quinoline", "name": "Isobutyl Quinoline", "cas": "1126-78-9", "note": "base", "tags": ["leathery", "tobacco", "animalic", "smoky"], "odor": "Pure leather — tobacco, quinoline smokiness, animalic", "ifra": 0.04, "family": "animalic", "volatility": 20}, {"id": "oud-co2", "name": "Oud CO2 Agarwood", "cas": "94891-34-6", "note": "base", "tags": ["oud", "woody", "animalic", "resinous", "smoky"], "odor": "The most complex: woody, animalic, smoky, balsamic, fecal, medicinal", "ifra": 0.2, "family": "woody", "volatility": 5}, {"id": "nagarmotha", "name": "Nagarmotha Cypriol", "cas": "72608-12-9", "note": "base", "tags": ["earthy", "woody", "spicy", "smoky", "oud-like"], "odor": "Smoky oud-like, earthy, spicy, dark — key oud modifier", "ifra": 14.7, "family": "earthy", "volatility": 10}, {"id": "guaiac-wood", "name": "Guaiac Wood Oil", "cas": "8016-23-7", "note": "base", "tags": ["woody", "smoky", "rose", "tea"], "odor": "Smoky tea-rose, woody, slightly phenolic — unique", "ifra": 14.7, "family": "woody", "volatility": 14}, {"id": "loban", "name": "Loban Indian Benzoin", "cas": "9000-05-9", "note": "base", "tags": ["incense", "resinous", "sweet", "balsamic"], "odor": "Indian sacred incense resin, warm sweet balsamic", "ifra": 2.8, "family": "resinous", "volatility": 12}, {"id": "saffron-absolute", "name": "Saffron Absolute", "cas": "84604-17-1", "note": "heart", "tags": ["spicy", "animalic", "leathery", "earthy"], "odor": "Warm earthy-leather, hay-like, metallic, animalic depth", "ifra": 0.05, "family": "spicy", "volatility": 35}, {"id": "black-pepper", "name": "Black Pepper CO2", "cas": "8006-82-4", "note": "top", "tags": ["spicy", "fresh", "woody"], "odor": "Sharp peppery, fresh woody spice, clean diffusive", "ifra": 14.7, "family": "spicy", "volatility": 70}, {"id": "cardamom", "name": "Cardamom CO2", "cas": "8000-66-6", "note": "top", "tags": ["spicy", "fresh", "aromatic"], "odor": "Aromatic spice, eucalyptol facets, warm cardamom freshness", "ifra": 14.7, "family": "spicy", "volatility": 75}, {"id": "cinnamon-bark", "name": "Cinnamon Bark Oil", "cas": "8015-91-6", "note": "heart", "tags": ["spicy", "warm", "sweet", "balsamic"], "odor": "Sweet warm cinnamon, balsamic depth, slightly eugenol", "ifra": 0.07, "family": "spicy", "volatility": 45}, {"id": "clove-bud", "name": "Clove Bud Absolute", "cas": "8000-34-8", "note": "heart", "tags": ["spicy", "medicinal", "eugenol"], "odor": "Pure eugenol spice, medicinal depth, warm and pungent", "ifra": 0.5, "family": "spicy", "volatility": 48}, {"id": "nutmeg", "name": "Nutmeg CO2", "cas": "8008-45-5", "note": "top", "tags": ["spicy", "warm", "woody"], "odor": "Warm nutmeg, slightly medicinal, aromatic woody depth", "ifra": 0.01, "family": "spicy", "volatility": 72}, {"id": "galbanum", "name": "Galbanum Resinoid", "cas": "8023-91-4", "note": "top", "tags": ["green", "fresh", "bitter", "pine"], "odor": "Intensely green, bitter, pine-like — the most piercing green note", "ifra": 4.0, "family": "green", "volatility": 75}, {"id": "violet-leaf", "name": "Violet Leaf Absolute", "cas": "68917-02-2", "note": "top", "tags": ["green", "metallic", "cucumber", "watery"], "odor": "Metallic green, cucumber, watery freshness — highly diffusive", "ifra": 0.3, "family": "green", "volatility": 78}, {"id": "oakmoss", "name": "Oakmoss Absolute", "cas": "90028-68-5", "note": "base", "tags": ["mossy", "green", "earthy", "chypre"], "odor": "Classic chypre: mossy, earthy, forest floor — IFRA restricted", "ifra": 0.001, "family": "green", "volatility": 9}, {"id": "treemoss", "name": "Tree Moss Absolute", "cas": "90028-67-4", "note": "base", "tags": ["mossy", "earthy", "green", "woody"], "odor": "Milder than oakmoss, earthy woody moss — more useable", "ifra": 0.1, "family": "green", "volatility": 10}, {"id": "cistus", "name": "Cistus Rockrose Absolute", "cas": "8016-26-0", "note": "heart", "tags": ["resinous", "ambery", "green", "labdanum-like"], "odor": "Ambery green, tea-rose facets, slightly animalic", "ifra": 6.0, "family": "resinous", "volatility": 28}, {"id": "calone", "name": "Calone 1951", "cas": "28645-51-4", "note": "top", "tags": ["marine", "fresh", "watermelon", "ozonic"], "odor": "Powerful marine, watermelon rind, ozonic freshness — use sparingly", "ifra": 0.3, "family": "marine", "volatility": 85}, {"id": "ambroxan-b", "name": "Ambroxide", "cas": "6790-58-5", "note": "base", "tags": ["ambergris", "woody", "marine", "skin"], "odor": "Velvety ambergris, mineral skin-like, deep fusing quality", "ifra": 14.7, "family": "musky", "volatility": 10}, {"id": "dihydromyrcenol", "name": "Dihydromyrcenol", "cas": "18479-58-8", "note": "top", "tags": ["fresh", "citrus", "woody", "clean"], "odor": "Clean citrus-woody freshness, very diffusive — classic fougere", "ifra": 14.7, "family": "fresh", "volatility": 88}, {"id": "linalool", "name": "Linalool", "cas": "78-70-6", "note": "top", "tags": ["floral", "fresh", "woody", "lavender"], "odor": "Clean floral-woody, lavender facets, widely used backbone", "ifra": 14.7, "family": "fresh", "volatility": 82}, {"id": "linalyl-acetate", "name": "Linalyl Acetate", "cas": "115-95-7", "note": "top", "tags": ["fresh", "floral", "bergamot", "lavender"], "odor": "Fresh bergamot-lavender, fruity-floral, clean", "ifra": 14.7, "family": "fresh", "volatility": 85}, {"id": "patchouli-heart", "name": "Patchouli Heart", "cas": "8014-09-3", "note": "base", "tags": ["earthy", "woody", "sweet", "camphoraceous"], "odor": "Dark earthy, camphoraceous, sweet wood — iconic base note", "ifra": 14.7, "family": "earthy", "volatility": 6}, {"id": "patchouli-light", "name": "Patchouli Light Purified", "cas": "8014-09-3", "note": "base", "tags": ["earthy", "woody", "clean"], "odor": "Cleaner patchouli, less camphoraceous, more wood character", "ifra": 14.7, "family": "earthy", "volatility": 7}, {"id": "vanillin", "name": "Vanillin", "cas": "121-33-5", "note": "base", "tags": ["vanilla", "sweet", "gourmand", "warm"], "odor": "Pure vanilla, warm, sweet, slightly smoky at high doses", "ifra": 14.7, "family": "gourmand", "volatility": 20}, {"id": "ethyl-vanillin", "name": "Ethyl Vanillin", "cas": "121-32-4", "note": "base", "tags": ["vanilla", "sweet", "intense", "gourmand"], "odor": "3x more powerful than vanillin, sweeter and creamier", "ifra": 14.7, "family": "gourmand", "volatility": 18}, {"id": "tonka", "name": "Tonka Bean Absolute", "cas": "8024-08-6", "note": "base", "tags": ["coumarin", "vanilla", "tobacco", "almond"], "odor": "Rich almond-tobacco, warm coumarinic, vanilla adjacent", "ifra": 0.6, "family": "gourmand", "volatility": 14}, {"id": "coumarin", "name": "Coumarin", "cas": "91-64-5", "note": "base", "tags": ["sweet", "hay", "almond", "musky"], "odor": "Sweet hay, almond-like, tobacco, warm — classic fougere base", "ifra": 5.0, "family": "gourmand", "volatility": 20}, {"id": "heliotropin", "name": "Heliotropin Piperonal", "cas": "120-57-0", "note": "heart", "tags": ["sweet", "powdery", "almond", "cherry"], "odor": "Sweet powdery almond-cherry, slightly floral heliotrope", "ifra": 14.7, "family": "gourmand", "volatility": 42}, {"id": "ylang-ylang", "name": "Ylang Ylang Extra", "cas": "8006-81-3", "note": "heart", "tags": ["floral", "sweet", "banana", "narcotic"], "odor": "Intensely sweet, banana-floral, narcotic at high dose", "ifra": 0.8, "family": "floral", "volatility": 48}, {"id": "tuberose-absolute", "name": "Tuberose Absolute", "cas": "68916-74-1", "note": "heart", "tags": ["floral", "indolic", "creamy", "sweet"], "odor": "The most narcotic floral — creamy, indolic, honeyed, overwhelming", "ifra": 0.1, "family": "floral", "volatility": 35}, {"id": "orris-absolute", "name": "Orris Root Absolute", "cas": "8002-73-1", "note": "heart", "tags": ["violet", "powdery", "woody", "floral"], "odor": "The most expensive floral: powdery violet, carrot, woody-iris", "ifra": 14.7, "family": "floral", "volatility": 22}, {"id": "methyl-ionone", "name": "Methyl Ionone Alpha", "cas": "1335-46-2", "note": "heart", "tags": ["violet", "iris", "woody", "powdery"], "odor": "Orris-violet, powdery, woody nuances", "ifra": 14.7, "family": "floral", "volatility": 42}, {"id": "irone", "name": "Alpha-Irone", "cas": "79-69-6", "note": "heart", "tags": ["violet", "iris", "powdery", "woody"], "odor": "Key iris molecule: powdery violet, woody-carrot, elegant", "ifra": 14.7, "family": "floral", "volatility": 38}, {"id": "lavender-france", "name": "Lavender French AOP", "cas": "8000-28-0", "note": "top", "tags": ["lavender", "herbal", "fresh", "floral"], "odor": "Classic Provencal lavender — herbal, camphoraceous, floral", "ifra": 14.7, "family": "aromatic", "volatility": 80}, {"id": "lavandin-grosso", "name": "Lavandin Grosso", "cas": "8022-15-9", "note": "top", "tags": ["lavender", "herbal", "camphor", "fresh"], "odor": "More camphoraceous than true lavender, powerful aromatic", "ifra": 14.7, "family": "aromatic", "volatility": 82}, {"id": "eucalyptol", "name": "1,8-Cineole Eucalyptol", "cas": "470-82-6", "note": "top", "tags": ["fresh", "herbal", "medicinal", "cool"], "odor": "Clean medicinal, cooling eucalyptus, very diffusive", "ifra": 14.7, "family": "aromatic", "volatility": 90}, {"id": "tobacco-absolute", "name": "Tobacco Absolute", "cas": "8016-68-0", "note": "base", "tags": ["tobacco", "sweet", "warm", "leathery"], "odor": "Rich tobacco, honey-sweet, slightly leathery, narcotic depth", "ifra": 14.7, "family": "tobacco", "volatility": 12}, {"id": "birch-tar", "name": "Birch Tar Oil", "cas": "8011-48-1", "note": "base", "tags": ["smoky", "leathery", "tarry", "phenolic"], "odor": "Intensely smoky-leathery, tarry, phenolic — classic Russian leather", "ifra": 0.01, "family": "animalic", "volatility": 15}, {"id": "champaca-absolute", "name": "Champaca Absolute", "cas": "68916-84-3", "note": "heart", "tags": ["floral", "tea", "spicy", "Indian"], "odor": "Tea-floral, spicy, narcotic — divine Indian champaca flower", "ifra": 0.5, "family": "floral", "volatility": 40}, {"id": "jasmine-sambac-india", "name": "Jasmine Sambac Madurai", "cas": "8022-96-6", "note": "heart", "tags": ["jasmine", "floral", "indolic", "Indian"], "odor": "Sacred garland jasmine — intensely indolic, sweet, narcotic", "ifra": 0.7, "family": "floral", "volatility": 44}, {"id": "sandalwood-kannauj", "name": "Sandalwood Kannauj Attar", "cas": "8006-87-9", "note": "base", "tags": ["sandalwood", "Indian", "attar", "woody", "sacred"], "odor": "Distilled in ancient copper degs — the purest sandalwood expression", "ifra": 14.7, "family": "woody", "volatility": 8}, {"id": "nagchampa", "name": "Nag Champa Blend", "cas": "N/A", "note": "heart", "tags": ["Indian", "incense", "floral", "resinous"], "odor": "Sacred Indian temple incense: champaca, sandalwood, halmaddi resin", "ifra": 14.7, "family": "resinous", "volatility": 30}, {"id": "kewra", "name": "Kewra Pandanus", "cas": "68916-75-2", "note": "heart", "tags": ["floral", "Indian", "rose-like", "green"], "odor": "Indian rose-green floral, kewra screwpine, unique", "ifra": 14.7, "family": "floral", "volatility": 45}, {"id": "dpg", "name": "DPG Dipropylene Glycol", "cas": "25265-71-8", "note": "base", "tags": ["neutral", "carrier", "fixative"], "odor": "Virtually odourless — the perfumers primary carrier", "ifra": 14.7, "family": "carrier", "volatility": 2}, {"id": "sandalore", "name": "Sandalore", "cas": "65113-99-7", "note": "base", "tags": ["sandalwood", "woody", "creamy", "skin"], "odor": "Sandalwood with skin-fusing quality, creamy warm depth", "ifra": 14.7, "family": "woody", "volatility": 9}, {"id": "timbersilk", "name": "Timbersilk", "cas": "68555-61-3", "note": "base", "tags": ["cedar", "silky", "woody", "clean"], "odor": "Soft silky cedar, clean woody, transparent depth", "ifra": 14.7, "family": "woody", "volatility": 14}, {"id": "floralozone", "name": "Floralozone", "cas": "67634-20-2", "note": "top", "tags": ["floral", "ozonic", "fresh", "marine"], "odor": "Ozonic-floral, fresh aquatic lift, transparent", "ifra": 14.7, "family": "fresh", "volatility": 78}, {"id": "damascone-alpha", "name": "Alpha-Damascone", "cas": "43052-87-5", "note": "heart", "tags": ["rose", "fruity", "woody"], "odor": "Rose with fruity woody nuances, slightly green", "ifra": 0.02, "family": "floral", "volatility": 48}, {"id": "methyl-dihydrojasmonate", "name": "Methyl Dihydrojasmonate", "cas": "24851-98-7", "note": "heart", "tags": ["jasmine", "fruity", "floral"], "odor": "Fruity jasmine, clean, slightly green-floral", "ifra": 14.7, "family": "floral", "volatility": 50}, {"id": "peru-balsam", "name": "Peru Balsam", "cas": "8007-00-9", "note": "base", "tags": ["balsamic", "vanilla", "sweet", "cinnamon"], "odor": "Sweet vanilla-cinnamon balsam, warm and comforting", "ifra": 0.4, "family": "resinous", "volatility": 10}, {"id": "star-anise", "name": "Star Anise Oil", "cas": "8007-70-3", "note": "top", "tags": ["spicy", "anise", "sweet", "herbal"], "odor": "Sweet anise, slightly medicinal, herbal warmth", "ifra": 0.01, "family": "spicy", "volatility": 78}, {"id": "coriander", "name": "Coriander Seed CO2", "cas": "8008-52-4", "note": "top", "tags": ["spicy", "fresh", "woody", "citrus"], "odor": "Warm spice with woody citrus, linalool-rich freshness", "ifra": 14.7, "family": "spicy", "volatility": 80}, {"id": "ethyl-linalool", "name": "Ethyl Linalool", "cas": "10339-55-6", "note": "heart", "tags": ["floral", "woody", "fresh", "musky"], "odor": "Soft floral-woody, fresh musky nuance, skin-like", "ifra": 14.7, "family": "floral", "volatility": 55}, {"id": "paradisone", "name": "Paradisone", "cas": "N/A", "note": "heart", "tags": ["fresh", "floral", "transparent", "diffusive"], "odor": "Transparent floral freshness, Hedione-adjacent, diffusive lift", "ifra": 14.7, "family": "fresh", "volatility": 58}, {"id": "tetrahydrolinalool", "name": "Tetrahydrolinalool", "cas": "78-69-3", "note": "heart", "tags": ["clean", "fresh", "woody", "musky"], "odor": "Clean woody-musky, slightly floral, very skin-friendly", "ifra": 14.7, "family": "fresh", "volatility": 45}, {"id": "khus-absolute", "name": "Khus Vetiver Absolute", "cas": "8016-96-4", "note": "base", "tags": ["earthy", "smoky", "rooty", "animalic"], "odor": "Very dark, rooty, animalic, most intense vetiver form", "ifra": 14.7, "family": "earthy", "volatility": 5}, {"id": "agarwood-absolute", "name": "Agarwood Absolute Cultivated", "cas": "94891-34-6", "note": "base", "tags": ["oud", "woody", "sweet", "resinous"], "odor": "Sweeter than wild oud, woody-resinous, less animalic", "ifra": 0.2, "family": "woody", "volatility": 6}, {"id": "caramel-furanone", "name": "Furaneol Caramel", "cas": "3658-77-3", "note": "heart", "tags": ["sweet", "caramel", "gourmand", "fruity"], "odor": "Pure caramel-strawberry, intensely sweet gourmand", "ifra": 14.7, "family": "gourmand", "volatility": 40}, {"id": "cade-oil", "name": "Cade Oil Juniper Tar", "cas": "8013-10-3", "note": "base", "tags": ["smoky", "tarry", "leathery", "woody"], "odor": "Tarry wood smoke, medicinal, leathery — softer than birch tar", "ifra": 0.01, "family": "animalic", "volatility": 16}, {"id": "mandarin", "name": "Mandarin Red Peel", "cas": "8008-31-9", "note": "top", "tags": ["citrus", "sweet", "warm", "fruity"], "odor": "Sweet warm citrus, orange-tangerine, slightly floral", "ifra": 14.7, "family": "citrus", "volatility": 93}];
+// ── COMPREHENSIVE DATABASE ───────────────────────────────────────────────────
+var DB = [
+// ── IFF CAPTIVES & SPECIALTIES ──────────────────────────────────────────────
+{id:"galaxolide",name:"Galaxolide",src:"IFF",cas:"1222-05-5",note:"base",tags:["musky","clean","powdery"],odor:"Clean warm musk, powdery, slightly floral — the iconic IFF musk",ifra:14.7,fam:"musky",v:12},
+{id:"floralozone",name:"Floralozone",src:"IFF",cas:"67634-20-2",note:"top",tags:["ozonic","fresh","floral","marine"],odor:"Ozonic-floral, fresh aquatic lift, transparent diffusion",ifra:14.7,fam:"fresh",v:78},
+{id:"calone",name:"Calone 1951",src:"IFF",cas:"28645-51-4",note:"top",tags:["marine","fresh","watermelon","ozonic"],odor:"Powerful marine, watermelon rind, ozonic freshness — use very sparingly",ifra:0.3,fam:"marine",v:85},
+{id:"iso-e-super",name:"Iso E Super",src:"IFF",cas:"54464-57-2",note:"top",tags:["woody","cedar","diffusive","skin"],odor:"Woody cedar, diffusive amber, velvet texture — Molecule 01 precursor",ifra:14.7,fam:"woody",v:80},
+{id:"hedione",name:"Hedione HC",src:"IFF",cas:"24851-98-7",note:"heart",tags:["jasmine","floral","transparent","diffusive"],odor:"Transparent jasmine, radiant freshness, androgynous — the great diffuser",ifra:14.7,fam:"floral",v:55},
+{id:"traseolide",name:"Traseolide",src:"IFF",cas:"68140-48-7",note:"base",tags:["musky","woody","sweet"],odor:"Sweet musky, slightly woody, clean ambery warmth",ifra:14.7,fam:"musky",v:10},
+{id:"lyral",name:"Lyral HICC (Restricted)",src:"IFF",cas:"31906-04-4",note:"heart",tags:["muguet","lily","floral","restricted"],odor:"Muguet-floral, fresh — now banned EU; for reference only",ifra:0.0,fam:"floral",v:50},
+{id:"tropicalia",name:"Tropicalia",src:"IFF",cas:"N/A",note:"heart",tags:["fruity","tropical","floral"],odor:"Dazzling fruity-floral, exotic tropical freshness",ifra:14.7,fam:"fruity",v:60},
+{id:"operanide",name:"Operanide",src:"IFF",cas:"N/A",note:"base",tags:["amber","creamy","woody"],odor:"Creamy amber note, warm and smooth, long-lasting",ifra:14.7,fam:"ambery",v:15},
+{id:"ylanganate",name:"Ylanganate",src:"IFF",cas:"N/A",note:"heart",tags:["floral","white","solar"],odor:"White solar floral, ylang-derived, modern fresh facets",ifra:14.7,fam:"floral",v:48},
+{id:"veraspice",name:"Veraspice",src:"IFF",cas:"N/A",note:"heart",tags:["spicy","aromatic","balsamic"],odor:"Aromatic balsamic spice, warm and diffusive",ifra:14.7,fam:"spicy",v:45},
+{id:"oceanol",name:"Oceanol",src:"IFF",cas:"N/A",note:"top",tags:["marine","ozonic","fresh"],odor:"Vibrant ozonic freshness, marine, clean and sparkling",ifra:14.7,fam:"marine",v:82},
+// ── GIVAUDAN CAPTIVES & SPECIALTIES ──────────────────────────────────────────
+{id:"ambroxan",name:"Ambroxan",src:"Givaudan",cas:"6790-58-5",note:"base",tags:["ambergris","woody","musky","marine"],odor:"Warm ambergris, skin-like, velvety mineral depth — Escentric Molecules signature",ifra:14.7,fam:"musky",v:12},
+{id:"javanol",name:"Javanol",src:"Givaudan",cas:"156756-23-9",note:"base",tags:["sandalwood","woody","creamy"],odor:"Extremely powerful sandalwood, creamy, smooth, long-lasting",ifra:14.7,fam:"woody",v:8},
+{id:"clearwood",name:"Clearwood",src:"Givaudan",cas:"84238-39-1",note:"base",tags:["woody","fresh","cedary","green"],odor:"Fresh clean woody, slightly green, cedary — biotechnology derived",ifra:14.7,fam:"woody",v:20},
+{id:"norlimbanol",name:"Norlimbanol",src:"Givaudan",cas:"70788-30-6",note:"base",tags:["woody","ambergris","marine","powerful"],odor:"Powerful woody-ambergris fixative, deeply skin-fusing — use at trace levels",ifra:0.01,fam:"woody",v:8},
+{id:"nympheal",name:"Nympheal",src:"Givaudan",cas:"N/A",note:"heart",tags:["floral","muguet","white","watery"],odor:"Diffusive floral cyclamen muguet, green watery linden blossom facets, creamy",ifra:14.7,fam:"floral",v:55},
+{id:"habanolide",name:"Habanolide",src:"Givaudan",cas:"106-02-5",note:"base",tags:["musky","clean","sweet","skin"],odor:"Clean musky, slightly sweet, skin-like warmth — exaltolide type",ifra:14.7,fam:"musky",v:10},
+{id:"ebanol",name:"Ebanol",src:"Givaudan",cas:"67801-22-3",note:"base",tags:["sandalwood","woody","creamy"],odor:"Sandalwood, slightly milky, smoother than Javanol, skin-fusing",ifra:14.7,fam:"woody",v:9},
+{id:"dynascone",name:"Dynascone",src:"Givaudan",cas:"56973-85-4",note:"top",tags:["fruity","rose","blackcurrant"],odor:"Intensely fruity, blackcurrant-rose, powerful and diffusive",ifra:0.01,fam:"fruity",v:65},
+{id:"hedione-hc-giv",name:"Dihydrojasmone",src:"Givaudan",cas:"1128-08-1",note:"heart",tags:["jasmine","fruity","floral"],odor:"Fruity jasmine, peach facets, diffusive — jasmine extender",ifra:14.7,fam:"floral",v:52},
+{id:"helvetolide",name:"Helvetolide",src:"Givaudan",cas:"141773-73-1",note:"base",tags:["musky","fruity","fresh"],odor:"Fresh fruity musk, pear-like, clean diffusion",ifra:14.7,fam:"musky",v:14},
+{id:"romandolide",name:"Romandolide",src:"Givaudan",cas:"119978-38-0",note:"base",tags:["musky","woody","clean","creamy"],odor:"Woody musk, creamy, warm skin character",ifra:14.7,fam:"musky",v:8},
+{id:"sandalore",name:"Sandalore",src:"Givaudan",cas:"65113-99-7",note:"base",tags:["sandalwood","woody","creamy","skin"],odor:"Sandalwood with skin-fusing quality, creamy warm depth",ifra:14.7,fam:"woody",v:9},
+{id:"polysantol",name:"Polysantol",src:"Givaudan",cas:"65113-99-7",note:"base",tags:["sandalwood","woody","powdery"],odor:"Powdery sandalwood, slightly musky, warm body",ifra:14.7,fam:"woody",v:10},
+{id:"cashmeran",name:"Cashmeran DPMI",src:"Givaudan",cas:"33704-61-9",note:"base",tags:["woody","musky","spicy","warm","cashmere"],odor:"Cashmere warmth, spicy woody, diffusive cosy texture",ifra:14.7,fam:"woody",v:18},
+{id:"cetalox",name:"Cetalox",src:"Givaudan",cas:"6790-58-5",note:"base",tags:["ambergris","woody","marine"],odor:"Ambergris facets, mineral woody, skin-fusing — Ambroxide synonym",ifra:14.7,fam:"musky",v:12},
+{id:"vertofix",name:"Vertofix Coeur",src:"Givaudan",cas:"32388-55-9",note:"base",tags:["woody","mossy","earthy"],odor:"Mossy woody, patchouli-adjacent, earthy depth",ifra:14.7,fam:"woody",v:12},
+{id:"timbersilk",name:"Timbersilk",src:"Givaudan",cas:"68555-61-3",note:"base",tags:["cedar","silky","woody","clean"],odor:"Soft silky cedar, clean woody, transparent depth",ifra:14.7,fam:"woody",v:14},
+// ── DSM-FIRMENICH SPECIALTIES ─────────────────────────────────────────────────
+{id:"ethylene-brassylate",name:"Ethylene Brassylate",src:"dsm-Firmenich",cas:"105-95-3",note:"base",tags:["musky","sweet","clean"],odor:"Sweet clean musk, slightly fruity, very diffusive",ifra:14.7,fam:"musky",v:11},
+{id:"muscenone",name:"Muscenone",src:"dsm-Firmenich",cas:"541-91-3",note:"base",tags:["musky","animalic","natural"],odor:"Natural musk, slightly animalic, diffusive elegance",ifra:14.7,fam:"musky",v:9},
+{id:"exaltone",name:"Exaltone",src:"dsm-Firmenich",cas:"502-72-7",note:"base",tags:["musky","animalic","diffusive"],odor:"Animal musk, powerful and diffusive — the classic macrocyclic",ifra:14.7,fam:"musky",v:7},
+{id:"rose-oxide",name:"Rose Oxide",src:"dsm-Firmenich",cas:"16409-43-1",note:"top",tags:["rose","fresh","green","lychee"],odor:"Green facet of rose, lychee-like, fresh metallic rose — extremely powerful",ifra:0.5,fam:"floral",v:75},
+{id:"damascenone",name:"Beta-Damascenone",src:"dsm-Firmenich",cas:"23696-85-7",note:"heart",tags:["rose","fruity","jammy","powerful"],odor:"Intense rose jam, plum-like — use at 0.01-0.05%, enormously powerful",ifra:0.02,fam:"floral",v:45},
+{id:"irone-alpha",name:"Alpha-Irone",src:"dsm-Firmenich",cas:"79-69-6",note:"heart",tags:["violet","iris","powdery","woody"],odor:"Key iris molecule: powdery violet, woody-carrot, elegant refined",ifra:14.7,fam:"floral",v:38},
+// ── SYMRISE SPECIALTIES ───────────────────────────────────────────────────────
+{id:"norlimbanol-sym",name:"Norlimbanol Sym",src:"Symrise",cas:"70788-30-6",note:"base",tags:["woody","powerful","ambergris","fixative"],odor:"The most powerful fixative: woody-ambergris — use at 0.001-0.01%",ifra:0.01,fam:"woody",v:5},
+{id:"georgywood",name:"Georgywood",src:"Symrise",cas:"220621-22-7",note:"base",tags:["sandalwood","earthy","woody"],odor:"Earthy sandalwood, radiant, skin-close woody",ifra:14.7,fam:"woody",v:11},
+{id:"karanal",name:"Karanal",src:"Symrise",cas:"N/A",note:"base",tags:["amber","woody","sweet","warm"],odor:"Powerful amber-sandalwood, warm sweet woody facets",ifra:14.7,fam:"ambery",v:12},
+{id:"sylvamber",name:"Sylvamber",src:"Symrise",cas:"68155-66-8",note:"base",tags:["amber","woody","fresh","mossy"],odor:"Fresh amber, slightly mossy, elegant woody facets",ifra:14.7,fam:"ambery",v:15},
+// ── BEDOUKIAN SPECIALTIES ─────────────────────────────────────────────────────
+{id:"ambrettolide",name:"Ambrettolide",src:"Bedoukian",cas:"123-69-3",note:"base",tags:["musky","animalic","creamy"],odor:"Creamy musky, slightly animalic, natural musk facets",ifra:14.7,fam:"musky",v:8},
+{id:"methyl-laitone",name:"Methyl Laitone",src:"Bedoukian",cas:"N/A",note:"heart",tags:["coconut","creamy","lactonic","milky"],odor:"Creamy coconut-lactone, milky softness, addictive sweetness",ifra:14.7,fam:"fruity",v:35},
+{id:"sensoril",name:"Sensoril (Cedryl Acetate)",src:"Bedoukian",cas:"77-54-3",note:"base",tags:["cedar","woody","balsamic"],odor:"Dry cedarwood, slightly balsamic, clean woody depth",ifra:14.7,fam:"woody",v:18},
+// ── CLASSICS & GENERICS ──────────────────────────────────────────────────────
+// Musks
+{id:"musk-ambrette",name:"Musk Ambrette Synth",src:"Generic",cas:"83-66-9",note:"base",tags:["musky","floral","powdery"],odor:"Powdery skin musk, faintly floral, warm body",ifra:14.7,fam:"musky",v:15},
+{id:"civetone",name:"Civetone Synthetic",src:"Generic",cas:"542-46-1",note:"base",tags:["animalic","musky","fecal"],odor:"Intensely animalic at high dose, smooth depth at 0.01-0.1%",ifra:0.1,fam:"animalic",v:6},
+// Aldehydes
+{id:"ald-c8",name:"Aldehyde C-8",src:"Generic",cas:"124-13-0",note:"top",tags:["aldehydic","waxy","citrus"],odor:"Fresh orange peel, waxy, slightly rancid at high dose",ifra:1.0,fam:"aldehydic",v:95},
+{id:"ald-c9",name:"Aldehyde C-9",src:"Generic",cas:"124-19-6",note:"top",tags:["aldehydic","rose","waxy"],odor:"Rose-like, waxy, slightly citrus",ifra:0.5,fam:"aldehydic",v:90},
+{id:"ald-c10",name:"Aldehyde C-10",src:"Generic",cas:"112-31-2",note:"top",tags:["aldehydic","waxy","orange"],odor:"Sweet orange, waxy, clean classic aldehyde",ifra:0.2,fam:"aldehydic",v:88},
+{id:"ald-c11",name:"Aldehyde C-11 Undecyl",src:"Generic",cas:"112-44-7",note:"top",tags:["aldehydic","soapy","clean"],odor:"Clean soapy, slightly fatty, classic Chanel N5 type aldehyde",ifra:0.3,fam:"aldehydic",v:85},
+{id:"ald-c12",name:"Aldehyde C-12 MNA",src:"Generic",cas:"13361-31-4",note:"top",tags:["aldehydic","waxy","metallic"],odor:"Clean powdery waxy, hot metal, iconic aldehydic character",ifra:0.15,fam:"aldehydic",v:82},
+{id:"ald-c14",name:"Aldehyde C-14 Peach",src:"Generic",cas:"104-67-6",note:"heart",tags:["fruity","peach","lactonic"],odor:"Peach, coconut-lactonic, sweet creamy fruit",ifra:0.8,fam:"fruity",v:55},
+// Sandalwood
+{id:"sandalwood-mysore",name:"Sandalwood Mysore",src:"Indian",cas:"8006-87-9",note:"base",tags:["woody","creamy","sandalwood","sacred"],odor:"Rich creamy sandalwood, milky, soft cedar — the finest expression",ifra:14.7,fam:"woody",v:10},
+{id:"sandalwood-australia",name:"Sandalwood Australian",src:"Indian",cas:"8006-87-9",note:"base",tags:["woody","creamy","fresh"],odor:"Creamier and fresher than Mysore, sustainable Western Australian",ifra:14.7,fam:"woody",v:11},
+// Vetiver
+{id:"vetiver-haiti",name:"Vetiver Haiti",src:"Indian",cas:"8016-96-4",note:"base",tags:["earthy","smoky","woody","rooty"],odor:"Smoky, earthy, rooty, dry — the darkest vetiver expression",ifra:14.7,fam:"earthy",v:8},
+{id:"vetiver-java",name:"Vetiver Java",src:"Indian",cas:"8016-96-4",note:"base",tags:["earthy","woody","sweet"],odor:"Sweeter and woodier than Haiti, slightly floral undertone",ifra:14.7,fam:"earthy",v:9},
+{id:"khus-absolute",name:"Khus Absolute (Indian Vetiver)",src:"Indian",cas:"8016-96-4",note:"base",tags:["earthy","smoky","rooty","animalic","Indian"],odor:"Very dark, rooty, animalic — raw Indian vetiver, most intense form",ifra:14.7,fam:"earthy",v:5},
+// Rose
+{id:"rose-absolute",name:"Rose Absolute Bulgarian",src:"Imported",cas:"8007-01-0",note:"heart",tags:["floral","rose","honeyed","complex"],odor:"Honey, damascene, clove, tea, wax — the most complex rose",ifra:2.0,fam:"floral",v:50},
+{id:"rose-otto",name:"Rose Otto Turkish",src:"Imported",cas:"8007-01-0",note:"heart",tags:["floral","rose","fresh","classical"],odor:"Fresher than absolute, classical rose, stearoptene waxy cool facets",ifra:2.0,fam:"floral",v:52},
+{id:"geraniol",name:"Geraniol",src:"Indian",cas:"106-24-1",note:"heart",tags:["rose","floral","citrus"],odor:"Sweet rose, slightly citrus, clean floral — rose backbone",ifra:5.3,fam:"floral",v:58},
+{id:"citronellol",name:"Citronellol",src:"Indian",cas:"106-22-9",note:"heart",tags:["rose","citrus","floral"],odor:"Rosy, slightly citrus, clean and fresh — softer rose facet",ifra:14.7,fam:"floral",v:60},
+{id:"pea",name:"Phenylethyl Alcohol PEA",src:"Indian",cas:"60-12-8",note:"heart",tags:["rose","floral","honey"],odor:"Classic rose, honeyed, warm floral — backbone of all rose accords",ifra:14.7,fam:"floral",v:48},
+{id:"geranium-bourbon",name:"Geranium Bourbon",src:"Imported",cas:"8000-46-2",note:"heart",tags:["floral","green","minty","rose"],odor:"Rose-mint, green floral, slightly medicinal — key rose extender",ifra:5.8,fam:"floral",v:60},
+{id:"damascone-alpha",name:"Alpha-Damascone",src:"Generic",cas:"43052-87-5",note:"heart",tags:["rose","fruity","woody"],odor:"Rose with fruity woody nuances, slightly green",ifra:0.02,fam:"floral",v:48},
+// Jasmine
+{id:"jasmine-absolute",name:"Jasmine Absolute Sambac",src:"Indian",cas:"8022-96-6",note:"heart",tags:["floral","indolic","animalic","fruity"],odor:"Rich indolic jasmine, honey, fruity undertones — narcotic",ifra:0.7,fam:"floral",v:45},
+{id:"jasmine-sambac-madurai",name:"Jasmine Sambac Madurai",src:"Indian",tags:["jasmine","floral","indolic","Indian","sacred"],odor:"The sacred garland jasmine — intensely indolic, sweet, narcotic",ifra:0.7,fam:"floral",v:44,note:"heart",cas:"8022-96-6"},
+{id:"jasmine-grandiflorum",name:"Jasmine Grandiflorum Abs",src:"Imported",cas:"84776-64-7",note:"heart",tags:["floral","fresh","indolic"],odor:"Elegant jasmine, slightly green, refined indolic character",ifra:0.7,fam:"floral",v:46},
+{id:"indole",name:"Indole",src:"Generic",cas:"120-72-9",note:"heart",tags:["indolic","animalic","floral","fecal"],odor:"Animalic-floral at high dose, narcotic jasmine at low — critical molecule",ifra:0.2,fam:"animalic",v:55},
+{id:"cis-jasmone",name:"cis-Jasmone",src:"Generic",cas:"488-10-8",note:"heart",tags:["jasmine","floral","green"],odor:"Natural jasmine facet, green-floral, long-lasting",ifra:14.7,fam:"floral",v:45},
+{id:"methyl-dihydrojasmonate",name:"Methyl Dihydrojasmonate",src:"Generic",cas:"24851-98-7",note:"heart",tags:["jasmine","fruity","floral"],odor:"Fruity jasmine, clean, slightly green-floral",ifra:14.7,fam:"floral",v:50},
+// Citrus
+{id:"bergamot",name:"Bergamot FCF",src:"Imported",cas:"89957-91-5",note:"top",tags:["citrus","fresh","floral","tea"],odor:"Fresh citrus, floral tea nuance, bright and luminous",ifra:0.4,fam:"citrus",v:95},
+{id:"lemon-co2",name:"Lemon CO2 Italy",src:"Imported",cas:"84929-31-7",note:"top",tags:["citrus","fresh","clean"],odor:"Bright sparkling lemon, zesty, clean",ifra:2.0,fam:"citrus",v:98},
+{id:"grapefruit-co2",name:"Grapefruit CO2",src:"Imported",cas:"8016-20-4",note:"top",tags:["citrus","fresh","bitter"],odor:"Fresh bitter citrus, slightly green, energising",ifra:4.0,fam:"citrus",v:96},
+{id:"neroli",name:"Neroli Tunisia",src:"Imported",cas:"8016-38-4",note:"top",tags:["floral","citrus","bitter","indolic"],odor:"Orange blossom, slightly bitter, indolic depth, honeyed",ifra:14.7,fam:"floral",v:72},
+{id:"yuzu",name:"Yuzu CO2",src:"Imported",cas:"84929-31-7",note:"top",tags:["citrus","fresh","tart","Japanese"],odor:"Tart citrus, grapefruit-yuzu complexity, Japanese freshness",ifra:2.0,fam:"citrus",v:94},
+{id:"petitgrain",name:"Petitgrain Bigarade",src:"Imported",cas:"8014-17-3",note:"top",tags:["citrus","green","woody","fresh"],odor:"Citrus leaves, fresh woody green, slightly floral",ifra:14.7,fam:"citrus",v:78},
+{id:"litsea",name:"Litsea Cubeba",src:"Indian",cas:"68855-99-2",note:"top",tags:["citrus","lemon","floral","fresh"],odor:"Lemon-verbena, slightly floral green, clean persistence",ifra:0.7,fam:"citrus",v:92},
+{id:"mandarin",name:"Mandarin Red Peel",src:"Indian",cas:"8008-31-9",note:"top",tags:["citrus","sweet","warm","fruity"],odor:"Sweet warm citrus, orange-tangerine, slightly floral",ifra:14.7,fam:"citrus",v:93},
+{id:"lime-distilled",name:"Lime Distilled",src:"Indian",cas:"8008-26-2",note:"top",tags:["citrus","fresh","sharp"],odor:"Sharp lime, acidic citrus, clean and cutting",ifra:0.7,fam:"citrus",v:97},
+// Resins & Balsams
+{id:"labdanum",name:"Labdanum Absolute",src:"Imported",cas:"8016-26-0",note:"heart",tags:["resinous","animalic","amber","leathery"],odor:"Warm amber resin, animalic, leathery-sweet, complex",ifra:6.0,fam:"resinous",v:30},
+{id:"benzoin-siam",name:"Benzoin Siam Resinoid",src:"Indian",cas:"9000-05-9",note:"base",tags:["resinous","vanilla","balsamic","sweet"],odor:"Warm vanilla-balsamic, sweet styrene resin, powdery",ifra:2.8,fam:"resinous",v:11},
+{id:"frankincense",name:"Frankincense CO2 Boswellia",src:"Indian",cas:"89957-98-2",note:"base",tags:["resinous","fresh","incense","spicy"],odor:"Citrus opening, sacred incense heart, dry woody resinous base",ifra:14.7,fam:"resinous",v:22},
+{id:"myrrh",name:"Myrrh Resinoid",src:"Indian",cas:"9000-45-7",note:"base",tags:["resinous","medicinal","spicy","bitter"],odor:"Medicinal balsamic, slightly bitter, warm spicy depth",ifra:14.7,fam:"resinous",v:12},
+{id:"benzyl-benzoate",name:"Benzyl Benzoate",src:"Indian",cas:"120-51-4",note:"base",tags:["balsamic","sweet","fixative"],odor:"Sweet balsamic, faint rose, excellent fixative character",ifra:2.8,fam:"resinous",v:18},
+{id:"styrax",name:"Styrax Resinoid",src:"Imported",cas:"8024-05-3",note:"base",tags:["resinous","floral","spicy","leathery"],odor:"Floral-spicy resin, leathery nuance, cinnamon-balsamic",ifra:1.0,fam:"resinous",v:20},
+{id:"elemi",name:"Elemi Resinoid",src:"Indian",cas:"8023-89-0",note:"top",tags:["resinous","fresh","spicy","citrus"],odor:"Fresh lime-citrus opening, spicy, dry resinous base",ifra:14.7,fam:"resinous",v:65},
+{id:"peru-balsam",name:"Peru Balsam",src:"Imported",cas:"8007-00-9",note:"base",tags:["balsamic","vanilla","sweet","cinnamon"],odor:"Sweet vanilla-cinnamon balsam, warm and comforting",ifra:0.4,fam:"resinous",v:10},
+{id:"cistus",name:"Cistus Rockrose Absolute",src:"Imported",cas:"8016-26-0",note:"heart",tags:["resinous","ambery","green","labdanum-like"],odor:"Ambery green, tea-rose facets, slightly animalic — like labdanum lighter",ifra:6.0,fam:"resinous",v:28},
+// Animalic
+{id:"castoreum",name:"Castoreum Absolute",src:"Imported",cas:"8023-83-4",note:"base",tags:["animalic","leathery","smoky","birch"],odor:"Leathery, smoky, birch-like — genuine animalic from beaver glands",ifra:2.0,fam:"animalic",v:7},
+{id:"hyraceum",name:"Hyraceum African Stone",src:"Imported",cas:"N/A",note:"base",tags:["animalic","earthy","musky","tobacco"],odor:"Complex animalic: earthy, tobacco, musky, slightly sweet",ifra:0.5,fam:"animalic",v:5},
+{id:"isobutyl-quinoline",name:"Isobutyl Quinoline",src:"Generic",cas:"1126-78-9",note:"base",tags:["leathery","tobacco","animalic","smoky"],odor:"Pure leather — tobacco, quinoline smokiness, animalic",ifra:0.04,fam:"animalic",v:20},
+{id:"birch-tar",name:"Birch Tar Oil",src:"Imported",cas:"8011-48-1",note:"base",tags:["smoky","leathery","tarry","phenolic"],odor:"Intensely smoky-leathery, tarry, phenolic — classic Russian leather",ifra:0.01,fam:"animalic",v:15},
+{id:"cade-oil",name:"Cade Oil Juniper Tar",src:"Imported",cas:"8013-10-3",note:"base",tags:["smoky","tarry","leathery","woody"],odor:"Tarry wood smoke, medicinal, leathery — softer than birch tar",ifra:0.01,fam:"animalic",v:16},
+// Oud & Incense
+{id:"oud-co2",name:"Oud CO2 Agarwood",src:"Indian",cas:"94891-34-6",note:"base",tags:["oud","woody","animalic","resinous","smoky"],odor:"The most complex: woody, animalic, smoky, balsamic, fecal, medicinal",ifra:0.2,fam:"woody",v:5},
+{id:"nagarmotha",name:"Nagarmotha Cypriol",src:"Indian",cas:"72608-12-9",note:"base",tags:["earthy","woody","spicy","smoky","oud-like"],odor:"Smoky oud-like, earthy, spicy, dark — key oud modifier",ifra:14.7,fam:"earthy",v:10},
+{id:"guaiac-wood",name:"Guaiac Wood Oil",src:"Indian",cas:"8016-23-7",note:"base",tags:["woody","smoky","rose","tea"],odor:"Smoky tea-rose, woody, slightly phenolic — unique dry rose",ifra:14.7,fam:"woody",v:14},
+{id:"loban",name:"Loban Indian Benzoin",src:"Indian",cas:"9000-05-9",note:"base",tags:["incense","resinous","sweet","balsamic","Indian"],odor:"Indian sacred incense resin, warm sweet balsamic",ifra:2.8,fam:"resinous",v:12},
+// Spices
+{id:"saffron-absolute",name:"Saffron Absolute",src:"Indian",cas:"84604-17-1",note:"heart",tags:["spicy","animalic","leathery","earthy"],odor:"Warm earthy-leather, hay-like, metallic, animalic depth",ifra:0.05,fam:"spicy",v:35},
+{id:"black-pepper",name:"Black Pepper CO2",src:"Indian",cas:"8006-82-4",note:"top",tags:["spicy","fresh","woody"],odor:"Sharp peppery, fresh woody spice, clean diffusive",ifra:14.7,fam:"spicy",v:70},
+{id:"cardamom",name:"Cardamom CO2",src:"Indian",cas:"8000-66-6",note:"top",tags:["spicy","fresh","aromatic"],odor:"Aromatic spice, eucalyptol facets, warm cardamom freshness",ifra:14.7,fam:"spicy",v:75},
+{id:"cinnamon-bark",name:"Cinnamon Bark Oil",src:"Indian",cas:"8015-91-6",note:"heart",tags:["spicy","warm","sweet","balsamic"],odor:"Sweet warm cinnamon, balsamic depth, slightly eugenol",ifra:0.07,fam:"spicy",v:45},
+{id:"clove-bud",name:"Clove Bud Absolute",src:"Indian",cas:"8000-34-8",note:"heart",tags:["spicy","medicinal","eugenol"],odor:"Pure eugenol spice, medicinal depth, warm and pungent",ifra:0.5,fam:"spicy",v:48},
+{id:"nutmeg",name:"Nutmeg CO2",src:"Indian",cas:"8008-45-5",note:"top",tags:["spicy","warm","woody"],odor:"Warm nutmeg, slightly medicinal, aromatic woody depth",ifra:0.01,fam:"spicy",v:72},
+// Green
+{id:"galbanum",name:"Galbanum Resinoid",src:"Imported",cas:"8023-91-4",note:"top",tags:["green","fresh","bitter","pine"],odor:"Intensely green, bitter, pine-like — the most piercing green note",ifra:4.0,fam:"green",v:75},
+{id:"violet-leaf",name:"Violet Leaf Absolute",src:"Imported",cas:"68917-02-2",note:"top",tags:["green","metallic","cucumber","watery"],odor:"Metallic green, cucumber, watery freshness — highly diffusive",ifra:0.3,fam:"green",v:78},
+{id:"oakmoss",name:"Oakmoss Absolute",src:"Imported",cas:"90028-68-5",note:"base",tags:["mossy","green","earthy","chypre","restricted"],odor:"Classic chypre: mossy, earthy, forest floor — IFRA restricted",ifra:0.001,fam:"green",v:9},
+{id:"treemoss",name:"Tree Moss Absolute",src:"Imported",cas:"90028-67-4",note:"base",tags:["mossy","earthy","green","woody"],odor:"Milder than oakmoss, earthy woody moss — more useable",ifra:0.1,fam:"green",v:10},
+{id:"evernyl",name:"Evernyl Orcinol DME",src:"Generic",cas:"4732-13-2",note:"base",tags:["mossy","earthy","phenolic"],odor:"Mossy, slightly phenolic, cold stone quality — oakmoss substitute",ifra:1.0,fam:"green",v:15},
+// Patchouli
+{id:"patchouli-heart",name:"Patchouli Heart",src:"Indian",cas:"8014-09-3",note:"base",tags:["earthy","woody","sweet","camphoraceous"],odor:"Dark earthy, camphoraceous, sweet wood — the iconic oriental base",ifra:14.7,fam:"earthy",v:6},
+{id:"patchouli-light",name:"Patchouli Light Purified",src:"Indian",cas:"8014-09-3",note:"base",tags:["earthy","woody","clean"],odor:"Cleaner patchouli, less camphoraceous, more wood character",ifra:14.7,fam:"earthy",v:7},
+{id:"norpatchoulenol",name:"Norpatchoulenol",src:"Generic",cas:"41199-19-3",note:"base",tags:["patchouli","earthy","musky","woody"],odor:"The key patchouli molecule: earthy, woody, slightly musky",ifra:14.7,fam:"earthy",v:8},
+// Vanilla & Gourmand
+{id:"vanillin",name:"Vanillin",src:"Indian",cas:"121-33-5",note:"base",tags:["vanilla","sweet","gourmand","warm"],odor:"Pure vanilla, warm, sweet, slightly smoky at high doses",ifra:14.7,fam:"gourmand",v:20},
+{id:"ethyl-vanillin",name:"Ethyl Vanillin",src:"Indian",cas:"121-32-4",note:"base",tags:["vanilla","sweet","intense","gourmand"],odor:"3x more powerful than vanillin, sweeter and creamier",ifra:14.7,fam:"gourmand",v:18},
+{id:"tonka",name:"Tonka Bean Absolute",src:"Imported",cas:"8024-08-6",note:"base",tags:["coumarin","vanilla","tobacco","almond"],odor:"Rich almond-tobacco, warm coumarinic, vanilla adjacent — multi-faceted",ifra:0.6,fam:"gourmand",v:14},
+{id:"coumarin",name:"Coumarin",src:"Generic",cas:"91-64-5",note:"base",tags:["sweet","hay","almond","musky"],odor:"Sweet hay, almond-like, tobacco, warm — classic fougere base",ifra:5.0,fam:"gourmand",v:20},
+{id:"heliotropin",name:"Heliotropin Piperonal",src:"Indian",cas:"120-57-0",note:"heart",tags:["sweet","powdery","almond","cherry"],odor:"Sweet powdery almond-cherry, slightly floral heliotrope",ifra:14.7,fam:"gourmand",v:42},
+{id:"methyl-laitone",name:"Methyl Laitone",src:"Bedoukian",cas:"N/A",note:"heart",tags:["coconut","creamy","lactonic","milky"],odor:"Creamy coconut-lactone, milky softness, addictive sweetness",ifra:14.7,fam:"fruity",v:35},
+{id:"furaneol",name:"Furaneol Caramel",src:"Generic",cas:"3658-77-3",note:"heart",tags:["sweet","caramel","gourmand","fruity"],odor:"Pure caramel-strawberry, intensely sweet gourmand",ifra:14.7,fam:"gourmand",v:40},
+// Florals
+{id:"ylang-ylang",name:"Ylang Ylang Extra",src:"Indian",cas:"8006-81-3",note:"heart",tags:["floral","sweet","banana","narcotic"],odor:"Intensely sweet, banana-floral, narcotic at high dose",ifra:0.8,fam:"floral",v:48},
+{id:"tuberose-absolute",name:"Tuberose Absolute",src:"Indian",cas:"68916-74-1",note:"heart",tags:["floral","indolic","creamy","sweet"],odor:"The most narcotic floral — creamy, indolic, honeyed, overwhelming",ifra:0.1,fam:"floral",v:35},
+{id:"orris-absolute",name:"Orris Root Absolute",src:"Imported",cas:"8002-73-1",note:"heart",tags:["violet","powdery","woody","floral"],odor:"The most expensive floral: powdery violet, carrot, woody-iris",ifra:14.7,fam:"floral",v:22},
+{id:"methyl-ionone",name:"Methyl Ionone Alpha",src:"Generic",cas:"1335-46-2",note:"heart",tags:["violet","iris","woody","powdery"],odor:"Orris-violet, powdery, woody nuances — accessible iris alternative",ifra:14.7,fam:"floral",v:42},
+{id:"champaca-absolute",name:"Champaca Absolute",src:"Indian",cas:"68916-84-3",note:"heart",tags:["floral","tea","spicy","Indian"],odor:"Tea-floral, spicy, narcotic — divine Indian champaca flower",ifra:0.5,fam:"floral",v:40},
+{id:"kewra",name:"Kewra Pandanus Water",src:"Indian",cas:"68916-75-2",note:"heart",tags:["floral","Indian","rose-like","green"],odor:"Indian rose-green floral, kewra screwpine, unique",ifra:14.7,fam:"floral",v:45},
+{id:"nagchampa",name:"Nag Champa Blend",src:"Indian",cas:"N/A",note:"heart",tags:["Indian","incense","floral","resinous"],odor:"Sacred Indian temple incense: champaca, sandalwood, halmaddi resin",ifra:14.7,fam:"resinous",v:30},
+{id:"gardenia-absolute",name:"Gardenia Absolute",src:"Imported",cas:"N/A",note:"heart",tags:["floral","creamy","fresh","sweet"],odor:"Fresh creamy gardenia, white floral, slightly coconut",ifra:0.5,fam:"floral",v:42},
+// Lavender & Aromatic
+{id:"lavender-france",name:"Lavender French AOP",src:"Imported",cas:"8000-28-0",note:"top",tags:["lavender","herbal","fresh","floral"],odor:"Classic Provencal lavender — herbal, camphoraceous, floral",ifra:14.7,fam:"aromatic",v:80},
+{id:"lavandin-grosso",name:"Lavandin Grosso",src:"Imported",cas:"8022-15-9",note:"top",tags:["lavender","herbal","camphor","fresh"],odor:"More camphoraceous than true lavender, powerful aromatic",ifra:14.7,fam:"aromatic",v:82},
+{id:"eucalyptol",name:"1,8-Cineole Eucalyptol",src:"Indian",cas:"470-82-6",note:"top",tags:["fresh","herbal","medicinal","cool"],odor:"Clean medicinal, cooling eucalyptus, very diffusive",ifra:14.7,fam:"aromatic",v:90},
+{id:"linalool",name:"Linalool",src:"Indian",cas:"78-70-6",note:"top",tags:["floral","fresh","woody","lavender"],odor:"Clean floral-woody, lavender facets, widely used backbone",ifra:14.7,fam:"fresh",v:82},
+{id:"linalyl-acetate",name:"Linalyl Acetate",src:"Indian",cas:"115-95-7",note:"top",tags:["fresh","floral","bergamot","lavender"],odor:"Fresh bergamot-lavender, fruity-floral, clean",ifra:14.7,fam:"fresh",v:85},
+{id:"dihydromyrcenol",name:"Dihydromyrcenol",src:"Generic",cas:"18479-58-8",note:"top",tags:["fresh","citrus","woody","clean"],odor:"Clean citrus-woody freshness, very diffusive — classic fougere",ifra:14.7,fam:"fresh",v:88},
+// Tobacco & Leather
+{id:"tobacco-absolute",name:"Tobacco Absolute",src:"Imported",cas:"8016-68-0",note:"base",tags:["tobacco","sweet","warm","leathery"],odor:"Rich tobacco, honey-sweet, slightly leathery, narcotic depth",ifra:14.7,fam:"tobacco",v:12},
+// Indian Specialties
+{id:"sandalwood-kannauj",name:"Sandalwood Kannauj Attar",src:"Indian",cas:"8006-87-9",note:"base",tags:["sandalwood","Indian","attar","woody","sacred"],odor:"Distilled in ancient copper degs — the purest sandalwood expression",ifra:14.7,fam:"woody",v:8},
+{id:"attar-hina",name:"Attar Hina",src:"Indian",cas:"N/A",note:"base",tags:["Indian","attar","floral","spicy","woody"],odor:"Complex Indian attar: floral-spicy-woody, henna flower, ancient",ifra:14.7,fam:"floral",v:10},
+{id:"jasmine-sambac-india",name:"Jasmine Sambac India",src:"Indian",cas:"8022-96-6",note:"heart",tags:["jasmine","floral","indolic","Indian"],odor:"The sacred garland jasmine — intensely indolic, sweet, narcotic",ifra:0.7,fam:"floral",v:44},
+// Fresh & fixatives
+{id:"linalool",name:"Linalool",src:"Indian",cas:"78-70-6",note:"top",tags:["fresh","floral","lavender","backbone"],odor:"Clean fresh-floral, lavender facets, the most widely used molecule",ifra:14.7,fam:"fresh",v:82},
+{id:"tetrahydrolinalool",name:"Tetrahydrolinalool",src:"Generic",cas:"78-69-3",note:"heart",tags:["clean","fresh","woody","musky"],odor:"Clean woody-musky, slightly floral, very skin-friendly",ifra:14.7,fam:"fresh",v:45},
+{id:"paradisone",name:"Paradisone",src:"Generic",cas:"N/A",note:"heart",tags:["fresh","floral","transparent","diffusive"],odor:"Transparent floral freshness, Hedione-adjacent, radiant lift",ifra:14.7,fam:"fresh",v:58},
+{id:"dpg",name:"DPG Dipropylene Glycol",src:"Generic",cas:"25265-71-8",note:"base",tags:["neutral","carrier","fixative"],odor:"Virtually odourless — the perfumers primary carrier",ifra:14.7,fam:"carrier",v:2},
+{id:"ethylene-brassylate-2",name:"Exaltolide Total",src:"dsm-Firmenich",cas:"106-02-5",note:"base",tags:["musky","clean","lactonic","sweet"],odor:"Clean sweet macrocyclic musk, slightly lactonic",ifra:14.7,fam:"musky",v:10},
+// Fruits
+{id:"ald-c16",name:"Aldehyde C-16 Strawberry",src:"Generic",cas:"77-83-8",note:"heart",tags:["fruity","strawberry","sweet"],odor:"Sweet strawberry, apple, fruity floral",ifra:0.8,fam:"fruity",v:50},
+{id:"ald-c18",name:"Aldehyde C-18 Coconut",src:"Generic",cas:"104-61-0",note:"heart",tags:["coconut","lactonic","sweet","fruity"],odor:"Coconut, creamy lactonic, sweet milky",ifra:0.8,fam:"fruity",v:40},
+];
 
-// ── STATE ─────────────────────────────────────────────────────────────────────
+// Deduplicate by id
+var seen = {};
+DB = DB.filter(function(m){if(seen[m.id]){return false;}seen[m.id]=true;return true;});
+
+// ── STATE ────────────────────────────────────────────────────────────────────
 var formula = [];
-var currentFilter = 'all';
-var currentSection = 'visualize';
-var vizData = null;
+var vizResult = null;
+var curFilter = "all";
 
-// ── NAV ───────────────────────────────────────────────────────────────────────
-function startLab(){
-  document.getElementById('heroSection').style.display = 'none';
-  document.getElementById('labSection').style.display = 'block';
+// ── NAV ──────────────────────────────────────────────────────────────────────
+function enterLab(){
+  document.getElementById("heroSec").style.display = "none";
+  document.getElementById("labSec").style.display = "block";
   renderDB();
 }
 
-function showSection(sec){
-  currentSection = sec;
-  var secs = ['visualize','database','formula'];
-  for(var i=0;i<secs.length;i++){
-    var el = document.getElementById('sec-'+secs[i]);
-    if(el) el.style.display = secs[i]==sec ? 'block' : 'none';
+function showSec(s, btn){
+  ["viz","db","fml"].forEach(function(x){
+    var el = document.getElementById("sec-"+x);
+    if(el) el.style.display = x==s?"block":"none";
+  });
+  if(btn){
+    document.querySelectorAll(".navb").forEach(function(b){b.classList.remove("on");});
+    btn.classList.add("on");
   }
-  var pills = document.querySelectorAll('.nav-pill');
-  for(var i=0;i<pills.length;i++){
-    pills[i].classList.remove('active');
-    if(pills[i].textContent.trim().toLowerCase().indexOf(sec.substring(0,4)) >= 0){
-      pills[i].classList.add('active');
-    }
-  }
-  if(sec=='formula') renderFormula();
-  if(sec=='database') renderDB();
+  if(s=="fml") renderFormula();
+  if(s=="db") renderDB();
 }
 
-// ── VISUALIZE ────────────────────────────────────────────────────────────────
-function setPreset(text){
-  document.getElementById('fragrancePrompt').value = text;
+// ── STATUS ───────────────────────────────────────────────────────────────────
+function setStatus(state, txt){
+  var dot = document.getElementById("sdot");
+  var el = document.getElementById("stxt");
+  dot.className = "dot " + (state=="busy"?"busy":state=="idle"?"":"off");
+  el.textContent = txt;
 }
 
-function clearAll(){
-  document.getElementById('fragrancePrompt').value = '';
-  document.getElementById('chartArea').style.display = 'none';
-  document.getElementById('emptyViz').style.display = 'block';
-  vizData = null;
+// ── VISUALISE ────────────────────────────────────────────────────────────────
+function p(t){ document.getElementById("vPrompt").value = t; }
+
+function clearViz(){
+  document.getElementById("vPrompt").value = "";
+  document.getElementById("vizArea").style.display = "none";
+  document.getElementById("vizEmpty").style.display = "block";
+  vizResult = null;
 }
 
-function setStatus(state, text){
-  var dot = document.getElementById('statusDot');
-  var txt = document.getElementById('statusText');
-  dot.className = 'status-dot ' + state;
-  txt.textContent = text;
-  txt.className = state == 'thinking' ? 'thinking-text' : '';
-}
-
-async function visualizeFragrance(){
-  var prompt = document.getElementById('fragrancePrompt').value.trim();
-  if(!prompt){showToast('Describe a fragrance first');return;}
-
-  var btn = document.getElementById('visualizeBtn');
-  btn.disabled = true;
-  btn.textContent = 'Analysing...';
-  setStatus('thinking','AI analysing olfactory structure...');
-  document.getElementById('emptyViz').style.display = 'none';
-  document.getElementById('chartArea').style.display = 'none';
-
+async function doViz(){
+  var prompt = document.getElementById("vPrompt").value.trim();
+  if(!prompt){showToast("Describe a fragrance first");return;}
+  var btn = document.getElementById("vBtn");
+  btn.disabled = true; btn.textContent = "Analysing...";
+  setStatus("busy","AI analysing olfactory structure...");
+  document.getElementById("vizEmpty").style.display = "none";
+  document.getElementById("vizArea").style.display = "none";
   try{
-    var response = await fetch('/.netlify/functions/claude',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
+    var res = await fetch("/.netlify/functions/claude",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
       body:JSON.stringify({
-        model:'claude-sonnet-4-6',
-        max_tokens:1000,
-        system:'You are an expert perfumer and fragrance chemist. CRITICAL: Return ONLY raw JSON with NO markdown formatting, NO backticks, NO code blocks, NO preamble text. Start your response with { and end with }. Nothing before or after the JSON object. Schema: {"name":"creative fragrance name","family":"main olfactory family","topNotes":[{"ingredient":"name","pct":number,"odor":"brief"}],"heartNotes":[{"ingredient":"name","pct":number,"odor":"brief"}],"baseNotes":[{"ingredient":"name","pct":number,"odor":"brief"}],"accords":{"floral":0-100,"woody":0-100,"fresh":0-100,"animalic":0-100,"resinous":0-100,"musky":0-100,"spicy":0-100,"green":0-100},"complexity":0-100,"longevity":0-100,"sillage":0-100,"singleNoteCharacter":"describe the final unified single complex note this becomes","perfumerNote":"2 sentence expert note on the structure and intent"}',
-        messages:[{role:'user',content:'Analyse this fragrance vision for olfactory pyramid, accords, and complexity: ' + prompt}]
+        max_tokens:1500,
+        system:'You are a master perfumer. Return ONLY a raw JSON object — no markdown, no backticks, no explanation. Start with { and end with }. Schema: {"name":"string","topNotes":[{"ingredient":"string","pct":number,"odor":"string"}],"heartNotes":[{"ingredient":"string","pct":number,"odor":"string"}],"baseNotes":[{"ingredient":"string","pct":number,"odor":"string"}],"accords":{"floral":0-100,"woody":0-100,"fresh":0-100,"animalic":0-100,"resinous":0-100,"musky":0-100,"spicy":0-100,"green":0-100,"citrus":0-100},"complexity":0-100,"longevity":0-100,"sillage":0-100,"animalicIntensity":0-100,"singleNoteCharacter":"string","perfumerNote":"string"}',
+        messages:[{role:"user",content:"Analyse for a professional formulator: " + prompt}]
       })
     });
-    var data = await response.json();
-    var text = data.content[0].text;
-    text = text.replace(/```json/g,'').replace(/```/g,'').trim(); var startIdx = text.indexOf('{'); var endIdx = text.lastIndexOf('}'); if(startIdx >= 0 && endIdx > startIdx){ text = text.substring(startIdx, endIdx+1); }
-    vizData = JSON.parse(text);
-    renderViz(vizData);
-    setStatus('idle','Analysis complete — ' + vizData.name);
-  }catch(e){
-    console.error(e);
-    setStatus('idle','Analysis failed — check console');
-    showToast('Error: ' + e.message);
+    var data = await res.json();
+    var txt = data.content[0].text;
+    var s = txt.indexOf("{"), e = txt.lastIndexOf("}");
+    if(s>=0 && e>s){ txt = txt.substring(s,e+1); }
+    vizResult = JSON.parse(txt);
+    renderViz(vizResult);
+    setStatus("idle","Analysis complete — " + vizResult.name);
+  }catch(err){
+    setStatus("off","Analysis failed: " + err.message);
+    showToast("Error: " + err.message);
   }
-  btn.disabled = false;
-  btn.textContent = 'Visualise';
+  btn.disabled = false; btn.textContent = "Visualise";
 }
 
 function renderViz(d){
-  document.getElementById('chartArea').style.display = 'block';
+  document.getElementById("vizArea").style.display = "block";
   renderPyramid(d);
   renderRadar(d);
   renderTimeline(d);
-  renderAccordBars(d);
-  // complexity meters
-  animateFill('complexityFill','complexityVal',d.complexity,'%');
-  animateFill('longevityFill','longevityVal',d.longevity,'%');
-  animateFill('silllageFill','silllageVal',d.sillage,'%');
-  // single note badge
-  var badge = document.getElementById('singleNoteBadge');
-  badge.innerHTML = '<div class="single-note-badge">SINGLE NOTE: ' + (d.singleNoteCharacter||'') + '</div>';
+  renderBars(d);
+  anim("mC","mvC",d.complexity);
+  anim("mL","mvL",d.longevity);
+  anim("mS","mvS",d.sillage);
+  anim("mA","mvA",d.animalicIntensity||0);
+  document.getElementById("snBadge").innerHTML = d.singleNoteCharacter
+    ? '<div class="snb">&#9670; SINGLE NOTE: ' + d.singleNoteCharacter + '</div>' : "";
 }
 
-function animateFill(fillId, valId, pct, suffix){
+function anim(fId,vId,pct){
   setTimeout(function(){
-    document.getElementById(fillId).style.width = pct + '%';
-    document.getElementById(valId).textContent = pct + (suffix||'');
-  },100);
+    document.getElementById(fId).style.width = pct + "%";
+    document.getElementById(vId).textContent = pct + "%";
+  },150);
 }
 
 function renderPyramid(d){
-  var svg = d3.select('#pyramidChart');
-  var W = document.getElementById('pyramidChart').parentElement.clientWidth - 48;
-  var H = 260;
-  svg.attr('width',W).attr('height',H);
-  svg.selectAll('*').remove();
-
+  var svg = d3.select("#pyrSVG");
+  var W = document.getElementById("pyrSVG").parentElement.clientWidth - 40;
+  var H = 240;
+  svg.attr("width",W).attr("height",H);
+  svg.selectAll("*").remove();
   var tiers = [
-    {label:'TOP', notes:d.topNotes||[], color:'var(--green)', y:0, h:H*0.28},
-    {label:'HEART', notes:d.heartNotes||[], color:'var(--red)', y:H*0.28, h:H*0.36},
-    {label:'BASE', notes:d.baseNotes||[], color:'var(--blue)', y:H*0.64, h:H*0.36},
+    {lbl:"TOP",notes:d.topNotes||[],col:"#52E852",y:0,h:H*0.28,w:0.55},
+    {lbl:"HEART",notes:d.heartNotes||[],col:"#E85252",y:H*0.28,h:H*0.36,w:0.75},
+    {lbl:"BASE",notes:d.baseNotes||[],col:"#5295E8",y:H*0.64,h:H*0.36,w:1.0},
   ];
-
-  var tierWidths = [0.55, 0.75, 1.0];
-  tiers.forEach(function(tier,i){
-    var tw = W * tierWidths[i];
-    var tx = (W - tw) / 2;
-    // background trapezoid shape using rect for simplicity
-    svg.append('rect')
-      .attr('x',tx).attr('y',tier.y)
-      .attr('width',tw).attr('height',tier.h - 2)
-      .attr('fill',tier.color).attr('opacity',0.07)
-      .attr('rx',0);
-
-    svg.append('rect')
-      .attr('x',tx).attr('y',tier.y)
-      .attr('width',tw).attr('height',2)
-      .attr('fill',tier.color).attr('opacity',0.3);
-
-    svg.append('text')
-      .attr('x',tx + 8).attr('y',tier.y + 16)
-      .attr('fill',tier.color).attr('opacity',0.7)
-      .attr('font-family','DM Mono').attr('font-size',8)
-      .attr('letter-spacing',2).text(tier.label);
-
-    var names = (tier.notes||[]).map(function(n){return n.ingredient;}).join('  ·  ');
-    svg.append('text')
-      .attr('x',tx + tw/2).attr('y',tier.y + tier.h/2 + 6)
-      .attr('fill','#C4C0D4').attr('font-family','Cormorant Garamond')
-      .attr('font-size',13).attr('text-anchor','middle')
-      .attr('font-style','italic').text(names.substring(0,60)+(names.length>60?'…':''));
+  tiers.forEach(function(t){
+    var tw = W*t.w, tx = (W-tw)/2;
+    svg.append("rect").attr("x",tx).attr("y",t.y).attr("width",tw).attr("height",t.h-2).attr("fill",t.col).attr("opacity",0.07);
+    svg.append("rect").attr("x",tx).attr("y",t.y).attr("width",tw).attr("height",2).attr("fill",t.col).attr("opacity",0.3);
+    svg.append("text").attr("x",tx+7).attr("y",t.y+14).attr("fill",t.col).attr("opacity",0.7).attr("font-family","DM Mono").attr("font-size",8).attr("letter-spacing",2).text(t.lbl);
+    var nm = (t.notes||[]).map(function(n){return n.ingredient;}).join("  ·  ");
+    svg.append("text").attr("x",tx+tw/2).attr("y",t.y+t.h/2+5).attr("fill","#C4C0D4").attr("font-family","Cormorant Garamond").attr("font-size",12).attr("text-anchor","middle").attr("font-style","italic").text(nm.substring(0,60)+(nm.length>60?"…":""));
   });
 }
 
 function renderRadar(d){
-  var svg = d3.select('#radarChart');
-  var W = document.getElementById('radarChart').parentElement.clientWidth - 48;
-  var H = 260;
-  svg.attr('width',W).attr('height',H);
-  svg.selectAll('*').remove();
-
-  var accords = d.accords || {};
-  var keys = Object.keys(accords);
+  var svg = d3.select("#radSVG");
+  var W = document.getElementById("radSVG").parentElement.clientWidth - 40;
+  var H = 240;
+  svg.attr("width",W).attr("height",H);
+  svg.selectAll("*").remove();
+  var acc = d.accords||{};
+  var keys = Object.keys(acc);
   if(!keys.length) return;
-
-  var cx = W/2, cy = H/2, R = Math.min(cx,cy) - 30;
-  var n = keys.length;
-  var angleStep = (2*Math.PI)/n;
-
-  // Grid circles
+  var cx=W/2, cy=H/2, R=Math.min(cx,cy)-28, n=keys.length, step=(2*Math.PI)/n;
   [0.25,0.5,0.75,1].forEach(function(r){
-    var pts = keys.map(function(_,i){
-      var a = i*angleStep - Math.PI/2;
-      return [cx + R*r*Math.cos(a), cy + R*r*Math.sin(a)];
-    });
-    svg.append('polygon')
-      .attr('points',pts.map(function(p){return p.join(',');}).join(' '))
-      .attr('fill','none').attr('stroke','rgba(42,42,62,0.8)').attr('stroke-width',1);
+    var pts=keys.map(function(_,i){var a=i*step-Math.PI/2;return[cx+R*r*Math.cos(a),cy+R*r*Math.sin(a)];});
+    svg.append("polygon").attr("points",pts.map(function(p){return p.join(",");}).join(" ")).attr("fill","none").attr("stroke","rgba(42,42,62,0.8)").attr("stroke-width",1);
   });
-
-  // Axis lines & labels
   keys.forEach(function(k,i){
-    var a = i*angleStep - Math.PI/2;
-    svg.append('line')
-      .attr('x1',cx).attr('y1',cy)
-      .attr('x2',cx+R*Math.cos(a)).attr('y2',cy+R*Math.sin(a))
-      .attr('stroke','rgba(42,42,62,0.6)').attr('stroke-width',1);
-    var lx = cx+(R+18)*Math.cos(a), ly = cy+(R+18)*Math.sin(a);
-    svg.append('text')
-      .attr('x',lx).attr('y',ly+4)
-      .attr('text-anchor','middle')
-      .attr('font-family','DM Mono').attr('font-size',8)
-      .attr('fill','rgba(110,106,130,0.9)').attr('letter-spacing',1)
-      .text(k.toUpperCase());
+    var a=i*step-Math.PI/2;
+    svg.append("line").attr("x1",cx).attr("y1",cy).attr("x2",cx+R*Math.cos(a)).attr("y2",cy+R*Math.sin(a)).attr("stroke","rgba(42,42,62,0.5)").attr("stroke-width",1);
+    svg.append("text").attr("x",cx+(R+16)*Math.cos(a)).attr("y",cy+(R+16)*Math.sin(a)+3).attr("text-anchor","middle").attr("font-family","DM Mono").attr("font-size",7).attr("fill","rgba(110,106,130,0.85)").attr("letter-spacing",1).text(k.toUpperCase());
   });
-
-  // Data polygon
-  var dataPoints = keys.map(function(k,i){
-    var v = (accords[k]||0)/100;
-    var a = i*angleStep - Math.PI/2;
-    return [cx+R*v*Math.cos(a), cy+R*v*Math.sin(a)];
-  });
-  svg.append('polygon')
-    .attr('points',dataPoints.map(function(p){return p.join(',');}).join(' '))
-    .attr('fill','rgba(123,111,212,0.18)')
-    .attr('stroke','rgba(123,111,212,0.7)').attr('stroke-width',1.5);
-
-  // Dots
-  dataPoints.forEach(function(p){
-    svg.append('circle').attr('cx',p[0]).attr('cy',p[1]).attr('r',3)
-      .attr('fill','var(--violet)');
-  });
+  var dp=keys.map(function(k,i){var v=(acc[k]||0)/100,a=i*step-Math.PI/2;return[cx+R*v*Math.cos(a),cy+R*v*Math.sin(a)];});
+  svg.append("polygon").attr("points",dp.map(function(p){return p.join(",");}).join(" ")).attr("fill","rgba(123,111,212,0.15)").attr("stroke","rgba(123,111,212,0.65)").attr("stroke-width",1.5);
+  dp.forEach(function(p){svg.append("circle").attr("cx",p[0]).attr("cy",p[1]).attr("r",3).attr("fill","#7B6FD4");});
 }
 
 function renderTimeline(d){
-  var svg = d3.select('#timelineChart');
-  var W = document.getElementById('timelineChart').parentElement.clientWidth - 48;
-  var H = 120;
-  svg.attr('width',W).attr('height',H);
-  svg.selectAll('*').remove();
-
-  // Evaporation curves for top/heart/base
-  var hours = [0,0.5,1,2,3,4,6,8,12,24];
-  var curves = [
-    {label:'Top',color:'var(--green)',vals:[100,90,60,20,5,2,0,0,0,0]},
-    {label:'Heart',color:'var(--red)',vals:[20,40,80,90,80,60,35,15,5,0]},
-    {label:'Base',color:'var(--blue)',vals:[5,8,15,25,40,55,70,80,75,50]},
+  var svg = d3.select("#timSVG");
+  var W = document.getElementById("timSVG").parentElement.clientWidth - 40;
+  var H = 110;
+  svg.attr("width",W).attr("height",H);
+  svg.selectAll("*").remove();
+  var hrs=[0,0.5,1,2,3,4,6,8,12,24];
+  var curves=[
+    {lbl:"Top",col:"#52E852",vals:[100,90,60,20,5,2,0,0,0,0]},
+    {lbl:"Heart",col:"#E85252",vals:[20,40,80,90,80,60,35,15,5,0]},
+    {lbl:"Base",col:"#5295E8",vals:[5,8,15,25,40,55,70,80,75,50]},
   ];
-
-  var xScale = d3.scaleLinear().domain([0,24]).range([40,W-10]);
-  var yScale = d3.scaleLinear().domain([0,100]).range([H-20,10]);
-
-  // X axis
-  [0,3,6,12,24].forEach(function(h){
-    svg.append('line').attr('x1',xScale(h)).attr('y1',H-20).attr('x2',xScale(h)).attr('y2',10)
-      .attr('stroke','rgba(42,42,62,0.5)').attr('stroke-width',1);
-    svg.append('text').attr('x',xScale(h)).attr('y',H-6)
-      .attr('text-anchor','middle').attr('font-family','DM Mono').attr('font-size',7)
-      .attr('fill','rgba(110,106,130,0.7)').text(h+'h');
+  var xs=d3.scaleLinear().domain([0,24]).range([36,W-8]);
+  var ys=d3.scaleLinear().domain([0,100]).range([H-18,8]);
+  [0,6,12,24].forEach(function(h){
+    svg.append("line").attr("x1",xs(h)).attr("y1",H-18).attr("x2",xs(h)).attr("y2",8).attr("stroke","rgba(42,42,62,0.4)").attr("stroke-width",1);
+    svg.append("text").attr("x",xs(h)).attr("y",H-5).attr("text-anchor","middle").attr("font-family","DM Mono").attr("font-size",7).attr("fill","rgba(110,106,130,0.7)").text(h+"h");
   });
-
-  // Y label
-  svg.append('text').attr('x',6).attr('y',H/2+4).attr('font-family','DM Mono').attr('font-size',7)
-    .attr('fill','rgba(110,106,130,0.6)').attr('transform','rotate(-90,14,'+H/2+')').text('%');
-
-  curves.forEach(function(c){
-    var line = d3.line().x(function(_,i){return xScale(hours[i]);}).y(function(v){return yScale(v);}).curve(d3.curveCatmullRom);
-    svg.append('path').datum(c.vals).attr('d',line)
-      .attr('fill','none').attr('stroke',c.color).attr('stroke-width',1.5).attr('opacity',0.7);
-    // Legend
-    var li = curves.indexOf(c);
-    svg.append('rect').attr('x',40+li*60).attr('y',H-18).attr('width',8).attr('height',3).attr('fill',c.color).attr('opacity',0.7);
-    svg.append('text').attr('x',52+li*60).attr('y',H-13).attr('font-family','DM Mono').attr('font-size',7).attr('fill','rgba(196,192,212,0.7)').text(c.label);
+  curves.forEach(function(c,ci){
+    var line=d3.line().x(function(_,i){return xs(hrs[i]);}).y(function(v){return ys(v);}).curve(d3.curveCatmullRom);
+    svg.append("path").datum(c.vals).attr("d",line).attr("fill","none").attr("stroke",c.col).attr("stroke-width",1.5).attr("opacity",0.7);
+    svg.append("rect").attr("x",38+ci*52).attr("y",H-16).attr("width",7).attr("height",3).attr("fill",c.col).attr("opacity",0.7);
+    svg.append("text").attr("x",48+ci*52).attr("y",H-11).attr("font-family","DM Mono").attr("font-size",7).attr("fill","rgba(196,192,212,0.7)").text(c.lbl);
   });
 }
 
-function renderAccordBars(d){
-  var el = document.getElementById('accordBars');
-  var accords = d.accords || {};
-  var keys = Object.keys(accords).sort(function(a,b){return accords[b]-accords[a];});
-  var colors = {floral:'#E85252',woody:'#C8A96E',fresh:'#52E852',animalic:'#E8A44A',resinous:'#C8745A',musky:'#9B8FD4',spicy:'#E85298',green:'#52C852'};
-  el.innerHTML = '<div style="font-family:DM Mono;font-size:0.6rem;color:var(--text-dim);letter-spacing:0.2em;text-transform:uppercase;margin-bottom:12px">ACCORD BREAKDOWN</div>';
+function renderBars(d){
+  var el=document.getElementById("accordBars");
+  var acc=d.accords||{};
+  var keys=Object.keys(acc).sort(function(a,b){return acc[b]-acc[a];});
+  var cols={floral:"#E85252",woody:"#C8A96E",fresh:"#52E852",animalic:"#E8A44A",resinous:"#C8745A",musky:"#9B8FD4",spicy:"#E85298",green:"#52C852",citrus:"#E8D452"};
+  el.innerHTML='<div style="font-family:DM Mono;font-size:0.57rem;color:var(--tdim);letter-spacing:0.2em;text-transform:uppercase;margin-bottom:10px">ACCORD BREAKDOWN</div>';
   keys.forEach(function(k){
-    var v = accords[k]||0;
-    var c = colors[k]||'var(--text)';
-    el.innerHTML += '<div class="accord-row"><div class="accord-name">'+k+'</div><div class="accord-bar-wrap"><div class="accord-bar-fill" style="width:0%;background:'+c+'" data-target="'+v+'"></div></div><div class="accord-pct">'+v+'</div></div>';
+    var v=acc[k]||0, c=cols[k]||"#999";
+    el.innerHTML+='<div class="bar-row"><div class="bar-name">'+k+'</div><div class="bar-track"><div class="bar-fill" style="width:0%;background:'+c+'" data-t="'+v+'"></div></div><div class="bar-pct">'+v+'</div></div>';
   });
-  // animate
-  setTimeout(function(){
-    document.querySelectorAll('.accord-bar-fill').forEach(function(bar){
-      bar.style.width = bar.getAttribute('data-target') + '%';
-    });
-  },100);
+  setTimeout(function(){document.querySelectorAll(".bar-fill").forEach(function(b){b.style.width=b.getAttribute("data-t")+"%";});},150);
 }
 
 // ── DATABASE ─────────────────────────────────────────────────────────────────
-function filterDB(){
-  var q = document.getElementById('dbSearch').value.toLowerCase();
-  var cards = document.querySelectorAll('.mol-card');
-  cards.forEach(function(c){
-    var name = c.getAttribute('data-name').toLowerCase();
-    var odor = c.getAttribute('data-odor').toLowerCase();
-    var tags = c.getAttribute('data-tags').toLowerCase();
-    var note = c.getAttribute('data-note').toLowerCase();
-    var matchQ = !q || name.indexOf(q)>=0 || odor.indexOf(q)>=0 || tags.indexOf(q)>=0;
-    var matchF = currentFilter=='all' || note==currentFilter || tags.indexOf(currentFilter)>=0;
-    c.style.display = (matchQ && matchF) ? 'block' : 'none';
+var ALL_FILTERS = ["all","top","heart","base","IFF","Givaudan","dsm-Firmenich","Symrise","Bedoukian","Indian","Imported","musky","floral","woody","animalic","resinous","fresh","spicy","green","gourmand","citrus","aldehydic","aromatic","oud","Indian"];
+
+function renderFilterPills(){
+  var pils=["all","top","heart","base","IFF","Givaudan","dsm-Firmenich","Symrise","Bedoukian","Indian","Imported","musky","floral","woody","animalic","resinous","fresh","spicy","green","gourmand","citrus","aldehydic","oud"];
+  var html="";
+  pils.forEach(function(f){
+    html+='<button class="pill'+(f=="all"?" on":"")+'" onclick="setFilt(this,\''+f+'\')">'+f+'</button>';
   });
+  document.getElementById("filterPills").innerHTML=html;
 }
 
-function setFilter(btn, f){
-  currentFilter = f;
-  document.querySelectorAll('.filter-pill').forEach(function(p){p.classList.remove('on');});
-  btn.classList.add('on');
+function setFilt(btn,f){
+  curFilter=f;
+  document.querySelectorAll(".pill").forEach(function(p){p.classList.remove("on");});
+  btn.classList.add("on");
   filterDB();
 }
 
-function renderDB(){
-  var grid = document.getElementById('dbGrid');
-  grid.innerHTML = '';
-  DB.forEach(function(mol){
-    var inFormula = formula.some(function(f){return f.id==mol.id;});
-    var noteColors = {top:'#52E852',heart:'#E85252',base:'#5295E8'};
-    var tagColors = {floral:'#E85252',woody:'#C8A96E',fresh:'#52E852',animalic:'#E8A44A',resinous:'#C8745A',musky:'#9B8FD4',spicy:'#E85298',green:'#52C852',marine:'#52C8E8',citrus:'#E8D452',earthy:'#A87840',aldehydic:'#D4D452',violet:'#B47BD4',sweet:'#E898A0',balsamic:'#C87850',leathery:'#9A6440',gourmand:'#E8B452',chypre:'#52A870'};
-    var tagHtml = mol.tags.map(function(t){return '<span class="mol-tag" style="background:rgba(255,255,255,0.05);color:'+(tagColors[t]||'#999')+'">'+t+'</span>';}).join('');
-    var noteBadge = '<span class="note-badge note-'+mol.note+'">'+mol.note.toUpperCase()+'</span>';
-    grid.innerHTML += '<div class="mol-card'+(inFormula?' selected':'')+'" data-id="'+mol.id+'" data-name="'+mol.name.toLowerCase()+'" data-odor="'+mol.odor.toLowerCase()+'" data-tags="'+mol.tags.join(',')+'" data-note="'+mol.note+'">'
-      +'<button class="mol-add-btn" onclick="addToFormula(\''+mol.id+'\')" title="Add to formula">'+(inFormula?'✓':'+')+'</button>'
-      +'<div class="mol-name">'+mol.name+'</div>'
-      +'<div class="mol-iupac">CAS: '+mol.cas+' &nbsp;·&nbsp; IFRA: '+mol.ifra+'%</div>'
-      +'<div class="mol-tags">'+noteBadge+' '+tagHtml+'</div>'
-      +'<div class="mol-odor">'+mol.odor+'</div>'
-      +'</div>';
+function filterDB(){
+  var q=document.getElementById("dbQ").value.toLowerCase();
+  var cards=document.querySelectorAll(".mol");
+  var shown=0;
+  cards.forEach(function(c){
+    var nm=c.getAttribute("data-n");
+    var od=c.getAttribute("data-o");
+    var tg=c.getAttribute("data-t");
+    var nt=c.getAttribute("data-note");
+    var src=c.getAttribute("data-src");
+    var mq=!q||(nm.indexOf(q)>=0)||(od.indexOf(q)>=0)||(tg.indexOf(q)>=0)||(src&&src.indexOf(q)>=0);
+    var mf=curFilter=="all"||(nt==curFilter)||(tg.indexOf(curFilter.toLowerCase())>=0)||(src&&src.toLowerCase().indexOf(curFilter.toLowerCase())>=0);
+    var vis=mq&&mf;
+    c.style.display=vis?"block":"none";
+    if(vis)shown++;
   });
+  document.getElementById("dbCount").textContent=shown+" compounds shown";
 }
 
-function addToFormula(id){
-  var mol = DB.find(function(m){return m.id==id;});
-  if(!mol) return;
-  if(formula.some(function(f){return f.id==id;})){
-    showToast(mol.name+' already in formula');return;
-  }
-  formula.push({id:mol.id,name:mol.name,note:mol.note,odor:mol.odor,ifra:mol.ifra,pct:2.0});
+function renderDB(){
+  var grid=document.getElementById("molGrid");
+  grid.innerHTML="";
+  var ncols={top:"nb-top",heart:"nb-heart",base:"nb-base"};
+  var tagcols={floral:"#E85252",woody:"#C8A96E",fresh:"#52E852",animalic:"#E8A44A",resinous:"#C8745A",musky:"#9B8FD4",spicy:"#E85298",green:"#52C852",citrus:"#E8D452",aldehydic:"#D4D452",gourmand:"#E898A0",marine:"#52C8E8",earthy:"#A87840",aromatic:"#88C8A0",Indian:"#E87840",oud:"#C87050",tobacco:"#A06030",ambery:"#E8B050",fruity:"#E87090"};
+  DB.forEach(function(m){
+    var inF=formula.some(function(f){return f.id==m.id;});
+    var thtml=m.tags.map(function(t){return'<span class="tag" style="background:rgba(255,255,255,0.05);color:'+(tagcols[t]||"#888")+'">'+t+'</span>';}).join("");
+    var srcColor={"IFF":"#52C8E8","Givaudan":"#52E852","dsm-Firmenich":"#E85252","Symrise":"#E8A44A","Bedoukian":"#9B8FD4","Indian":"#E87840","Imported":"#C8A96E"}[m.src]||"#888";
+    grid.innerHTML+='<div class="mol'+(inF?" sel":'')+'" data-id="'+m.id+'" data-n="'+m.name.toLowerCase()+'" data-o="'+m.odor.toLowerCase()+'" data-t="'+m.tags.join(",")+'" data-note="'+m.note+'" data-src="'+m.src+'">'
+      +'<button class="mol-btn" onclick="addToF(\''+m.id+'\')">'+(inF?"✓":"+")+'</button>'
+      +'<div class="mol-n">'+m.name+'</div>'
+      +'<div class="mol-src" style="color:'+srcColor+'">'+m.src+' &nbsp;·&nbsp; CAS: '+m.cas+'</div>'
+      +'<div class="mol-cas">IFRA max: '+m.ifra+'% &nbsp;·&nbsp; Volatility: '+m.v+'</div>'
+      +'<div class="mol-tags"><span class="nbadge '+(ncols[m.note]||"")+'">'+(m.note||"").toUpperCase()+'</span> '+thtml+'</div>'
+      +'<div class="mol-od">'+m.odor+'</div>'
+      +'</div>';
+  });
+  renderFilterPills();
+  document.getElementById("dbCount").textContent=DB.length+" compounds shown";
+}
+
+function addToF(id){
+  var m=DB.find(function(x){return x.id==id;});
+  if(!m) return;
+  if(formula.some(function(f){return f.id==id;})){showToast(m.name+" already in formula");return;}
+  formula.push({id:m.id,name:m.name,src:m.src,note:m.note,odor:m.odor,ifra:m.ifra,pct:2.0});
   renderDB();
-  showToast(mol.name+' added to formula');
+  showToast("Added: "+m.name);
 }
 
 // ── FORMULA ───────────────────────────────────────────────────────────────────
 function renderFormula(){
-  var empty = document.getElementById('formulaEmpty');
-  var table = document.getElementById('formulaTable');
-  if(!formula.length){empty.style.display='block';table.style.display='none';return;}
-  empty.style.display='none';table.style.display='block';
-
-  var body = document.getElementById('formulaBody');
-  body.innerHTML='';
+  var empty=document.getElementById("fmlEmpty");
+  var tbl=document.getElementById("fmlTable");
+  if(!formula.length){empty.style.display="block";tbl.style.display="none";return;}
+  empty.style.display="none";tbl.style.display="block";
+  var body=document.getElementById("fmlBody");
+  body.innerHTML="";
   var total=0;
   formula.forEach(function(item,idx){
     total+=item.pct;
-    var drops = Math.round(item.pct/100*10*20); // 20 drops per gram
-    var ifraOk = item.pct <= item.ifra;
+    var drops=Math.round(item.pct/100*10*20);
+    var ok=item.pct<=item.ifra;
+    var nbcls={top:"nb-top",heart:"nb-heart",base:"nb-base"}[item.note]||"";
     body.innerHTML+='<tr>'
-      +'<td style="font-family:Cormorant Garamond,serif;font-size:1rem">'+item.name+'</td>'
-      +'<td><span class="note-badge note-'+item.note+'">'+item.note.toUpperCase()+'</span></td>'
-      +'<td><span class="odor-tag">'+item.odor.substring(0,50)+(item.odor.length>50?'…':'')+'</span></td>'
-      +'<td><input class="conc-input" type="number" min="0.01" max="'+item.ifra+'" step="0.1" value="'+item.pct.toFixed(2)+'" onchange="updatePct('+idx+',this.value)"></td>'
-      +'<td style="font-family:DM Mono;font-size:0.75rem;color:var(--text-dim)">~'+drops+' drops</td>'
-      +'<td class="'+(ifraOk?'ifra-ok':'ifra-warn')+'">'+(ifraOk?'✓ safe':'⚠ over limit')+'</td>'
-      +'<td><button onclick="removeFromFormula('+idx+')" style="background:none;border:none;color:var(--text-dim);cursor:pointer;font-size:0.75rem;padding:4px 8px">✕</button></td>'
+      +'<td style="font-family:Cormorant Garamond,serif;font-size:0.95rem">'+item.name+'</td>'
+      +'<td style="font-family:DM Mono,monospace;font-size:0.6rem;color:var(--gdim)">'+item.src+'</td>'
+      +'<td><span class="nbadge '+nbcls+'">'+(item.note||"").toUpperCase()+'</span></td>'
+      +'<td style="font-size:0.72rem;font-style:italic;color:var(--tdim)">'+item.odor.substring(0,45)+(item.odor.length>45?"…":"")+'</td>'
+      +'<td><input class="conc-i" type="number" min="0.001" max="'+item.ifra+'" step="0.1" value="'+item.pct.toFixed(2)+'" onchange="updPct('+idx+',this.value)"></td>'
+      +'<td style="font-family:DM Mono,monospace;font-size:0.68rem;color:var(--tdim)">~'+drops+' drops</td>'
+      +'<td style="font-family:DM Mono,monospace;font-size:0.68rem;color:var(--tdim)">'+item.ifra+'%</td>'
+      +'<td class="'+(ok?"ok":"warn")+'">'+(ok?"✓ safe":"⚠ over")+'</td>'
+      +'<td><button onclick="rmF('+idx+')" style="background:none;border:none;color:var(--tdim);cursor:pointer;font-size:0.72rem;padding:2px 6px">✕</button></td>'
       +'</tr>';
   });
-  document.getElementById('totalPct').textContent=total.toFixed(2)+'%';
+  document.getElementById("totalPct").textContent=total.toFixed(2)+"%";
 }
 
-function updatePct(idx,val){
-  formula[idx].pct=parseFloat(val)||0;
-  renderFormula();
-}
+function updPct(idx,v){formula[idx].pct=parseFloat(v)||0;renderFormula();}
+function rmF(idx){formula.splice(idx,1);renderDB();renderFormula();}
 
-function removeFromFormula(idx){
-  formula.splice(idx,1);
-  renderDB();
-  renderFormula();
-}
-
-async function generateFormula(){
-  if(!vizData && !formula.length){
-    showToast('Visualise a fragrance first or add ingredients from the database');return;
-  }
-  setStatus('thinking','AI generating professional formula...');
-  var prompt = vizData
-    ? 'Create a professional perfume formula for: '+document.getElementById('fragrancePrompt').value+'. Available chemicals: '+DB.map(function(m){return m.name+'('+m.note+',IFRA:'+m.ifra+'%)';}).join(', ')
-    : 'Optimise this perfume formula for single complex note character: '+formula.map(function(f){return f.name+' '+f.pct+'%';}).join(', ');
-
+async function aiFormula(){
+  var prompt = document.getElementById("vPrompt").value.trim();
+  if(!prompt && !formula.length){showToast("Describe a fragrance or add ingredients first");return;}
+  var src = prompt
+    ? "Create a professional formula for: " + prompt + ". Use only chemicals available from: " + DB.map(function(m){return m.name+"("+m.src+","+m.note+",IFRA:"+m.ifra+"%)";}).join(", ")
+    : "Optimise this formula for single complex note: " + formula.map(function(f){return f.name+" "+f.pct+"%";}).join(", ");
+  setStatus("busy","AI generating professional formula...");
   try{
-    var response = await fetch('/.netlify/functions/claude',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
+    var res = await fetch("/.netlify/functions/claude",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
       body:JSON.stringify({
-        model:'claude-sonnet-4-6',
-        max_tokens:1000,
-        system:'You are a master perfumer. CRITICAL: Return ONLY raw JSON. NO markdown, NO backticks, NO code blocks. Start response with { and end with }. Nothing else. Schema: {"formula":[{"ingredient":"exact name from DB","pct":number}],"perfumerNote":"expert 3-sentence note on structure, evolution, and single-note character achieved"}',
-        messages:[{role:'user',content:prompt}]
+        max_tokens:1500,
+        system:"You are a master perfumer. Return ONLY raw JSON — no markdown, no backticks. Start with { end with }. Schema: {\"formula\":[{\"ingredient\":\"name\",\"pct\":number}],\"name\":\"creative name\",\"perfumerNote\":\"expert 4-sentence note on structure, materials, evolution, and single-note character\"}",
+        messages:[{role:"user",content:src}]
       })
     });
-    var data = await response.json();
-    var text = data.content[0].text.replace(/```json/g,'').replace(/```/g,'').trim();
-    var result = JSON.parse(text);
-    // Map to DB
-    formula = [];
+    var data = await res.json();
+    var txt = data.content[0].text;
+    var s=txt.indexOf("{"),e=txt.lastIndexOf("}");
+    if(s>=0&&e>s){txt=txt.substring(s,e+1);}
+    var result = JSON.parse(txt);
+    formula=[];
     (result.formula||[]).forEach(function(item){
-      var mol = DB.find(function(m){return m.name.toLowerCase().indexOf(item.ingredient.toLowerCase())>=0||item.ingredient.toLowerCase().indexOf(m.name.toLowerCase().split(' ')[0])>=0;});
-      if(mol){formula.push({id:mol.id,name:mol.name,note:mol.note,odor:mol.odor,ifra:mol.ifra,pct:item.pct});}
+      var mol=DB.find(function(m){return m.name.toLowerCase().indexOf(item.ingredient.toLowerCase().split(" ")[0])>=0||item.ingredient.toLowerCase().indexOf(m.name.toLowerCase().split(" ")[0])>=0;});
+      if(mol){formula.push({id:mol.id,name:mol.name,src:mol.src,note:mol.note,odor:mol.odor,ifra:mol.ifra,pct:item.pct});}
     });
-    document.getElementById('perfumerNotes').textContent = result.perfumerNote||'';
+    if(result.name){document.getElementById("fmlTitle").textContent=result.name;}
+    document.getElementById("fmlNotes").textContent=result.perfumerNote||"";
     renderFormula();
-    showSection('formula');
-    setStatus('idle','Formula generated — '+formula.length+' ingredients');
-  }catch(e){
-    setStatus('idle','Generation failed');
-    showToast('Error: '+e.message);
+    renderDB();
+    showSec("fml",null);
+    setStatus("idle","Formula generated — "+formula.length+" ingredients");
+  }catch(err){
+    setStatus("off","Generation failed: "+err.message);
+    showToast("Error: "+err.message);
   }
+}
+
+function exportCSV(){
+  if(!formula.length){showToast("No formula to export");return;}
+  var csv="Ingredient,Brand/Source,Note,Concentration%,Per 10g (drops),IFRA Max%,Status\n";
+  formula.forEach(function(f){
+    var drops=Math.round(f.pct/100*10*20);
+    csv+=f.name+","+f.src+","+f.note+","+f.pct.toFixed(2)+","+drops+","+f.ifra+","+(f.pct<=f.ifra?"Safe":"Over IFRA limit")+"\n";
+  });
+  var a=document.createElement("a");
+  a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));
+  a.download="RK-Perfumery-Formula.csv";
+  a.click();
+  showToast("Exported CSV");
 }
 
 function exportFormula(){
-  if(!formula.length){showToast('No formula to export');return;}
-  var csv='Ingredient,Note,Conc%,In 10g drops,IFRA Limit,IFRA Status\n';
-  formula.forEach(function(f){
-    var drops=Math.round(f.pct/100*10*20);
-    csv+=f.name+','+f.note+','+f.pct.toFixed(2)+','+drops+','+f.ifra+'%,'+(f.pct<=f.ifra?'Safe':'Over limit')+'\n';
+  if(!formula.length){showToast("No formula to export");return;}
+  var title=document.getElementById("fmlTitle").textContent;
+  var txt="RK PERFUMERY LAB\n"+title+"\n"+"=".repeat(50)+"\n\n";
+  var total=0;
+  var tiers={top:[],heart:[],base:[]};
+  formula.forEach(function(f){if(tiers[f.note]){tiers[f.note].push(f);}total+=f.pct;});
+  ["top","heart","base"].forEach(function(t){
+    if(tiers[t].length){
+      txt+=t.toUpperCase()+" NOTES\n";
+      tiers[t].forEach(function(f){txt+="  "+f.name.padEnd(35)+" "+f.pct.toFixed(2)+"% ("+f.src+")\n";});
+      txt+="\n";
+    }
   });
-  var blob = new Blob([csv],{type:'text/csv'});
-  var a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'RK-Perfumery-Formula.csv';
+  txt+="TOTAL: "+total.toFixed(2)+"%\n\n";
+  var notes=document.getElementById("fmlNotes").textContent;
+  if(notes){txt+="PERFUMER'S NOTES\n"+notes+"\n";}
+  var a=document.createElement("a");
+  a.href=URL.createObjectURL(new Blob([txt],{type:"text/plain"}));
+  a.download="RK-Perfumery-Formula.txt";
   a.click();
-  showToast('Formula exported');
+  showToast("Exported TXT");
 }
 
-// ── UTILS ─────────────────────────────────────────────────────────────────────
 function showToast(msg){
-  var t=document.getElementById('toast');
-  t.textContent=msg;t.classList.add('show');
-  setTimeout(function(){t.classList.remove('show');},2800);
+  var t=document.getElementById("toast");
+  t.textContent=msg;t.classList.add("on");
+  setTimeout(function(){t.classList.remove("on");},2800);
 }
 </script>
 </body>
