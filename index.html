@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RK Perfumery Lab</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400;500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js" onerror="window.d3={select:function(){return{attr:function(){return this},selectAll:function(){return{remove:function(){}}},append:function(){return this},text:function(){return this}};}}"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{--ob:#0A0A0F;--deep:#12121A;--surf:#1A1A26;--panel:#20202E;--bdr:#2A2A3E;--gold:#C8A96E;--gdim:#7A6240;--amb:#E8A44A;--vio:#7B6FD4;--vdim:#3D3868;--txt:#C4C0D4;--tdim:#6E6A82;--wh:#F0EDF8;--grn:#52E852;--red:#E85252;--blu:#5295E8}
@@ -432,9 +432,13 @@ var curFilter = "all";
 
 // ── NAVIGATION ───────────────────────────────────────────────────────────────
 function enterLab(){
-  document.getElementById("hero").style.display = "none";
-  document.getElementById("lab").style.display = "block";
-  renderDB();
+  try{
+    document.getElementById("hero").style.display = "none";
+    document.getElementById("lab").style.display = "block";
+    renderDB();
+  }catch(e){
+    alert("Error: "+e.message);
+  }
 }
 
 function showSec(n){
@@ -526,7 +530,9 @@ function am(fid,vid,pct){
 }
 
 function drawPyramid(d){
+  try{
   var el = document.getElementById("pyrsvg");
+  if(!el||typeof d3=="undefined") return;
   var W = el.parentElement.clientWidth-32, H=230;
   var svg = d3.select("#pyrsvg").attr("width",W).attr("height",H);
   svg.selectAll("*").remove();
@@ -543,6 +549,7 @@ function drawPyramid(d){
     var nm=(t.n||[]).map(function(x){return x.ingredient;}).join("  ·  ");
     svg.append("text").attr("x",tx+tw/2).attr("y",t.y+t.h/2+5).attr("fill","#C4C0D4").attr("font-family","Cormorant Garamond").attr("font-size",11).attr("text-anchor","middle").attr("font-style","italic").text(nm.substring(0,58)+(nm.length>58?"…":""));
   });
+  }catch(e){console.log("Pyramid:",e);}
 }
 
 function drawRadar(d){
@@ -723,6 +730,7 @@ function rmF(i){formula.splice(i,1);renderFml();renderDB();}
 var FILTER_LABELS = ["all","top","heart","base","IFF","Givaudan","dsm-Firmenich","Symrise","Bedoukian","Indian","Imported","musky","floral","woody","animalic","resinous","fresh","spicy","green","gourmand","citrus","aldehydic","oud"];
 
 function renderDB(){
+  try{
   var grid=document.getElementById("mgrid");
   if(!grid) return;
   grid.innerHTML="";
@@ -743,6 +751,7 @@ function renderDB(){
   });
   renderFilterPills();
   document.getElementById("dbc").textContent = DB.length + " compounds";
+  }catch(e){console.log("renderDB error:",e);showToast("DB error: "+e.message);}
 }
 
 function renderFilterPills(){
