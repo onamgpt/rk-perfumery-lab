@@ -454,6 +454,10 @@ async function doViz(){
       })
     });
     var data = await res.json();
+    if(!data.content || !data.content[0]){
+      var errMsg = data.error ? data.error.message : JSON.stringify(data);
+      throw new Error("API error: " + errMsg);
+    }
     var txt = data.content[0].text;
     var s = txt.indexOf("{"), e = txt.lastIndexOf("}");
     if(s>=0 && e>s){ txt = txt.substring(s,e+1); }
@@ -691,6 +695,10 @@ async function aiFormula(){
       })
     });
     var data = await res.json();
+    if(!data.content || !data.content[0]){
+      var errMsg = data.error ? data.error.message : JSON.stringify(data);
+      throw new Error("API error: " + errMsg);
+    }
     var txt = data.content[0].text;
     var s=txt.indexOf("{"),e=txt.lastIndexOf("}");
     if(s>=0&&e>s){txt=txt.substring(s,e+1);}
