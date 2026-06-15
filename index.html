@@ -181,7 +181,7 @@ tr:hover td{background:var(--panel)}
     <div class="sec-lbl">03 &nbsp; Generated Formula</div>
     <div class="fml">
       <div class="fml-hdr">
-        <div class="fml-title" id="fmlTitle">Working Formula</div>
+        <div class="fml-title" id="fmlTitle2">Working Formula</div>
         <div class="fml-btns">
           <button class="btn-ghost" onclick="exportCSV()">&#8681; CSV</button>
           <button class="btn-ghost" onclick="exportPDF()">&#8681; PDF</button>
@@ -189,14 +189,14 @@ tr:hover td{background:var(--panel)}
           <button class="btn-gold" onclick="aiFormula()">Regenerate</button>
         </div>
       </div>
-      <div id="fmlEmpty" class="empty"><span class="empty-i">⚗</span><div class="empty-t">Generating formula...</div></div>
-      <div id="fmlTable" style="display:none">
+      <div id="fmlEmpty2" class="empty"><span class="empty-i">⚗</span><div class="empty-t">Generating formula...</div></div>
+      <div id="fmlTable2" style="display:none">
         <table>
           <thead><tr><th>Ingredient</th><th>Brand</th><th>Note</th><th>Odour Profile</th><th>Conc %</th><th>Per 10g</th><th>IFRA %</th><th>Status</th><th></th></tr></thead>
-          <tbody id="fmlBody"></tbody>
-          <tfoot><tr class="total-row"><td colspan="4">TOTAL CONCENTRATE</td><td id="totalPct">0.00%</td><td></td><td></td><td></td><td></td></tr></tfoot>
+          <tbody id="fmlBody2"></tbody>
+          <tfoot><tr class="total-row"><td colspan="4">TOTAL CONCENTRATE</td><td id="totalPct2">0.00%</td><td></td><td></td><td></td><td></td></tr></tfoot>
         </table>
-        <div class="notes-box"><div class="notes-lbl">Perfumer's Notes</div><div class="notes-txt" id="fmlNotes"></div></div>
+        <div class="notes-box"><div class="notes-lbl">Perfumer's Notes</div><div class="notes-txt" id="fmlNotes2"></div></div>
       </div>
     </div>
   </div>
@@ -528,10 +528,14 @@ async function autoFormula(d, prompt){
       });
       if(mol){formula.push({id:mol.id,name:mol.name,src:mol.src,note:mol.note,odor:mol.odor,ifra:mol.ifra,pct:item.pct});}
     });
-    if(result.name){document.getElementById("fmlTitle").textContent=result.name;}
+    if(result.name){
+      document.getElementById("fmlTitle2").textContent=result.name;
+      document.getElementById("fmlTitle").textContent=result.name;
+    }
+    document.getElementById("fmlNotes2").textContent=result.perfumerNote||"";
     document.getElementById("fmlNotes").textContent=result.perfumerNote||"";
+    renderFormulaInline();
     renderFormula();
-    // Show formula section below viz
     document.getElementById("fmlInline").style.display="block";
   }catch(err){
     showToast("Formula error: "+err.message);
@@ -713,6 +717,37 @@ function addToF(id){
 }
 
 // ── FORMULA ───────────────────────────────────────────────────────────────────
+function renderFormulaInline(){
+  var empty=document.getElementById("fmlEmpty2");
+  var tbl=document.getElementById("fmlTable2");
+  if(!formula.length){if(empty)empty.style.display="block";if(tbl)tbl.style.display="none";return;}
+  if(empty)empty.style.display="none";
+  if(tbl)tbl.style.display="block";
+  var body=document.getElementById("fmlBody2");
+  if(!body) return;
+  body.innerHTML="";
+  var total=0;
+  formula.forEach(function(item,idx){
+    total+=item.pct;
+    var drops=Math.round(item.pct/100*10*20);
+    var ok=item.pct<=item.ifra;
+    var nbcls={top:"nb-top",heart:"nb-heart",base:"nb-base"}[item.note]||"";
+    body.innerHTML+="<tr>"
+      +"<td style='font-family:Cormorant Garamond,serif;font-size:0.95rem'>"+item.name+"</td>"
+      +"<td style='font-family:DM Mono,monospace;font-size:0.6rem;color:var(--gdim)'>"+item.src+"</td>"
+      +"<td><span class='nbadge "+nbcls+"'>"+(item.note||"").toUpperCase()+"</span></td>"
+      +"<td style='font-size:0.72rem;font-style:italic;color:var(--tdim)'>"+item.odor.substring(0,40)+(item.odor.length>40?"…":"")+"</td>"
+      +"<td><input class='conc-i' type='number' min='0.001' max='"+item.ifra+"' step='0.1' value='"+item.pct.toFixed(2)+"' onchange='updPct("+idx+",this.value)'></td>"
+      +"<td style='font-family:DM Mono,monospace;font-size:0.68rem;color:var(--tdim)'>~"+drops+" drops</td>"
+      +"<td style='font-family:DM Mono,monospace;font-size:0.68rem;color:var(--tdim)'>"+item.ifra+"%</td>"
+      +"<td class='"+(ok?"ok":"warn")+"'>"+(ok?"✓ safe":"⚠ over")+"</td>"
+      +"<td><button onclick='rmF("+idx+")' style='background:none;border:none;color:var(--tdim);cursor:pointer;font-size:0.72rem;padding:2px 6px'>✕</button></td>"
+      +"</tr>";
+  });
+  var tp=document.getElementById("totalPct2");
+  if(tp) tp.textContent=total.toFixed(2)+"%";
+}
+
 function renderFormula(){
   var empty=document.getElementById("fmlEmpty");
   var tbl=document.getElementById("fmlTable");
