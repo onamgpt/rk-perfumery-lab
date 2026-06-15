@@ -423,7 +423,7 @@ async function visualizeFragrance(){
   document.getElementById('chartArea').style.display = 'none';
 
   try{
-    var response = await fetch('https://api.anthropic.com/v1/messages',{
+    var response = await fetch('/.netlify/functions/claude',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
@@ -735,7 +735,7 @@ async function generateFormula(){
     : 'Optimise this perfume formula for single complex note character: '+formula.map(function(f){return f.name+' '+f.pct+'%';}).join(', ');
 
   try{
-    var response = await fetch('https://api.anthropic.com/v1/messages',{
+    var response = await fetch('/.netlify/functions/claude',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
