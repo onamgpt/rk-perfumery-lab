@@ -8,232 +8,242 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{--ob:#0A0A0F;--deep:#12121A;--surf:#1A1A26;--panel:#20202E;--bdr:#2A2A3E;--gold:#C8A96E;--gdim:#7A6240;--amb:#E8A44A;--vio:#7B6FD4;--vdim:#3D3868;--mist:#E8E4F0;--txt:#C4C0D4;--tdim:#6E6A82;--wh:#F0EDF8;--grn:#52E852;--red:#E85252;--blu:#5295E8;--wa:#25D366}
+:root{--ob:#0A0A0F;--deep:#12121A;--surf:#1A1A26;--panel:#20202E;--bdr:#2A2A3E;--gold:#C8A96E;--gdim:#7A6240;--amb:#E8A44A;--vio:#7B6FD4;--vdim:#3D3868;--txt:#C4C0D4;--tdim:#6E6A82;--wh:#F0EDF8;--grn:#52E852;--red:#E85252;--blu:#5295E8}
 html{scroll-behavior:smooth}
-body{font-family:'Inter',sans-serif;background:var(--ob);color:var(--txt);min-height:100vh;overflow-x:hidden}
-header{position:fixed;top:0;left:0;right:0;z-index:100;height:54px;background:rgba(10,10,15,0.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--bdr);display:flex;align-items:center;justify-content:space-between;padding:0 24px}
-.logo{font-family:'Cormorant Garamond',serif;font-size:1.05rem;font-weight:300;color:var(--gold);letter-spacing:0.2em;text-transform:uppercase}
-.logo span{color:var(--tdim);font-size:0.6rem;display:block;letter-spacing:0.3em;margin-top:1px}
-.navp{display:flex;gap:4px}
-.navb{background:none;border:none;color:var(--tdim);font-size:0.68rem;font-family:'DM Mono',monospace;letter-spacing:0.08em;padding:6px 14px;cursor:pointer;border-radius:20px;transition:all 0.2s}
-.navb:hover,.navb.on{background:var(--bdr);color:var(--gold)}
-.hero{min-height:100vh;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;padding-top:54px;background:radial-gradient(ellipse 80% 80% at 50% 40%,rgba(123,111,212,0.07) 0%,transparent 70%)}
-.hero-orb{position:absolute;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(200,169,110,0.05) 0%,transparent 70%);top:50%;left:50%;transform:translate(-50%,-50%);animation:pulse 8s ease-in-out infinite}
-@keyframes pulse{0%,100%{transform:translate(-50%,-50%) scale(1)}50%{transform:translate(-50%,-50%) scale(1.08)}}
-.hero-c{text-align:center;z-index:2;max-width:680px;padding:40px 24px}
-.eyebrow{font-family:'DM Mono',monospace;font-size:0.62rem;letter-spacing:0.3em;color:var(--gdim);text-transform:uppercase;margin-bottom:28px}
-.hero-t{font-family:'Cormorant Garamond',serif;font-size:clamp(3rem,8vw,6rem);font-weight:300;color:var(--wh);line-height:1;margin-bottom:8px}
-.hero-t em{font-style:italic;color:var(--gold)}
-.hero-s{font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:300;color:var(--tdim);margin-bottom:36px}
-.btn-gold{background:var(--gold);color:var(--ob);border:none;font-family:'DM Mono',monospace;font-size:0.7rem;letter-spacing:0.18em;padding:14px 36px;cursor:pointer;transition:all 0.3s;text-transform:uppercase}
-.btn-gold:hover{background:var(--amb)}
-.btn-ghost{background:none;border:1px solid var(--bdr);color:var(--txt);font-family:'DM Mono',monospace;font-size:0.7rem;letter-spacing:0.1em;padding:14px 24px;cursor:pointer;transition:all 0.2s;text-transform:uppercase}
-.btn-ghost:hover{border-color:var(--gdim);color:var(--gold)}
-.lab{padding:80px 20px;max-width:1400px;margin:0 auto}
-.sec-lbl{font-family:'DM Mono',monospace;font-size:0.58rem;letter-spacing:0.3em;color:var(--gdim);text-transform:uppercase;margin-bottom:20px;display:flex;align-items:center;gap:12px}
-.sec-lbl::after{content:'';flex:1;height:1px;background:var(--bdr)}
-.card{background:var(--surf);border:1px solid var(--bdr);padding:28px;margin-bottom:28px}
-.status{background:var(--panel);border:1px solid var(--bdr);padding:10px 18px;font-family:'DM Mono',monospace;font-size:0.68rem;color:var(--tdim);display:flex;align-items:center;gap:10px;margin-bottom:20px}
-.dot{width:6px;height:6px;border-radius:50%;background:var(--grn);flex-shrink:0}
+body{font-family:Inter,sans-serif;background:var(--ob);color:var(--txt);min-height:100vh;overflow-x:hidden}
+nav{position:fixed;top:0;left:0;right:0;z-index:1000;height:52px;background:rgba(10,10,15,0.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--bdr);display:flex;align-items:center;justify-content:space-between;padding:0 24px}
+.logo{font-family:"Cormorant Garamond",serif;font-size:1rem;font-weight:300;color:var(--gold);letter-spacing:0.2em;text-transform:uppercase;line-height:1.2}
+.logo small{color:var(--tdim);font-size:0.55rem;display:block;letter-spacing:0.28em}
+.navp{display:flex;gap:3px}
+.nb{background:none;border:none;color:var(--tdim);font-size:0.65rem;font-family:"DM Mono",monospace;letter-spacing:0.08em;padding:6px 13px;cursor:pointer;border-radius:20px;transition:all 0.2s}
+.nb:hover,.nb.on{background:var(--bdr);color:var(--gold)}
+/* HERO */
+#hero{min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:80px 24px 40px;background:radial-gradient(ellipse 80% 80% at 50% 40%,rgba(123,111,212,0.07) 0%,transparent 70%)}
+.hero-inner{max-width:640px}
+.ey{font-family:"DM Mono",monospace;font-size:0.6rem;letter-spacing:0.3em;color:var(--gdim);text-transform:uppercase;margin-bottom:24px}
+h1{font-family:"Cormorant Garamond",serif;font-size:clamp(3rem,9vw,6rem);font-weight:300;color:var(--wh);line-height:1;margin-bottom:6px}
+h1 em{color:var(--gold);font-style:italic}
+.hs{font-family:"Cormorant Garamond",serif;font-size:1.2rem;color:var(--tdim);margin-bottom:36px;font-weight:300}
+.btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.bg{background:var(--gold);color:var(--ob);border:none;font-family:"DM Mono",monospace;font-size:0.68rem;letter-spacing:0.18em;padding:13px 32px;cursor:pointer;transition:all 0.3s;text-transform:uppercase}
+.bg:hover{background:var(--amb)}
+.bg:disabled{opacity:0.5;cursor:not-allowed}
+.bgh{background:none;border:1px solid var(--bdr);color:var(--txt);font-family:"DM Mono",monospace;font-size:0.68rem;letter-spacing:0.1em;padding:13px 22px;cursor:pointer;transition:all 0.2s;text-transform:uppercase}
+.bgh:hover{border-color:var(--gdim);color:var(--gold)}
+/* LAB */
+#lab{display:none;padding:72px 20px 40px;max-width:1300px;margin:0 auto}
+.sl{font-family:"DM Mono",monospace;font-size:0.57rem;letter-spacing:0.28em;color:var(--gdim);text-transform:uppercase;margin-bottom:16px;display:flex;align-items:center;gap:10px}
+.sl::after{content:"";flex:1;height:1px;background:var(--bdr)}
+.card{background:var(--surf);border:1px solid var(--bdr);padding:24px;margin-bottom:24px}
+#sbar{background:var(--panel);border:1px solid var(--bdr);padding:9px 16px;font-family:"DM Mono",monospace;font-size:0.65rem;color:var(--tdim);display:flex;align-items:center;gap:10px;margin-bottom:18px}
+.dot{width:5px;height:5px;border-radius:50%;background:var(--grn);flex-shrink:0}
 .dot.busy{background:var(--amb);animation:blink 1s ease-in-out infinite}
 .dot.off{background:var(--bdr)}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0.2}}
-.row{display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap}
-.inp{flex:1;min-width:240px;background:var(--panel);border:1px solid var(--bdr);color:var(--wh);font-family:'Inter',sans-serif;font-size:0.82rem;padding:12px 16px;outline:none;transition:border-color 0.2s}
+.irow{display:flex;gap:9px;margin-bottom:14px;flex-wrap:wrap}
+.inp{flex:1;min-width:220px;background:var(--panel);border:1px solid var(--bdr);color:var(--wh);font-family:Inter,sans-serif;font-size:0.8rem;padding:11px 14px;outline:none}
 .inp:focus{border-color:var(--gdim)}
 .inp::placeholder{color:var(--tdim)}
-.presets{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px}
-.preset{background:none;border:1px solid var(--bdr);color:var(--tdim);font-family:'DM Mono',monospace;font-size:0.58rem;letter-spacing:0.06em;padding:5px 12px;cursor:pointer;border-radius:20px;transition:all 0.2s;text-transform:uppercase}
-.preset:hover{background:var(--vdim);color:var(--mist);border-color:var(--vio)}
-.chart-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px}
-@media(max-width:800px){.chart-grid{grid-template-columns:1fr}}
-.chart-box{background:var(--panel);border:1px solid var(--bdr);padding:20px}
-.chart-lbl{font-family:'DM Mono',monospace;font-size:0.58rem;letter-spacing:0.22em;color:var(--tdim);text-transform:uppercase;margin-bottom:14px}
-.bars{display:flex;flex-direction:column;gap:7px;margin-top:10px}
-.bar-row{display:flex;align-items:center;gap:10px}
-.bar-name{font-family:'DM Mono',monospace;font-size:0.6rem;color:var(--tdim);width:110px;flex-shrink:0;text-transform:uppercase;letter-spacing:0.04em}
-.bar-track{flex:1;height:5px;background:var(--bdr)}
-.bar-fill{height:100%;transition:width 1s ease}
-.bar-pct{font-family:'DM Mono',monospace;font-size:0.58rem;color:var(--tdim);width:30px;text-align:right}
-.meters{display:flex;flex-direction:column;gap:10px;margin-top:20px;padding-top:20px;border-top:1px solid var(--bdr)}
-.meter-row{display:flex;align-items:center;gap:14px}
-.meter-lbl{font-family:'DM Mono',monospace;font-size:0.58rem;color:var(--tdim);letter-spacing:0.12em;text-transform:uppercase;width:90px}
-.meter-track{flex:1;height:3px;background:var(--bdr)}
-.meter-fill{height:100%;background:linear-gradient(90deg,var(--vio),var(--gold),var(--amb));transition:width 0.8s ease}
-.meter-val{font-family:'DM Mono',monospace;font-size:0.68rem;color:var(--gold);width:32px;text-align:right}
-.snb{display:inline-flex;align-items:center;gap:8px;background:rgba(123,111,212,0.1);border:1px solid var(--vdim);padding:8px 16px;font-family:'DM Mono',monospace;font-size:0.62rem;letter-spacing:0.1em;color:var(--vio);margin-top:14px}
-.empty{text-align:center;padding:60px 20px;color:var(--tdim)}
-.empty-i{font-size:2.5rem;display:block;margin-bottom:12px;opacity:0.25}
-.empty-t{font-family:'Cormorant Garamond',serif;font-size:1.3rem;color:var(--tdim);margin-bottom:6px}
-.empty-s{font-size:0.8rem;line-height:1.7}
-.db-top{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap}
-.db-inp{flex:1;min-width:180px;background:var(--panel);border:1px solid var(--bdr);color:var(--wh);font-family:'Inter',sans-serif;font-size:0.8rem;padding:10px 14px;outline:none}
-.db-inp:focus{border-color:var(--gdim)}
-.pills{display:flex;gap:5px;flex-wrap:wrap}
-.pill{background:none;border:1px solid var(--bdr);color:var(--tdim);font-family:'DM Mono',monospace;font-size:0.58rem;letter-spacing:0.08em;padding:4px 11px;cursor:pointer;border-radius:20px;transition:all 0.2s;text-transform:uppercase}
-.pill.on,.pill:hover{background:var(--vdim);color:var(--mist);border-color:var(--vio)}
-.mol-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;max-height:520px;overflow-y:auto;padding-right:4px}
-.mol-grid::-webkit-scrollbar{width:3px}
-.mol-grid::-webkit-scrollbar-thumb{background:var(--bdr)}
-.mol{background:var(--panel);border:1px solid var(--bdr);padding:14px;cursor:pointer;transition:all 0.2s;position:relative}
+.prow{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:16px}
+.ps{background:none;border:1px solid var(--bdr);color:var(--tdim);font-family:"DM Mono",monospace;font-size:0.56rem;letter-spacing:0.05em;padding:4px 10px;cursor:pointer;border-radius:20px;transition:all 0.2s;text-transform:uppercase}
+.ps:hover{background:var(--vdim);color:#E8E4F0;border-color:var(--vio)}
+/* Charts */
+.cgrid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+@media(max-width:700px){.cgrid{grid-template-columns:1fr}}
+.cbox{background:var(--panel);border:1px solid var(--bdr);padding:16px}
+.cl{font-family:"DM Mono",monospace;font-size:0.56rem;letter-spacing:0.2em;color:var(--tdim);text-transform:uppercase;margin-bottom:12px}
+/* Accord bars */
+.abars{display:flex;flex-direction:column;gap:6px;margin-top:12px}
+.arow{display:flex;align-items:center;gap:9px}
+.an{font-family:"DM Mono",monospace;font-size:0.57rem;color:var(--tdim);width:100px;flex-shrink:0;text-transform:uppercase}
+.at{flex:1;height:4px;background:var(--bdr)}
+.af{height:100%;transition:width 1s ease}
+.av{font-family:"DM Mono",monospace;font-size:0.56rem;color:var(--tdim);width:28px;text-align:right}
+/* Meters */
+.meters{display:flex;flex-direction:column;gap:8px;margin-top:16px;padding-top:16px;border-top:1px solid var(--bdr)}
+.mr{display:flex;align-items:center;gap:12px}
+.ml{font-family:"DM Mono",monospace;font-size:0.56rem;color:var(--tdim);text-transform:uppercase;width:86px}
+.mt{flex:1;height:3px;background:var(--bdr)}
+.mf{height:100%;background:linear-gradient(90deg,var(--vio),var(--gold),var(--amb));transition:width 0.8s ease}
+.mv{font-family:"DM Mono",monospace;font-size:0.65rem;color:var(--gold);width:32px;text-align:right}
+.snb{display:inline-flex;align-items:center;gap:7px;background:rgba(123,111,212,0.1);border:1px solid var(--vdim);padding:7px 14px;font-family:"DM Mono",monospace;font-size:0.6rem;color:var(--vio);margin-top:12px;line-height:1.5}
+/* Formula table */
+.ftbl{width:100%;border-collapse:collapse;font-size:0.78rem;margin-bottom:16px}
+.ftbl th{font-family:"DM Mono",monospace;font-size:0.53rem;letter-spacing:0.16em;color:var(--tdim);text-transform:uppercase;padding:8px 12px;text-align:left;font-weight:400;border-bottom:1px solid var(--bdr)}
+.ftbl td{padding:9px 12px;border-bottom:1px solid rgba(42,42,62,0.4);color:var(--txt)}
+.ftbl tr:hover td{background:var(--panel)}
+.nbadge{display:inline-block;padding:2px 6px;font-family:"DM Mono",monospace;font-size:0.55rem;letter-spacing:0.07em;border-radius:10px;text-transform:uppercase}
+.nbtop{background:rgba(82,232,82,0.1);color:var(--grn);border:1px solid rgba(82,232,82,0.2)}
+.nbhrt{background:rgba(232,82,82,0.1);color:var(--red);border:1px solid rgba(232,82,82,0.2)}
+.nbbas{background:rgba(82,149,232,0.1);color:var(--blu);border:1px solid rgba(82,149,232,0.2)}
+.ok{color:var(--grn);font-size:0.65rem}.warn{color:var(--amb);font-size:0.65rem}
+.ci{background:var(--panel);border:1px solid var(--bdr);color:var(--wh);font-family:"DM Mono",monospace;font-size:0.72rem;padding:3px 6px;width:60px;outline:none;text-align:right}
+.ci:focus{border-color:var(--gdim)}
+.trow td{font-family:"DM Mono",monospace;font-size:0.7rem;color:var(--gold);border-top:1px solid var(--bdr);border-bottom:none;padding-top:10px}
+.nbox{background:var(--panel);border:1px solid var(--bdr);padding:14px;margin-top:4px}
+.nl{font-family:"DM Mono",monospace;font-size:0.55rem;color:var(--tdim);letter-spacing:0.14em;text-transform:uppercase;margin-bottom:8px}
+.nt{font-family:"Cormorant Garamond",serif;font-size:0.95rem;color:var(--txt);line-height:1.75;font-style:italic}
+.fhdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px}
+.ftitle{font-family:"Cormorant Garamond",serif;font-size:1.25rem;color:var(--wh)}
+.fbtns{display:flex;gap:6px;flex-wrap:wrap}
+/* DB */
+.dbtop{display:flex;gap:9px;margin-bottom:14px;flex-wrap:wrap}
+.dbi{flex:1;min-width:180px;background:var(--panel);border:1px solid var(--bdr);color:var(--wh);font-family:Inter,sans-serif;font-size:0.78rem;padding:9px 13px;outline:none}
+.dbi:focus{border-color:var(--gdim)}
+.pills{display:flex;gap:4px;flex-wrap:wrap}
+.pill{background:none;border:1px solid var(--bdr);color:var(--tdim);font-family:"DM Mono",monospace;font-size:0.56rem;letter-spacing:0.06em;padding:4px 10px;cursor:pointer;border-radius:20px;transition:all 0.2s;text-transform:uppercase}
+.pill.on,.pill:hover{background:var(--vdim);color:#E8E4F0;border-color:var(--vio)}
+.mgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:9px;max-height:500px;overflow-y:auto;padding-right:3px}
+.mgrid::-webkit-scrollbar{width:3px}
+.mgrid::-webkit-scrollbar-thumb{background:var(--bdr)}
+.mol{background:var(--panel);border:1px solid var(--bdr);padding:13px;position:relative;transition:border-color 0.2s}
 .mol:hover{border-color:var(--gdim)}
 .mol.sel{border-color:var(--gold);background:rgba(200,169,110,0.05)}
-.mol-n{font-family:'Cormorant Garamond',serif;font-size:0.95rem;color:var(--wh);margin-bottom:2px;padding-right:24px}
-.mol-src{font-family:'DM Mono',monospace;font-size:0.55rem;color:var(--gdim);letter-spacing:0.1em;margin-bottom:4px}
-.mol-cas{font-family:'DM Mono',monospace;font-size:0.55rem;color:var(--tdim);margin-bottom:6px}
-.mol-tags{display:flex;gap:3px;flex-wrap:wrap;margin-bottom:6px}
-.tag{font-size:0.55rem;font-family:'DM Mono',monospace;padding:2px 6px;border-radius:2px;letter-spacing:0.04em}
-.mol-od{font-size:0.7rem;color:var(--tdim);font-style:italic;line-height:1.4}
-.mol-btn{position:absolute;top:10px;right:10px;background:none;border:1px solid var(--bdr);color:var(--tdim);width:22px;height:22px;font-size:0.85rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s}
-.mol-btn:hover{border-color:var(--gold);color:var(--gold)}
-.nb-top{background:rgba(82,232,82,0.1);color:var(--grn);border:1px solid rgba(82,232,82,0.2)}
-.nb-heart{background:rgba(232,82,82,0.1);color:var(--red);border:1px solid rgba(232,82,82,0.2)}
-.nb-base{background:rgba(82,149,232,0.1);color:var(--blu);border:1px solid rgba(82,149,232,0.2)}
-.fml{background:var(--surf);border:1px solid var(--bdr);padding:28px;margin-bottom:28px}
-.fml-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px}
-.fml-title{font-family:'Cormorant Garamond',serif;font-size:1.3rem;color:var(--wh)}
-.fml-btns{display:flex;gap:8px}
-table{width:100%;border-collapse:collapse;font-size:0.8rem}
-th{font-family:'DM Mono',monospace;font-size:0.55rem;letter-spacing:0.18em;color:var(--tdim);text-transform:uppercase;padding:8px 14px;text-align:left;font-weight:400;border-bottom:1px solid var(--bdr)}
-td{padding:10px 14px;border-bottom:1px solid rgba(42,42,62,0.4);color:var(--txt)}
-tr:hover td{background:var(--panel)}
-.nbadge{display:inline-block;padding:2px 7px;font-family:'DM Mono',monospace;font-size:0.57rem;letter-spacing:0.08em;border-radius:10px;text-transform:uppercase}
-.ok{color:var(--grn);font-size:0.67rem}.warn{color:var(--amb);font-size:0.67rem}
-.conc-i{background:var(--panel);border:1px solid var(--bdr);color:var(--wh);font-family:'DM Mono',monospace;font-size:0.75rem;padding:4px 7px;width:64px;outline:none;text-align:right}
-.conc-i:focus{border-color:var(--gdim)}
-.total-row td{font-family:'DM Mono',monospace;font-size:0.72rem;color:var(--gold);border-top:1px solid var(--bdr);border-bottom:none;padding-top:12px}
-.notes-box{margin-top:20px;padding:14px;background:var(--panel);border:1px solid var(--bdr)}
-.notes-lbl{font-family:'DM Mono',monospace;font-size:0.57rem;color:var(--tdim);letter-spacing:0.14em;text-transform:uppercase;margin-bottom:10px}
-.notes-txt{font-family:'Cormorant Garamond',serif;font-size:0.98rem;color:var(--txt);line-height:1.75;font-style:italic}
-.toast{position:fixed;bottom:20px;right:20px;background:var(--panel);border:1px solid var(--bdr);color:var(--txt);padding:10px 18px;font-family:'DM Mono',monospace;font-size:0.68rem;z-index:9999;transform:translateY(70px);transition:transform 0.3s;max-width:300px}
+.mn{font-family:"Cormorant Garamond",serif;font-size:0.92rem;color:var(--wh);margin-bottom:1px;padding-right:22px;line-height:1.3}
+.msrc{font-family:"DM Mono",monospace;font-size:0.53rem;letter-spacing:0.09em;margin-bottom:3px}
+.mcas{font-family:"DM Mono",monospace;font-size:0.53rem;color:var(--tdim);margin-bottom:5px}
+.mtags{display:flex;gap:3px;flex-wrap:wrap;margin-bottom:5px}
+.tag{font-size:0.53rem;font-family:"DM Mono",monospace;padding:1px 5px;border-radius:2px}
+.mod{font-size:0.68rem;color:var(--tdim);font-style:italic;line-height:1.35}
+.madd{position:absolute;top:9px;right:9px;background:none;border:1px solid var(--bdr);color:var(--tdim);width:20px;height:20px;font-size:0.8rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;padding:0}
+.madd:hover{border-color:var(--gold);color:var(--gold)}
+.dbc{font-family:"DM Mono",monospace;font-size:0.56rem;color:var(--tdim);margin-bottom:10px}
+/* Empty */
+.empty{text-align:center;padding:48px 20px;color:var(--tdim)}
+.ei{font-size:2.2rem;display:block;margin-bottom:10px;opacity:0.22}
+.et{font-family:"Cormorant Garamond",serif;font-size:1.25rem;color:var(--tdim);margin-bottom:5px}
+.es{font-size:0.78rem;line-height:1.65}
+/* Toast */
+.toast{position:fixed;bottom:18px;right:18px;background:var(--panel);border:1px solid var(--bdr);color:var(--txt);padding:9px 16px;font-family:"DM Mono",monospace;font-size:0.65rem;z-index:9999;transform:translateY(70px);transition:transform 0.3s;max-width:280px;border-radius:2px}
 .toast.on{transform:translateY(0)}
-@media(max-width:768px){header{padding:0 14px}.lab{padding:60px 14px}.mol-grid{grid-template-columns:1fr 1fr}.navp{display:none}}
+@media(max-width:768px){nav{padding:0 14px}#lab{padding:64px 14px 32px}.mgrid{grid-template-columns:1fr 1fr}.navp{display:none}}
 </style>
 </head>
 <body>
-<header>
-  <div class="logo">RK Perfumery Lab<span>Fine Fragrance Formulation · Expert Mode</span></div>
-  <div class="navp">
-    <button class="navb on" onclick="showSec('viz',this)">Visualise</button>
-    <button class="navb" onclick="showSec('db',this)">Database</button>
-    <button class="navb" onclick="showSec('fml',this)">Formula</button>
-  </div>
-</header>
 
-<section class="hero" id="heroSec">
-  <div class="hero-orb"></div>
-  <div class="hero-c">
-    <div class="eyebrow">RK Perfumery Lab &nbsp;·&nbsp; Expert Formulation</div>
-    <h1 class="hero-t">Compose a<br><em>Fragrance</em></h1>
-    <p class="hero-s">Molecule to accord to single complex note</p>
-    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
-      <button class="btn-gold" onclick="enterLab()">Enter the Lab</button>
-      <button class="btn-ghost" onclick="enterLab();showSec('db',null)">Browse 300+ Chemicals</button>
+<nav>
+  <div class="logo">RK Perfumery Lab<small>Fine Fragrance Formulation</small></div>
+  <div class="navp" id="navp">
+    <button class="nb on" id="nb0" onclick="showSec(0)">Visualise</button>
+    <button class="nb" id="nb1" onclick="showSec(1)">Database</button>
+    <button class="nb" id="nb2" onclick="showSec(2)">Formula</button>
+  </div>
+</nav>
+
+<div id="hero">
+  <div class="hero-inner">
+    <div class="ey">RK Perfumery Lab &nbsp;&middot;&nbsp; Expert Mode</div>
+    <h1>Compose a<br><em>Fragrance</em></h1>
+    <p class="hs">Molecule to accord to single complex note</p>
+    <div class="btns">
+      <button class="bg" onclick="enterLab()">Enter the Lab</button>
+      <button class="bgh" onclick="enterLab();showSec(1)">Browse 200+ Chemicals</button>
     </div>
   </div>
-</section>
+</div>
 
-<div class="lab" id="labSec" style="display:none">
+<div id="lab">
+  <div id="sbar"><div class="dot off" id="sdot"></div><span id="stxt">Ready</span></div>
 
-  <div class="status"><div class="dot off" id="sdot"></div><span id="stxt">Ready — describe a vision or browse the database</span></div>
-
-  <!-- VISUALISE -->
-  <div id="sec-viz">
-    <div class="sec-lbl">01 &nbsp; Visualise a Fragrance</div>
+  <!-- SECTION 0: VISUALISE + AUTO FORMULA -->
+  <div id="s0">
+    <div class="sl">01 &nbsp; Visualise a Fragrance</div>
     <div class="card">
-      <div class="row">
-        <input class="inp" id="vPrompt" placeholder="e.g. Dark animalic amber with smoky vetiver, civetone, labdanum — single complex note targeting an oriental parfum extrait">
-        <button class="btn-gold" id="vBtn" onclick="doViz()">Visualise</button>
-        <button class="btn-ghost" onclick="clearViz()">Clear</button>
+      <div class="irow">
+        <input class="inp" id="vp" placeholder="e.g. Dark animalic amber with smoky vetiver, civetone, labdanum and oud — single complex note for an oriental extrait">
+        <button class="bg" id="vbtn" onclick="doViz()">Visualise</button>
+        <button class="bgh" onclick="document.getElementById('vp').value='';hideViz()">Clear</button>
       </div>
-      <div class="presets">
-        <span style="font-family:'DM Mono',monospace;font-size:0.57rem;color:var(--tdim);padding-top:5px;flex-shrink:0">PRESETS:</span>
-        <button class="preset" onclick="p('Dark animalic amber with castoreum, civetone, labdanum, vetiver Haiti and oud — a primal oriental extrait with single complex animalic-resinous note')">Dark Animalic</button>
-        <button class="preset" onclick="p('Aldehydic rose chypre with rose absolute, aldehyde C-12, oakmoss, labdanum and iris — classic Chanel type with powdery single note')">Aldehydic Rose</button>
-        <button class="preset" onclick="p('Marine ozonic aquatic with calone 1951, hedione HC, ambroxan and bergamot — transparent fresh single note for summer')">Marine Aquatic</button>
-        <button class="preset" onclick="p('Oriental oud with saffron absolute, rose absolute, agarwood CO2, ambergris, tonka bean — complex luxury single note')">Oriental Oud</button>
-        <button class="preset" onclick="p('Green chypre with oakmoss, galbanum, violet leaf, bergamot, labdanum — earthy complex single note')">Chypre Green</button>
-        <button class="preset" onclick="p('Smoky leather tobacco with birch tar, isobutyl quinoline, castoreum, tonka bean — animalic leathery single note')">Smoky Leather</button>
-        <button class="preset" onclick="p('Sandalwood fougere with lavender AOP, coumarin, Javanol sandalwood, ISO E super, linalool — classic elegant single note')">Fougere</button>
-        <button class="preset" onclick="p('Narcotic white floral with tuberose absolute, indole, ylang ylang, jasmine sambac, ambroxan — intensely floral single note')">White Floral</button>
+      <div class="prow">
+        <span style="font-family:DM Mono,monospace;font-size:0.54rem;color:var(--tdim);padding-top:5px;flex-shrink:0">PRESETS:</span>
+        <button class="ps" onclick="sp('Dark animalic amber with castoreum, civetone, labdanum, vetiver Haiti and oud CO2 — primal oriental extrait, single animalic-resinous note')">Dark Animalic</button>
+        <button class="ps" onclick="sp('Aldehydic rose chypre with rose absolute, aldehyde C-11, oakmoss, labdanum and orris — classic No5 type, powdery single note')">Aldehydic Rose</button>
+        <button class="ps" onclick="sp('Marine ozonic aquatic with calone 1951, hedione HC, ambroxan and bergamot FCF — transparent fresh single note')">Marine Aquatic</button>
+        <button class="ps" onclick="sp('Oriental oud with saffron absolute, rose absolute, agarwood CO2, ambroxan, tonka bean — complex luxury single note')">Oriental Oud</button>
+        <button class="ps" onclick="sp('Green chypre with oakmoss, galbanum, violet leaf, bergamot, cistus labdanum — classic earthy single note')">Chypre Green</button>
+        <button class="ps" onclick="sp('Smoky leather tobacco with birch tar, isobutyl quinoline, castoreum, tonka bean, patchouli — animalic leathery single note')">Smoky Leather</button>
+        <button class="ps" onclick="sp('Lavender fougere with lavender French AOP, coumarin, Javanol sandalwood, iso E super, linalool — elegant masculine single note')">Fougere</button>
+        <button class="ps" onclick="sp('Narcotic white floral with tuberose absolute, indole, ylang ylang extra, jasmine sambac, ambroxan — intensely floral single note')">White Floral</button>
       </div>
-      <div id="vizArea" style="display:none">
-        <div class="chart-grid">
-          <div class="chart-box"><div class="chart-lbl">Fragrance Pyramid</div><svg id="pyrSVG" height="240"></svg></div>
-          <div class="chart-box"><div class="chart-lbl">Accord Radar</div><svg id="radSVG" height="240"></svg></div>
+      <!-- Charts area (hidden until visualised) -->
+      <div id="varea" style="display:none">
+        <div class="cgrid">
+          <div class="cbox"><div class="cl">Fragrance Pyramid</div><svg id="pyrsvg" height="230"></svg></div>
+          <div class="cbox"><div class="cl">Accord Radar</div><svg id="radsvg" height="230"></svg></div>
         </div>
-        <div class="chart-box" style="margin-bottom:20px"><div class="chart-lbl">Evaporation Timeline — 24 Hours</div><svg id="timSVG" height="110"></svg></div>
-        <div class="bars" id="accordBars"></div>
-        <div id="snBadge"></div>
+        <div class="cbox" style="margin-bottom:16px"><div class="cl">Evaporation Timeline — 24hrs</div><svg id="timsvg" height="100"></svg></div>
+        <div class="abars" id="acordbars"></div>
+        <div id="snbadge"></div>
         <div class="meters">
-          <div class="meter-row"><div class="meter-lbl">Complexity</div><div class="meter-track"><div class="meter-fill" id="mC" style="width:0%"></div></div><div class="meter-val" id="mvC">-</div></div>
-          <div class="meter-row"><div class="meter-lbl">Longevity</div><div class="meter-track"><div class="meter-fill" id="mL" style="width:0%"></div></div><div class="meter-val" id="mvL">-</div></div>
-          <div class="meter-row"><div class="meter-lbl">Sillage</div><div class="meter-track"><div class="meter-fill" id="mS" style="width:0%"></div></div><div class="meter-val" id="mvS">-</div></div>
-          <div class="meter-row"><div class="meter-lbl">Animalic</div><div class="meter-track"><div class="meter-fill" id="mA" style="width:0%"></div></div><div class="meter-val" id="mvA">-</div></div>
+          <div class="mr"><div class="ml">Complexity</div><div class="mt"><div class="mf" id="mc" style="width:0%"></div></div><div class="mv" id="mvc">-</div></div>
+          <div class="mr"><div class="ml">Longevity</div><div class="mt"><div class="mf" id="ml" style="width:0%"></div></div><div class="mv" id="mvl">-</div></div>
+          <div class="mr"><div class="ml">Sillage</div><div class="mt"><div class="mf" id="ms" style="width:0%"></div></div><div class="mv" id="mvs">-</div></div>
+          <div class="mr"><div class="ml">Animalic</div><div class="mt"><div class="mf" id="ma" style="width:0%"></div></div><div class="mv" id="mva">-</div></div>
         </div>
       </div>
-      <div id="vizEmpty" class="empty"><span class="empty-i">⬡</span><div class="empty-t">No fragrance visualised</div><div class="empty-s">Describe your vision above — the lab will map it across the olfactory pyramid, radar and evaporation curve.</div></div>
+      <div id="vempty" class="empty"><span class="ei">&#11041;</span><div class="et">No fragrance visualised</div><div class="es">Describe your vision above and the lab will map it across the olfactory pyramid, accord radar and evaporation timeline.</div></div>
+    </div>
+
+    <!-- AUTO FORMULA (appears after visualise) -->
+    <div id="farea" style="display:none">
+      <div class="sl">02 &nbsp; Generated Formula</div>
+      <div class="card">
+        <div class="fhdr">
+          <div class="ftitle" id="ftitle">Formula</div>
+          <div class="fbtns">
+            <button class="bgh" onclick="exportCSV()">&#8681; CSV</button>
+            <button class="bgh" onclick="exportPDF()">&#8681; PDF</button>
+            <button class="bgh" onclick="exportTXT()">&#8681; TXT</button>
+            <button class="bg" onclick="regenFormula()">Regenerate</button>
+          </div>
+        </div>
+        <div id="fgen" class="empty"><span class="ei">&#9881;</span><div class="et">Generating formula...</div></div>
+        <div id="ftbl" style="display:none">
+          <table class="ftbl">
+            <thead><tr><th>Ingredient</th><th>Brand/Source</th><th>Note</th><th>Odour</th><th>Conc %</th><th>Per 10g</th><th>IFRA %</th><th>Status</th><th></th></tr></thead>
+            <tbody id="fbody"></tbody>
+            <tfoot><tr class="trow"><td colspan="4">TOTAL CONCENTRATE</td><td id="ftotal">0.00%</td><td></td><td></td><td></td><td></td></tr></tfoot>
+          </table>
+          <div class="nbox"><div class="nl">Perfumer's Notes</div><div class="nt" id="fnotes"></div></div>
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- INLINE FORMULA (shown after visualise) -->
-  <div id="fmlInline" style="display:none">
-    <div class="sec-lbl">03 &nbsp; Generated Formula</div>
-    <div class="fml">
-      <div class="fml-hdr">
-        <div class="fml-title" id="fmlTitle2">Working Formula</div>
-        <div class="fml-btns">
-          <button class="btn-ghost" onclick="exportCSV()">&#8681; CSV</button>
-          <button class="btn-ghost" onclick="exportPDF()">&#8681; PDF</button>
-          <button class="btn-ghost" onclick="exportFormula()">&#8681; TXT</button>
-          <button class="btn-gold" onclick="aiFormula()">Regenerate</button>
-        </div>
-      </div>
-      <div id="fmlEmpty2" class="empty"><span class="empty-i">⚗</span><div class="empty-t">Generating formula...</div></div>
-      <div id="fmlTable2" style="display:none">
-        <table>
-          <thead><tr><th>Ingredient</th><th>Brand</th><th>Note</th><th>Odour Profile</th><th>Conc %</th><th>Per 10g</th><th>IFRA %</th><th>Status</th><th></th></tr></thead>
-          <tbody id="fmlBody2"></tbody>
-          <tfoot><tr class="total-row"><td colspan="4">TOTAL CONCENTRATE</td><td id="totalPct2">0.00%</td><td></td><td></td><td></td><td></td></tr></tfoot>
-        </table>
-        <div class="notes-box"><div class="notes-lbl">Perfumer's Notes</div><div class="notes-txt" id="fmlNotes2"></div></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- DATABASE -->
-  <div id="sec-db" style="display:none">
-    <div class="sec-lbl">02 &nbsp; Aroma Chemical Database · 300+ Compounds</div>
+  <!-- SECTION 1: DATABASE -->
+  <div id="s1" style="display:none">
+    <div class="sl">02 &nbsp; Aroma Chemical Database &mdash; 200+ Compounds</div>
     <div class="card">
-      <div class="db-top">
-        <input class="db-inp" id="dbQ" placeholder="Search by name, brand, CAS, odour..." oninput="filterDB()">
-        <div class="pills" id="filterPills"></div>
+      <div class="dbtop">
+        <input class="dbi" id="dbq" placeholder="Search by name, brand, CAS, odour..." oninput="filterDB()">
+        <div class="pills" id="fpills"></div>
       </div>
-      <div style="font-family:'DM Mono',monospace;font-size:0.58rem;color:var(--tdim);margin-bottom:12px" id="dbCount"></div>
-      <div class="mol-grid" id="molGrid"></div>
+      <div class="dbc" id="dbc"></div>
+      <div class="mgrid" id="mgrid"></div>
     </div>
   </div>
 
-  <!-- FORMULA -->
-  <div id="sec-fml" style="display:none">
-    <div class="sec-lbl">03 &nbsp; Formulation</div>
-    <div class="fml">
-      <div class="fml-hdr">
-        <div class="fml-title" id="fmlTitle">Working Formula</div>
-        <div class="fml-btns">
-          <button class="btn-ghost" onclick="exportCSV()">Export CSV</button>
-          <button class="btn-ghost" onclick="exportFormula()">Export TXT</button>
-          <button class="btn-gold" onclick="aiFormula()">AI Suggest Formula</button>
+  <!-- SECTION 2: FORMULA (manual / from DB) -->
+  <div id="s2" style="display:none">
+    <div class="sl">03 &nbsp; Formula Builder</div>
+    <div class="card">
+      <div class="fhdr">
+        <div class="ftitle" id="ftitle2">Working Formula</div>
+        <div class="fbtns">
+          <button class="bgh" onclick="exportCSV()">&#8681; CSV</button>
+          <button class="bgh" onclick="exportPDF()">&#8681; PDF</button>
+          <button class="bgh" onclick="exportTXT()">&#8681; TXT</button>
+          <button class="bg" onclick="regenFormula()">AI Suggest</button>
         </div>
       </div>
-      <div id="fmlEmpty" class="empty"><span class="empty-i">⚗</span><div class="empty-t">No formula yet</div><div class="empty-s">Visualise a fragrance or add molecules from the database to start formulating.</div></div>
-      <div id="fmlTable" style="display:none">
-        <table>
+      <div id="s2empty" class="empty"><span class="ei">&#9879;</span><div class="et">No formula yet</div><div class="es">Visualise a fragrance to auto-generate, or add ingredients from the Database tab.</div></div>
+      <div id="s2tbl" style="display:none">
+        <table class="ftbl">
           <thead><tr><th>Ingredient</th><th>Brand/Source</th><th>Note</th><th>Odour</th><th>Conc %</th><th>Per 10g</th><th>IFRA %</th><th>Status</th><th></th></tr></thead>
-          <tbody id="fmlBody"></tbody>
-          <tfoot><tr class="total-row"><td colspan="4">TOTAL CONCENTRATE</td><td id="totalPct">0.00%</td><td></td><td></td><td></td><td></td></tr></tfoot>
+          <tbody id="fbody2"></tbody>
+          <tfoot><tr class="trow"><td colspan="4">TOTAL CONCENTRATE</td><td id="ftotal2">0.00%</td><td></td><td></td><td></td><td></td></tr></tfoot>
         </table>
-        <div class="notes-box"><div class="notes-lbl">Perfumer's Notes</div><div class="notes-txt" id="fmlNotes"></div></div>
+        <div class="nbox"><div class="nl">Perfumer's Notes</div><div class="nt" id="fnotes2"></div></div>
       </div>
     </div>
   </div>
@@ -242,7 +252,6 @@ tr:hover td{background:var(--panel)}
 <div class="toast" id="toast"></div>
 
 <script>
-// ── COMPREHENSIVE DATABASE ───────────────────────────────────────────────────
 var DB = [
 // ── IFF CAPTIVES & SPECIALTIES ──────────────────────────────────────────────
 {id:"galaxolide",name:"Galaxolide",src:"IFF",cas:"1222-05-5",note:"base",tags:["musky","clean","powdery"],odor:"Clean warm musk, powdery, slightly floral — the iconic IFF musk",ifra:14.7,fam:"musky",v:12},
@@ -413,187 +422,137 @@ var DB = [
 {id:"ald-c18",name:"Aldehyde C-18 Coconut",src:"Generic",cas:"104-61-0",note:"heart",tags:["coconut","lactonic","sweet","fruity"],odor:"Coconut, creamy lactonic, sweet milky",ifra:0.8,fam:"fruity",v:40},
 ];
 
-// Deduplicate by id
+// Deduplicate
 var seen = {};
 DB = DB.filter(function(m){if(seen[m.id]){return false;}seen[m.id]=true;return true;});
 
-// ── STATE ────────────────────────────────────────────────────────────────────
 var formula = [];
-var vizResult = null;
+var curViz = null;
 var curFilter = "all";
 
-// ── NAV ──────────────────────────────────────────────────────────────────────
+// ── NAVIGATION ───────────────────────────────────────────────────────────────
 function enterLab(){
-  document.getElementById("heroSec").style.display = "none";
-  document.getElementById("labSec").style.display = "block";
+  document.getElementById("hero").style.display = "none";
+  document.getElementById("lab").style.display = "block";
   renderDB();
 }
 
-function showSec(s, btn){
-  ["viz","db","fml"].forEach(function(x){
-    var el = document.getElementById("sec-"+x);
-    if(el) el.style.display = x==s?"block":"none";
-  });
-  if(btn){
-    document.querySelectorAll(".navb").forEach(function(b){b.classList.remove("on");});
-    btn.classList.add("on");
+function showSec(n){
+  for(var i=0;i<3;i++){
+    document.getElementById("s"+i).style.display = i==n?"block":"none";
+    document.getElementById("nb"+i).className = "nb" + (i==n?" on":"");
   }
-  if(s=="fml") renderFormula();
-  if(s=="db") renderDB();
+  if(n==1) renderDB();
+  if(n==2) renderFmlTab();
 }
 
-// ── STATUS ───────────────────────────────────────────────────────────────────
 function setStatus(state, txt){
-  var dot = document.getElementById("sdot");
-  var el = document.getElementById("stxt");
-  dot.className = "dot " + (state=="busy"?"busy":state=="idle"?"":"off");
-  el.textContent = txt;
+  document.getElementById("sdot").className = "dot " + (state=="busy"?"busy":state=="idle"?"":"off");
+  document.getElementById("stxt").textContent = txt;
 }
 
 // ── VISUALISE ────────────────────────────────────────────────────────────────
-function p(t){ document.getElementById("vPrompt").value = t; }
+function sp(t){ document.getElementById("vp").value = t; }
 
-function clearViz(){
-  document.getElementById("vPrompt").value = "";
-  document.getElementById("vizArea").style.display = "none";
-  document.getElementById("vizEmpty").style.display = "block";
-  vizResult = null;
+function hideViz(){
+  document.getElementById("varea").style.display = "none";
+  document.getElementById("vempty").style.display = "block";
+  document.getElementById("farea").style.display = "none";
+  curViz = null;
 }
 
-async function doViz(){
-  var prompt = document.getElementById("vPrompt").value.trim();
+function doViz(){
+  var prompt = document.getElementById("vp").value.trim();
   if(!prompt){showToast("Describe a fragrance first");return;}
-  var btn = document.getElementById("vBtn");
+  var btn = document.getElementById("vbtn");
   btn.disabled = true; btn.textContent = "Analysing...";
-  setStatus("busy","AI analysing olfactory structure...");
-  document.getElementById("vizEmpty").style.display = "none";
-  document.getElementById("vizArea").style.display = "none";
-  try{
-    var res = await fetch("/.netlify/functions/claude",{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({
-        max_tokens:1500,
-        system:'You are a master perfumer. Return ONLY a raw JSON object — no markdown, no backticks, no explanation. Start with { and end with }. Schema: {"name":"string","topNotes":[{"ingredient":"string","pct":number,"odor":"string"}],"heartNotes":[{"ingredient":"string","pct":number,"odor":"string"}],"baseNotes":[{"ingredient":"string","pct":number,"odor":"string"}],"accords":{"floral":0-100,"woody":0-100,"fresh":0-100,"animalic":0-100,"resinous":0-100,"musky":0-100,"spicy":0-100,"green":0-100,"citrus":0-100},"complexity":0-100,"longevity":0-100,"sillage":0-100,"animalicIntensity":0-100,"singleNoteCharacter":"string","perfumerNote":"string"}',
-        messages:[{role:"user",content:"Analyse for a professional formulator: " + prompt}]
-      })
-    });
-    var data = await res.json();
-    if(!data.content || !data.content[0]){
-      var errMsg = data.error ? data.error.message : JSON.stringify(data);
-      throw new Error("API error: " + errMsg);
-    }
-    var txt = data.content[0].text;
-    var s = txt.indexOf("{"), e = txt.lastIndexOf("}");
-    if(s>=0 && e>s){ txt = txt.substring(s,e+1); }
-    vizResult = JSON.parse(txt);
-    renderViz(vizResult);
-    setStatus("busy","Generating professional formula...");
-    await autoFormula(vizResult, prompt);
-    setStatus("idle","Analysis complete — " + vizResult.name);
-  }catch(err){
-    setStatus("off","Analysis failed: " + err.message);
-    showToast("Error: " + err.message);
-  }
-  btn.disabled = false; btn.textContent = "Visualise";
-}
+  setStatus("busy","Analysing olfactory structure...");
+  document.getElementById("vempty").style.display = "none";
+  document.getElementById("varea").style.display = "none";
+  document.getElementById("farea").style.display = "none";
 
-async function autoFormula(d, prompt){
-  try{
-    var src = "Create a professional perfumer formula for this fragrance: " + prompt
-      + ". Single complex note target: " + (d.singleNoteCharacter||"")
-      + ". Accords: " + JSON.stringify(d.accords||{})
-      + ". Use ONLY chemicals from this database: " + DB.map(function(m){return m.name+"("+m.src+","+m.note+",IFRA:"+m.ifra+"%)";}).join(", ")
-      + ". Give 8-14 ingredients with precise concentrations summing to 90-100%.";
-    var res = await fetch("/.netlify/functions/claude",{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({
-        max_tokens:1500,
-        system:"You are a master perfumer. Return ONLY raw JSON — no markdown, no backticks, no explanation. Start with { end with }. Schema: {\"formula\":[{\"ingredient\":\"exact name\",\"pct\":number}],\"name\":\"creative fragrance name\",\"perfumerNote\":\"expert 4-sentence note on structure, evolution, materials chosen, and the single-note complexity achieved\"}",
-        messages:[{role:"user",content:src}]
-      })
-    });
-    var data = await res.json();
-    if(!data.content||!data.content[0]) throw new Error(data.error?data.error.message:"No response");
+  fetch("/.netlify/functions/claude",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({
+      max_tokens:1500,
+      system:"You are a master perfumer. Return ONLY a raw JSON object. No markdown, no backticks, no explanation. Start with { end with }. Required schema: {name:string,topNotes:[{ingredient:string,pct:number,odor:string}],heartNotes:[{ingredient:string,pct:number,odor:string}],baseNotes:[{ingredient:string,pct:number,odor:string}],accords:{floral:0-100,woody:0-100,fresh:0-100,animalic:0-100,resinous:0-100,musky:0-100,spicy:0-100,green:0-100,citrus:0-100},complexity:0-100,longevity:0-100,sillage:0-100,animalicIntensity:0-100,singleNoteCharacter:string,perfumerNote:string}",
+      messages:[{role:"user",content:"Analyse for professional formulator: "+prompt}]
+    })
+  })
+  .then(function(r){return r.json();})
+  .then(function(data){
+    if(!data.content||!data.content[0]){
+      throw new Error(data.error?data.error.message:JSON.stringify(data));
+    }
     var txt = data.content[0].text;
     var s=txt.indexOf("{"),e=txt.lastIndexOf("}");
     if(s>=0&&e>s){txt=txt.substring(s,e+1);}
-    var result = JSON.parse(txt);
-    formula=[];
-    (result.formula||[]).forEach(function(item){
-      var mol=DB.find(function(m){
-        var mn=m.name.toLowerCase(), rn=item.ingredient.toLowerCase();
-        return mn===rn||mn.indexOf(rn)>=0||rn.indexOf(mn.split(" ")[0])>=0;
-      });
-      if(mol){formula.push({id:mol.id,name:mol.name,src:mol.src,note:mol.note,odor:mol.odor,ifra:mol.ifra,pct:item.pct});}
-    });
-    if(result.name){
-      document.getElementById("fmlTitle2").textContent=result.name;
-      document.getElementById("fmlTitle").textContent=result.name;
-    }
-    document.getElementById("fmlNotes2").textContent=result.perfumerNote||"";
-    document.getElementById("fmlNotes").textContent=result.perfumerNote||"";
-    renderFormulaInline();
-    renderFormula();
-    document.getElementById("fmlInline").style.display="block";
-  }catch(err){
-    showToast("Formula error: "+err.message);
-  }
-}
-
-function renderViz(d){
-  document.getElementById("vizArea").style.display = "block";
-  renderPyramid(d);
-  renderRadar(d);
-  renderTimeline(d);
-  renderBars(d);
-  anim("mC","mvC",d.complexity);
-  anim("mL","mvL",d.longevity);
-  anim("mS","mvS",d.sillage);
-  anim("mA","mvA",d.animalicIntensity||0);
-  document.getElementById("snBadge").innerHTML = d.singleNoteCharacter
-    ? '<div class="snb">&#9670; SINGLE NOTE: ' + d.singleNoteCharacter + '</div>' : "";
-}
-
-function anim(fId,vId,pct){
-  setTimeout(function(){
-    document.getElementById(fId).style.width = pct + "%";
-    document.getElementById(vId).textContent = pct + "%";
-  },150);
-}
-
-function renderPyramid(d){
-  var svg = d3.select("#pyrSVG");
-  var W = document.getElementById("pyrSVG").parentElement.clientWidth - 40;
-  var H = 240;
-  svg.attr("width",W).attr("height",H);
-  svg.selectAll("*").remove();
-  var tiers = [
-    {lbl:"TOP",notes:d.topNotes||[],col:"#52E852",y:0,h:H*0.28,w:0.55},
-    {lbl:"HEART",notes:d.heartNotes||[],col:"#E85252",y:H*0.28,h:H*0.36,w:0.75},
-    {lbl:"BASE",notes:d.baseNotes||[],col:"#5295E8",y:H*0.64,h:H*0.36,w:1.0},
-  ];
-  tiers.forEach(function(t){
-    var tw = W*t.w, tx = (W-tw)/2;
-    svg.append("rect").attr("x",tx).attr("y",t.y).attr("width",tw).attr("height",t.h-2).attr("fill",t.col).attr("opacity",0.07);
-    svg.append("rect").attr("x",tx).attr("y",t.y).attr("width",tw).attr("height",2).attr("fill",t.col).attr("opacity",0.3);
-    svg.append("text").attr("x",tx+7).attr("y",t.y+14).attr("fill",t.col).attr("opacity",0.7).attr("font-family","DM Mono").attr("font-size",8).attr("letter-spacing",2).text(t.lbl);
-    var nm = (t.notes||[]).map(function(n){return n.ingredient;}).join("  ·  ");
-    svg.append("text").attr("x",tx+tw/2).attr("y",t.y+t.h/2+5).attr("fill","#C4C0D4").attr("font-family","Cormorant Garamond").attr("font-size",12).attr("text-anchor","middle").attr("font-style","italic").text(nm.substring(0,60)+(nm.length>60?"…":""));
+    curViz = JSON.parse(txt);
+    drawViz(curViz);
+    setStatus("busy","Generating formula...");
+    genFormula(curViz, prompt);
+  })
+  .catch(function(err){
+    setStatus("off","Failed: "+err.message);
+    showToast("Error: "+err.message);
+    document.getElementById("vempty").style.display = "block";
+  })
+  .finally(function(){
+    btn.disabled = false; btn.textContent = "Visualise";
   });
 }
 
-function renderRadar(d){
-  var svg = d3.select("#radSVG");
-  var W = document.getElementById("radSVG").parentElement.clientWidth - 40;
-  var H = 240;
-  svg.attr("width",W).attr("height",H);
+function drawViz(d){
+  document.getElementById("varea").style.display = "block";
+  document.getElementById("vempty").style.display = "none";
+  drawPyramid(d);
+  drawRadar(d);
+  drawTimeline(d);
+  drawBars(d);
+  am("mc","mvc",d.complexity);
+  am("ml","mvl",d.longevity);
+  am("ms","mvs",d.sillage);
+  am("ma","mva",d.animalicIntensity||0);
+  document.getElementById("snbadge").innerHTML = d.singleNoteCharacter
+    ? "<div class=\"snb\">&#9670; SINGLE NOTE: "+d.singleNoteCharacter+"</div>" : "";
+}
+
+function am(fid,vid,pct){
+  setTimeout(function(){
+    document.getElementById(fid).style.width=pct+"%";
+    document.getElementById(vid).textContent=pct+"%";
+  },150);
+}
+
+function drawPyramid(d){
+  var el = document.getElementById("pyrsvg");
+  var W = el.parentElement.clientWidth-32, H=230;
+  var svg = d3.select("#pyrsvg").attr("width",W).attr("height",H);
   svg.selectAll("*").remove();
-  var acc = d.accords||{};
-  var keys = Object.keys(acc);
+  var tiers=[
+    {l:"TOP",n:d.topNotes||[],c:"#52E852",y:0,h:H*0.28,w:0.55},
+    {l:"HEART",n:d.heartNotes||[],c:"#E85252",y:H*0.28,h:H*0.36,w:0.76},
+    {l:"BASE",n:d.baseNotes||[],c:"#5295E8",y:H*0.64,h:H*0.36,w:1.0},
+  ];
+  tiers.forEach(function(t){
+    var tw=W*t.w,tx=(W-tw)/2;
+    svg.append("rect").attr("x",tx).attr("y",t.y).attr("width",tw).attr("height",t.h-2).attr("fill",t.c).attr("opacity",0.07);
+    svg.append("rect").attr("x",tx).attr("y",t.y).attr("width",tw).attr("height",2).attr("fill",t.c).attr("opacity",0.3);
+    svg.append("text").attr("x",tx+6).attr("y",t.y+13).attr("fill",t.c).attr("opacity",0.65).attr("font-family","DM Mono").attr("font-size",7).attr("letter-spacing",2).text(t.l);
+    var nm=(t.n||[]).map(function(x){return x.ingredient;}).join("  ·  ");
+    svg.append("text").attr("x",tx+tw/2).attr("y",t.y+t.h/2+5).attr("fill","#C4C0D4").attr("font-family","Cormorant Garamond").attr("font-size",11).attr("text-anchor","middle").attr("font-style","italic").text(nm.substring(0,58)+(nm.length>58?"…":""));
+  });
+}
+
+function drawRadar(d){
+  var el = document.getElementById("radsvg");
+  var W = el.parentElement.clientWidth-32, H=230;
+  var svg = d3.select("#radsvg").attr("width",W).attr("height",H);
+  svg.selectAll("*").remove();
+  var acc=d.accords||{}, keys=Object.keys(acc);
   if(!keys.length) return;
-  var cx=W/2, cy=H/2, R=Math.min(cx,cy)-28, n=keys.length, step=(2*Math.PI)/n;
+  var cx=W/2,cy=H/2,R=Math.min(cx,cy)-26,n=keys.length,step=(2*Math.PI)/n;
   [0.25,0.5,0.75,1].forEach(function(r){
     var pts=keys.map(function(_,i){var a=i*step-Math.PI/2;return[cx+R*r*Math.cos(a),cy+R*r*Math.sin(a)];});
     svg.append("polygon").attr("points",pts.map(function(p){return p.join(",");}).join(" ")).attr("fill","none").attr("stroke","rgba(42,42,62,0.8)").attr("stroke-width",1);
@@ -601,62 +560,197 @@ function renderRadar(d){
   keys.forEach(function(k,i){
     var a=i*step-Math.PI/2;
     svg.append("line").attr("x1",cx).attr("y1",cy).attr("x2",cx+R*Math.cos(a)).attr("y2",cy+R*Math.sin(a)).attr("stroke","rgba(42,42,62,0.5)").attr("stroke-width",1);
-    svg.append("text").attr("x",cx+(R+16)*Math.cos(a)).attr("y",cy+(R+16)*Math.sin(a)+3).attr("text-anchor","middle").attr("font-family","DM Mono").attr("font-size",7).attr("fill","rgba(110,106,130,0.85)").attr("letter-spacing",1).text(k.toUpperCase());
+    svg.append("text").attr("x",cx+(R+15)*Math.cos(a)).attr("y",cy+(R+15)*Math.sin(a)+3).attr("text-anchor","middle").attr("font-family","DM Mono").attr("font-size",7).attr("fill","rgba(110,106,130,0.85)").attr("letter-spacing",1).text(k.toUpperCase());
   });
   var dp=keys.map(function(k,i){var v=(acc[k]||0)/100,a=i*step-Math.PI/2;return[cx+R*v*Math.cos(a),cy+R*v*Math.sin(a)];});
-  svg.append("polygon").attr("points",dp.map(function(p){return p.join(",");}).join(" ")).attr("fill","rgba(123,111,212,0.15)").attr("stroke","rgba(123,111,212,0.65)").attr("stroke-width",1.5);
+  svg.append("polygon").attr("points",dp.map(function(p){return p.join(",");}).join(" ")).attr("fill","rgba(123,111,212,0.14)").attr("stroke","rgba(123,111,212,0.65)").attr("stroke-width",1.5);
   dp.forEach(function(p){svg.append("circle").attr("cx",p[0]).attr("cy",p[1]).attr("r",3).attr("fill","#7B6FD4");});
 }
 
-function renderTimeline(d){
-  var svg = d3.select("#timSVG");
-  var W = document.getElementById("timSVG").parentElement.clientWidth - 40;
-  var H = 110;
-  svg.attr("width",W).attr("height",H);
+function drawTimeline(d){
+  var el = document.getElementById("timsvg");
+  var W = el.parentElement.clientWidth-32, H=100;
+  var svg = d3.select("#timsvg").attr("width",W).attr("height",H);
   svg.selectAll("*").remove();
   var hrs=[0,0.5,1,2,3,4,6,8,12,24];
-  var curves=[
-    {lbl:"Top",col:"#52E852",vals:[100,90,60,20,5,2,0,0,0,0]},
-    {lbl:"Heart",col:"#E85252",vals:[20,40,80,90,80,60,35,15,5,0]},
-    {lbl:"Base",col:"#5295E8",vals:[5,8,15,25,40,55,70,80,75,50]},
-  ];
-  var xs=d3.scaleLinear().domain([0,24]).range([36,W-8]);
-  var ys=d3.scaleLinear().domain([0,100]).range([H-18,8]);
+  var curves=[{l:"Top",c:"#52E852",v:[100,90,60,20,5,2,0,0,0,0]},{l:"Heart",c:"#E85252",v:[20,40,80,90,80,60,35,15,5,0]},{l:"Base",c:"#5295E8",v:[5,8,15,25,40,55,70,80,75,50]}];
+  var xs=d3.scaleLinear().domain([0,24]).range([32,W-6]);
+  var ys=d3.scaleLinear().domain([0,100]).range([H-16,6]);
   [0,6,12,24].forEach(function(h){
-    svg.append("line").attr("x1",xs(h)).attr("y1",H-18).attr("x2",xs(h)).attr("y2",8).attr("stroke","rgba(42,42,62,0.4)").attr("stroke-width",1);
-    svg.append("text").attr("x",xs(h)).attr("y",H-5).attr("text-anchor","middle").attr("font-family","DM Mono").attr("font-size",7).attr("fill","rgba(110,106,130,0.7)").text(h+"h");
+    svg.append("line").attr("x1",xs(h)).attr("y1",H-16).attr("x2",xs(h)).attr("y2",6).attr("stroke","rgba(42,42,62,0.4)").attr("stroke-width",1);
+    svg.append("text").attr("x",xs(h)).attr("y",H-4).attr("text-anchor","middle").attr("font-family","DM Mono").attr("font-size",7).attr("fill","rgba(110,106,130,0.65)").text(h+"h");
   });
   curves.forEach(function(c,ci){
     var line=d3.line().x(function(_,i){return xs(hrs[i]);}).y(function(v){return ys(v);}).curve(d3.curveCatmullRom);
-    svg.append("path").datum(c.vals).attr("d",line).attr("fill","none").attr("stroke",c.col).attr("stroke-width",1.5).attr("opacity",0.7);
-    svg.append("rect").attr("x",38+ci*52).attr("y",H-16).attr("width",7).attr("height",3).attr("fill",c.col).attr("opacity",0.7);
-    svg.append("text").attr("x",48+ci*52).attr("y",H-11).attr("font-family","DM Mono").attr("font-size",7).attr("fill","rgba(196,192,212,0.7)").text(c.lbl);
+    svg.append("path").datum(c.v).attr("d",line).attr("fill","none").attr("stroke",c.c).attr("stroke-width",1.5).attr("opacity",0.7);
+    svg.append("rect").attr("x",34+ci*50).attr("y",H-14).attr("width",6).attr("height",3).attr("fill",c.c).attr("opacity",0.7);
+    svg.append("text").attr("x",43+ci*50).attr("y",H-9).attr("font-family","DM Mono").attr("font-size",7).attr("fill","rgba(196,192,212,0.7)").text(c.l);
   });
 }
 
-function renderBars(d){
-  var el=document.getElementById("accordBars");
+function drawBars(d){
+  var el=document.getElementById("acordbars");
   var acc=d.accords||{};
   var keys=Object.keys(acc).sort(function(a,b){return acc[b]-acc[a];});
   var cols={floral:"#E85252",woody:"#C8A96E",fresh:"#52E852",animalic:"#E8A44A",resinous:"#C8745A",musky:"#9B8FD4",spicy:"#E85298",green:"#52C852",citrus:"#E8D452"};
-  el.innerHTML='<div style="font-family:DM Mono;font-size:0.57rem;color:var(--tdim);letter-spacing:0.2em;text-transform:uppercase;margin-bottom:10px">ACCORD BREAKDOWN</div>';
+  var h='<div style="font-family:DM Mono,monospace;font-size:0.55rem;color:var(--tdim);letter-spacing:0.2em;text-transform:uppercase;margin-bottom:8px">ACCORD BREAKDOWN</div>';
   keys.forEach(function(k){
-    var v=acc[k]||0, c=cols[k]||"#999";
-    el.innerHTML+='<div class="bar-row"><div class="bar-name">'+k+'</div><div class="bar-track"><div class="bar-fill" style="width:0%;background:'+c+'" data-t="'+v+'"></div></div><div class="bar-pct">'+v+'</div></div>';
+    var v=acc[k]||0,c=cols[k]||"#888";
+    h+='<div class="arow"><div class="an">'+k+'</div><div class="at"><div class="af" style="width:0%;background:'+c+'" data-t="'+v+'"></div></div><div class="av">'+v+'</div></div>';
   });
-  setTimeout(function(){document.querySelectorAll(".bar-fill").forEach(function(b){b.style.width=b.getAttribute("data-t")+"%";});},150);
+  el.innerHTML=h;
+  setTimeout(function(){document.querySelectorAll(".af").forEach(function(b){b.style.width=b.getAttribute("data-t")+"%";});},150);
 }
 
+// ── FORMULA GENERATION ───────────────────────────────────────────────────────
+function genFormula(viz, prompt){
+  var src = "Create a professional perfumer formula for: " + prompt
+    + ". Target single note: " + (viz.singleNoteCharacter||"")
+    + ". Available chemicals: " + DB.map(function(m){return m.name+"("+m.src+","+m.note+",IFRA:"+m.ifra+"%)";}).join(", ")
+    + ". Give 8-14 ingredients. Concentrations must sum to 90-100%.";
+
+  document.getElementById("farea").style.display = "block";
+  document.getElementById("fgen").style.display = "block";
+  document.getElementById("ftbl").style.display = "none";
+
+  fetch("/.netlify/functions/claude",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({
+      max_tokens:1500,
+      system:"You are a master perfumer. Return ONLY raw JSON. No markdown, no backticks. Start with { end with }. Schema: {formula:[{ingredient:string,pct:number}],name:string,perfumerNote:string}",
+      messages:[{role:"user",content:src}]
+    })
+  })
+  .then(function(r){return r.json();})
+  .then(function(data){
+    if(!data.content||!data.content[0]) throw new Error(data.error?data.error.message:"No API response");
+    var txt=data.content[0].text;
+    var s=txt.indexOf("{"),e=txt.lastIndexOf("}");
+    if(s>=0&&e>s){txt=txt.substring(s,e+1);}
+    var result=JSON.parse(txt);
+    formula=[];
+    (result.formula||[]).forEach(function(item){
+      var mol=DB.find(function(m){
+        var mn=m.name.toLowerCase(),rn=item.ingredient.toLowerCase();
+        return mn===rn||mn.indexOf(rn)>=0||rn.indexOf(mn.split(" ")[0])>=0;
+      });
+      if(mol){formula.push({id:mol.id,name:mol.name,src:mol.src,note:mol.note,odor:mol.odor,ifra:mol.ifra,pct:item.pct});}
+    });
+    var name=result.name||"Formula";
+    document.getElementById("ftitle").textContent=name;
+    document.getElementById("ftitle2").textContent=name;
+    document.getElementById("fnotes").textContent=result.perfumerNote||"";
+    document.getElementById("fnotes2").textContent=result.perfumerNote||"";
+    renderFml();
+    setStatus("idle","Complete — "+name);
+  })
+  .catch(function(err){
+    setStatus("off","Formula failed: "+err.message);
+    showToast("Formula error: "+err.message);
+    document.getElementById("fgen").style.display="none";
+  });
+}
+
+function regenFormula(){
+  var prompt=document.getElementById("vp").value.trim();
+  if(!prompt){showToast("Describe a fragrance first (Visualise tab)");return;}
+  if(!curViz){showToast("Visualise a fragrance first");return;}
+  setStatus("busy","Regenerating formula...");
+  genFormula(curViz, prompt);
+}
+
+function renderFml(){
+  document.getElementById("fgen").style.display="none";
+  document.getElementById("ftbl").style.display="block";
+  var body=document.getElementById("fbody");
+  body.innerHTML="";
+  var total=0;
+  formula.forEach(function(f,i){
+    total+=f.pct;
+    var drops=Math.round(f.pct/100*10*20);
+    var ok=f.pct<=f.ifra;
+    var nc={top:"nbtop",heart:"nbhrt",base:"nbbas"}[f.note]||"";
+    body.innerHTML+="<tr>"
+      +"<td style='font-family:Cormorant Garamond,serif;font-size:0.9rem'>"+f.name+"</td>"
+      +"<td style='font-family:DM Mono,monospace;font-size:0.57rem;color:var(--gdim)'>"+f.src+"</td>"
+      +"<td><span class='nbadge "+nc+"'>"+(f.note||"").toUpperCase()+"</span></td>"
+      +"<td style='font-size:0.68rem;font-style:italic;color:var(--tdim)'>"+f.odor.substring(0,38)+(f.odor.length>38?"…":"")+"</td>"
+      +"<td><input class='ci' type='number' min='0.001' max='"+f.ifra+"' step='0.1' value='"+f.pct.toFixed(2)+"' onchange='uPct("+i+",this.value)'></td>"
+      +"<td style='font-family:DM Mono,monospace;font-size:0.65rem;color:var(--tdim)'>~"+drops+"</td>"
+      +"<td style='font-family:DM Mono,monospace;font-size:0.65rem;color:var(--tdim)'>"+f.ifra+"%</td>"
+      +"<td class='"+(ok?"ok":"warn")+"'>"+(ok?"&#10003; safe":"&#9888; over")+"</td>"
+      +"<td><button onclick='rmF("+i+")' style='background:none;border:none;color:var(--tdim);cursor:pointer;font-size:0.7rem;padding:2px 5px'>&#10005;</button></td>"
+      +"</tr>";
+  });
+  document.getElementById("ftotal").textContent=total.toFixed(2)+"%";
+  renderFmlTab();
+}
+
+function renderFmlTab(){
+  var empty=document.getElementById("s2empty");
+  var tbl=document.getElementById("s2tbl");
+  if(!formula.length){empty.style.display="block";tbl.style.display="none";return;}
+  empty.style.display="none";tbl.style.display="block";
+  var body=document.getElementById("fbody2");
+  body.innerHTML="";
+  var total=0;
+  formula.forEach(function(f,i){
+    total+=f.pct;
+    var drops=Math.round(f.pct/100*10*20);
+    var ok=f.pct<=f.ifra;
+    var nc={top:"nbtop",heart:"nbhrt",base:"nbbas"}[f.note]||"";
+    body.innerHTML+="<tr>"
+      +"<td style='font-family:Cormorant Garamond,serif;font-size:0.9rem'>"+f.name+"</td>"
+      +"<td style='font-family:DM Mono,monospace;font-size:0.57rem;color:var(--gdim)'>"+f.src+"</td>"
+      +"<td><span class='nbadge "+nc+"'>"+(f.note||"").toUpperCase()+"</span></td>"
+      +"<td style='font-size:0.68rem;font-style:italic;color:var(--tdim)'>"+f.odor.substring(0,38)+(f.odor.length>38?"…":"")+"</td>"
+      +"<td><input class='ci' type='number' min='0.001' max='"+f.ifra+"' step='0.1' value='"+f.pct.toFixed(2)+"' onchange='uPct("+i+",this.value)'></td>"
+      +"<td style='font-family:DM Mono,monospace;font-size:0.65rem;color:var(--tdim)'>~"+drops+"</td>"
+      +"<td style='font-family:DM Mono,monospace;font-size:0.65rem;color:var(--tdim)'>"+f.ifra+"%</td>"
+      +"<td class='"+(ok?"ok":"warn")+"'>"+(ok?"&#10003; safe":"&#9888; over")+"</td>"
+      +"<td><button onclick='rmF("+i+")' style='background:none;border:none;color:var(--tdim);cursor:pointer;font-size:0.7rem;padding:2px 5px'>&#10005;</button></td>"
+      +"</tr>";
+  });
+  document.getElementById("ftotal2").textContent=total.toFixed(2)+"%";
+  document.getElementById("fnotes2").textContent=document.getElementById("fnotes").textContent;
+}
+
+function uPct(i,v){formula[i].pct=parseFloat(v)||0;renderFml();}
+function rmF(i){formula.splice(i,1);renderFml();renderDB();}
+
 // ── DATABASE ─────────────────────────────────────────────────────────────────
-var ALL_FILTERS = ["all","top","heart","base","IFF","Givaudan","dsm-Firmenich","Symrise","Bedoukian","Indian","Imported","musky","floral","woody","animalic","resinous","fresh","spicy","green","gourmand","citrus","aldehydic","aromatic","oud","Indian"];
+var FILTER_LABELS = ["all","top","heart","base","IFF","Givaudan","dsm-Firmenich","Symrise","Bedoukian","Indian","Imported","musky","floral","woody","animalic","resinous","fresh","spicy","green","gourmand","citrus","aldehydic","oud"];
+
+function renderDB(){
+  var grid=document.getElementById("mgrid");
+  if(!grid) return;
+  grid.innerHTML="";
+  var nc={top:"nbtop",heart:"nbhrt",base:"nbbas"};
+  var tc={floral:"#E85252",woody:"#C8A96E",fresh:"#52E852",animalic:"#E8A44A",resinous:"#C8745A",musky:"#9B8FD4",spicy:"#E85298",green:"#52C852",citrus:"#E8D452",aldehydic:"#D4D452",gourmand:"#E898A0",marine:"#52C8E8",earthy:"#A87840",aromatic:"#88C8A0",oud:"#C87050",tobacco:"#A06030",ambery:"#E8B050",fruity:"#E87090",Indian:"#E87840"};
+  var sc={IFF:"#52C8E8",Givaudan:"#52E852","dsm-Firmenich":"#E85252",Symrise:"#E8A44A",Bedoukian:"#9B8FD4",Indian:"#E87840",Imported:"#C8A96E",Generic:"#6E6A82"};
+  DB.forEach(function(m){
+    var inF=formula.some(function(f){return f.id==m.id;});
+    var thtml=m.tags.map(function(t){return'<span class="tag" style="background:rgba(255,255,255,0.05);color:'+(tc[t]||"#888")+'">'+t+'</span>';}).join("");
+    grid.innerHTML+='<div class="mol'+(inF?" sel":'')+'" data-id="'+m.id+'" data-n="'+m.name.toLowerCase()+'" data-o="'+m.odor.toLowerCase()+'" data-t="'+m.tags.join(",")+'" data-note="'+m.note+'" data-src="'+(m.src||"")+'">'
+      +'<button class="madd" onclick="addToF(''+m.id+'')">'+(inF?"&#10003;":"+")+'</button>'
+      +'<div class="mn">'+m.name+'</div>'
+      +'<div class="msrc" style="color:'+(sc[m.src]||"#888")+'">'+m.src+' &nbsp;&middot;&nbsp; CAS: '+m.cas+'</div>'
+      +'<div class="mcas">IFRA: '+m.ifra+'% &nbsp;&middot;&nbsp; Volatility: '+m.v+'</div>'
+      +'<div class="mtags"><span class="nbadge '+(nc[m.note]||"")+'">'+(m.note||"").toUpperCase()+'</span> '+thtml+'</div>'
+      +'<div class="mod">'+m.odor+'</div>'
+      +'</div>';
+  });
+  renderFilterPills();
+  document.getElementById("dbc").textContent = DB.length + " compounds";
+}
 
 function renderFilterPills(){
-  var pils=["all","top","heart","base","IFF","Givaudan","dsm-Firmenich","Symrise","Bedoukian","Indian","Imported","musky","floral","woody","animalic","resinous","fresh","spicy","green","gourmand","citrus","aldehydic","oud"];
   var html="";
-  pils.forEach(function(f){
-    html+='<button class="pill'+(f=="all"?" on":"")+'" onclick="setFilt(this,\''+f+'\')">'+f+'</button>';
+  FILTER_LABELS.forEach(function(f){
+    html+='<button class="pill'+(f==curFilter?" on":"")+'" onclick="setFilt(this,''+f+'')">'+f+'</button>';
   });
-  document.getElementById("filterPills").innerHTML=html;
+  document.getElementById("fpills").innerHTML=html;
 }
 
 function setFilt(btn,f){
@@ -667,44 +761,17 @@ function setFilt(btn,f){
 }
 
 function filterDB(){
-  var q=document.getElementById("dbQ").value.toLowerCase();
+  var q=(document.getElementById("dbq").value||"").toLowerCase();
   var cards=document.querySelectorAll(".mol");
   var shown=0;
   cards.forEach(function(c){
-    var nm=c.getAttribute("data-n");
-    var od=c.getAttribute("data-o");
-    var tg=c.getAttribute("data-t");
-    var nt=c.getAttribute("data-note");
-    var src=c.getAttribute("data-src");
-    var mq=!q||(nm.indexOf(q)>=0)||(od.indexOf(q)>=0)||(tg.indexOf(q)>=0)||(src&&src.indexOf(q)>=0);
-    var mf=curFilter=="all"||(nt==curFilter)||(tg.indexOf(curFilter.toLowerCase())>=0)||(src&&src.toLowerCase().indexOf(curFilter.toLowerCase())>=0);
-    var vis=mq&&mf;
-    c.style.display=vis?"block":"none";
-    if(vis)shown++;
+    var mq=!q||(c.getAttribute("data-n").indexOf(q)>=0)||(c.getAttribute("data-o").indexOf(q)>=0)||(c.getAttribute("data-t").indexOf(q)>=0)||((c.getAttribute("data-src")||"").toLowerCase().indexOf(q)>=0);
+    var f=curFilter;
+    var mf=f=="all"||(c.getAttribute("data-note")==f)||(c.getAttribute("data-t").indexOf(f.toLowerCase())>=0)||((c.getAttribute("data-src")||"").toLowerCase().indexOf(f.toLowerCase())>=0);
+    c.style.display=(mq&&mf)?"block":"none";
+    if(mq&&mf) shown++;
   });
-  document.getElementById("dbCount").textContent=shown+" compounds shown";
-}
-
-function renderDB(){
-  var grid=document.getElementById("molGrid");
-  grid.innerHTML="";
-  var ncols={top:"nb-top",heart:"nb-heart",base:"nb-base"};
-  var tagcols={floral:"#E85252",woody:"#C8A96E",fresh:"#52E852",animalic:"#E8A44A",resinous:"#C8745A",musky:"#9B8FD4",spicy:"#E85298",green:"#52C852",citrus:"#E8D452",aldehydic:"#D4D452",gourmand:"#E898A0",marine:"#52C8E8",earthy:"#A87840",aromatic:"#88C8A0",Indian:"#E87840",oud:"#C87050",tobacco:"#A06030",ambery:"#E8B050",fruity:"#E87090"};
-  DB.forEach(function(m){
-    var inF=formula.some(function(f){return f.id==m.id;});
-    var thtml=m.tags.map(function(t){return'<span class="tag" style="background:rgba(255,255,255,0.05);color:'+(tagcols[t]||"#888")+'">'+t+'</span>';}).join("");
-    var srcColor={"IFF":"#52C8E8","Givaudan":"#52E852","dsm-Firmenich":"#E85252","Symrise":"#E8A44A","Bedoukian":"#9B8FD4","Indian":"#E87840","Imported":"#C8A96E"}[m.src]||"#888";
-    grid.innerHTML+='<div class="mol'+(inF?" sel":'')+'" data-id="'+m.id+'" data-n="'+m.name.toLowerCase()+'" data-o="'+m.odor.toLowerCase()+'" data-t="'+m.tags.join(",")+'" data-note="'+m.note+'" data-src="'+m.src+'">'
-      +'<button class="mol-btn" onclick="addToF(\''+m.id+'\')">'+(inF?"✓":"+")+'</button>'
-      +'<div class="mol-n">'+m.name+'</div>'
-      +'<div class="mol-src" style="color:'+srcColor+'">'+m.src+' &nbsp;·&nbsp; CAS: '+m.cas+'</div>'
-      +'<div class="mol-cas">IFRA max: '+m.ifra+'% &nbsp;·&nbsp; Volatility: '+m.v+'</div>'
-      +'<div class="mol-tags"><span class="nbadge '+(ncols[m.note]||"")+'">'+(m.note||"").toUpperCase()+'</span> '+thtml+'</div>'
-      +'<div class="mol-od">'+m.odor+'</div>'
-      +'</div>';
-  });
-  renderFilterPills();
-  document.getElementById("dbCount").textContent=DB.length+" compounds shown";
+  document.getElementById("dbc").textContent=shown+" compounds shown";
 }
 
 function addToF(id){
@@ -716,199 +783,101 @@ function addToF(id){
   showToast("Added: "+m.name);
 }
 
-// ── FORMULA ───────────────────────────────────────────────────────────────────
-function renderFormulaInline(){
-  var empty=document.getElementById("fmlEmpty2");
-  var tbl=document.getElementById("fmlTable2");
-  if(!formula.length){if(empty)empty.style.display="block";if(tbl)tbl.style.display="none";return;}
-  if(empty)empty.style.display="none";
-  if(tbl)tbl.style.display="block";
-  var body=document.getElementById("fmlBody2");
-  if(!body) return;
-  body.innerHTML="";
-  var total=0;
-  formula.forEach(function(item,idx){
-    total+=item.pct;
-    var drops=Math.round(item.pct/100*10*20);
-    var ok=item.pct<=item.ifra;
-    var nbcls={top:"nb-top",heart:"nb-heart",base:"nb-base"}[item.note]||"";
-    body.innerHTML+="<tr>"
-      +"<td style='font-family:Cormorant Garamond,serif;font-size:0.95rem'>"+item.name+"</td>"
-      +"<td style='font-family:DM Mono,monospace;font-size:0.6rem;color:var(--gdim)'>"+item.src+"</td>"
-      +"<td><span class='nbadge "+nbcls+"'>"+(item.note||"").toUpperCase()+"</span></td>"
-      +"<td style='font-size:0.72rem;font-style:italic;color:var(--tdim)'>"+item.odor.substring(0,40)+(item.odor.length>40?"…":"")+"</td>"
-      +"<td><input class='conc-i' type='number' min='0.001' max='"+item.ifra+"' step='0.1' value='"+item.pct.toFixed(2)+"' onchange='updPct("+idx+",this.value)'></td>"
-      +"<td style='font-family:DM Mono,monospace;font-size:0.68rem;color:var(--tdim)'>~"+drops+" drops</td>"
-      +"<td style='font-family:DM Mono,monospace;font-size:0.68rem;color:var(--tdim)'>"+item.ifra+"%</td>"
-      +"<td class='"+(ok?"ok":"warn")+"'>"+(ok?"✓ safe":"⚠ over")+"</td>"
-      +"<td><button onclick='rmF("+idx+")' style='background:none;border:none;color:var(--tdim);cursor:pointer;font-size:0.72rem;padding:2px 6px'>✕</button></td>"
-      +"</tr>";
-  });
-  var tp=document.getElementById("totalPct2");
-  if(tp) tp.textContent=total.toFixed(2)+"%";
-}
-
-function renderFormula(){
-  var empty=document.getElementById("fmlEmpty");
-  var tbl=document.getElementById("fmlTable");
-  if(!formula.length){empty.style.display="block";tbl.style.display="none";return;}
-  empty.style.display="none";tbl.style.display="block";
-  var body=document.getElementById("fmlBody");
-  body.innerHTML="";
-  var total=0;
-  formula.forEach(function(item,idx){
-    total+=item.pct;
-    var drops=Math.round(item.pct/100*10*20);
-    var ok=item.pct<=item.ifra;
-    var nbcls={top:"nb-top",heart:"nb-heart",base:"nb-base"}[item.note]||"";
-    body.innerHTML+='<tr>'
-      +'<td style="font-family:Cormorant Garamond,serif;font-size:0.95rem">'+item.name+'</td>'
-      +'<td style="font-family:DM Mono,monospace;font-size:0.6rem;color:var(--gdim)">'+item.src+'</td>'
-      +'<td><span class="nbadge '+nbcls+'">'+(item.note||"").toUpperCase()+'</span></td>'
-      +'<td style="font-size:0.72rem;font-style:italic;color:var(--tdim)">'+item.odor.substring(0,45)+(item.odor.length>45?"…":"")+'</td>'
-      +'<td><input class="conc-i" type="number" min="0.001" max="'+item.ifra+'" step="0.1" value="'+item.pct.toFixed(2)+'" onchange="updPct('+idx+',this.value)"></td>'
-      +'<td style="font-family:DM Mono,monospace;font-size:0.68rem;color:var(--tdim)">~'+drops+' drops</td>'
-      +'<td style="font-family:DM Mono,monospace;font-size:0.68rem;color:var(--tdim)">'+item.ifra+'%</td>'
-      +'<td class="'+(ok?"ok":"warn")+'">'+(ok?"✓ safe":"⚠ over")+'</td>'
-      +'<td><button onclick="rmF('+idx+')" style="background:none;border:none;color:var(--tdim);cursor:pointer;font-size:0.72rem;padding:2px 6px">✕</button></td>'
-      +'</tr>';
-  });
-  document.getElementById("totalPct").textContent=total.toFixed(2)+"%";
-}
-
-function updPct(idx,v){formula[idx].pct=parseFloat(v)||0;renderFormula();}
-function rmF(idx){formula.splice(idx,1);renderDB();renderFormula();}
-
-async function aiFormula(){
-  var prompt = document.getElementById("vPrompt").value.trim();
-  if(!prompt && !formula.length){showToast("Describe a fragrance or add ingredients first");return;}
-  var src = prompt
-    ? "Create a professional formula for: " + prompt + ". Use only chemicals available from: " + DB.map(function(m){return m.name+"("+m.src+","+m.note+",IFRA:"+m.ifra+"%)";}).join(", ")
-    : "Optimise this formula for single complex note: " + formula.map(function(f){return f.name+" "+f.pct+"%";}).join(", ");
-  setStatus("busy","AI generating professional formula...");
-  try{
-    var res = await fetch("/.netlify/functions/claude",{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({
-        max_tokens:1500,
-        system:"You are a master perfumer. Return ONLY raw JSON — no markdown, no backticks. Start with { end with }. Schema: {\"formula\":[{\"ingredient\":\"name\",\"pct\":number}],\"name\":\"creative name\",\"perfumerNote\":\"expert 4-sentence note on structure, materials, evolution, and single-note character\"}",
-        messages:[{role:"user",content:src}]
-      })
-    });
-    var data = await res.json();
-    if(!data.content || !data.content[0]){
-      var errMsg = data.error ? data.error.message : JSON.stringify(data);
-      throw new Error("API error: " + errMsg);
-    }
-    var txt = data.content[0].text;
-    var s=txt.indexOf("{"),e=txt.lastIndexOf("}");
-    if(s>=0&&e>s){txt=txt.substring(s,e+1);}
-    var result = JSON.parse(txt);
-    formula=[];
-    (result.formula||[]).forEach(function(item){
-      var mol=DB.find(function(m){return m.name.toLowerCase().indexOf(item.ingredient.toLowerCase().split(" ")[0])>=0||item.ingredient.toLowerCase().indexOf(m.name.toLowerCase().split(" ")[0])>=0;});
-      if(mol){formula.push({id:mol.id,name:mol.name,src:mol.src,note:mol.note,odor:mol.odor,ifra:mol.ifra,pct:item.pct});}
-    });
-    if(result.name){document.getElementById("fmlTitle").textContent=result.name;}
-    document.getElementById("fmlNotes").textContent=result.perfumerNote||"";
-    renderFormula();
-    renderDB();
-    showSec("fml",null);
-    setStatus("idle","Formula generated — "+formula.length+" ingredients");
-  }catch(err){
-    setStatus("off","Generation failed: "+err.message);
-    showToast("Error: "+err.message);
-  }
+// ── EXPORTS ───────────────────────────────────────────────────────────────────
+function getTitle(){
+  var t=document.getElementById("ftitle");
+  return t?t.textContent:"RK Formula";
 }
 
 function exportCSV(){
   if(!formula.length){showToast("No formula to export");return;}
-  var csv="Ingredient,Brand/Source,Note,Concentration%,Per 10g (drops),IFRA Max%,Status\n";
+  var csv="Ingredient,Brand/Source,Note,Conc %,Per 10g (drops),IFRA Max %,Status
+";
   formula.forEach(function(f){
     var drops=Math.round(f.pct/100*10*20);
-    csv+=f.name+","+f.src+","+f.note+","+f.pct.toFixed(2)+","+drops+","+f.ifra+","+(f.pct<=f.ifra?"Safe":"Over IFRA limit")+"\n";
+    csv+=f.name+","+f.src+","+f.note+","+f.pct.toFixed(2)+","+drops+","+f.ifra+","+(f.pct<=f.ifra?"Safe":"Over IFRA")+"
+";
   });
-  var a=document.createElement("a");
-  a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));
-  a.download="RK-Perfumery-Formula.csv";
-  a.click();
-  showToast("Exported CSV");
+  dl(csv,"text/csv","RK-Formula.csv");
+  showToast("CSV downloaded");
 }
 
-function exportFormula(){
+function exportTXT(){
   if(!formula.length){showToast("No formula to export");return;}
-  var title=document.getElementById("fmlTitle").textContent;
-  var txt="RK PERFUMERY LAB\n"+title+"\n"+"=".repeat(50)+"\n\n";
-  var total=0;
+  var title=getTitle(), total=0;
+  var txt="RK PERFUMERY LAB
+"+title+"
+"+"=".repeat(50)+"
+
+";
   var tiers={top:[],heart:[],base:[]};
   formula.forEach(function(f){if(tiers[f.note]){tiers[f.note].push(f);}total+=f.pct;});
   ["top","heart","base"].forEach(function(t){
     if(tiers[t].length){
-      txt+=t.toUpperCase()+" NOTES\n";
-      tiers[t].forEach(function(f){txt+="  "+f.name.padEnd(35)+" "+f.pct.toFixed(2)+"% ("+f.src+")\n";});
-      txt+="\n";
+      txt+=t.toUpperCase()+" NOTES
+";
+      tiers[t].forEach(function(f){txt+="  "+f.name.padEnd(36)+f.pct.toFixed(2)+"% ("+f.src+")
+";});
+      txt+="
+";
     }
   });
-  txt+="TOTAL: "+total.toFixed(2)+"%\n\n";
-  var notes=document.getElementById("fmlNotes").textContent;
-  if(notes){txt+="PERFUMER'S NOTES\n"+notes+"\n";}
-  var a=document.createElement("a");
-  a.href=URL.createObjectURL(new Blob([txt],{type:"text/plain"}));
-  a.download="RK-Perfumery-Formula.txt";
-  a.click();
-  showToast("Exported TXT");
+  txt+="TOTAL: "+total.toFixed(2)+"%
+
+";
+  var notes=document.getElementById("fnotes").textContent;
+  if(notes){txt+="PERFUMER'S NOTES
+"+notes+"
+";}
+  txt+="
+Generated by RK Perfumery Lab";
+  dl(txt,"text/plain","RK-Formula.txt");
+  showToast("TXT downloaded");
 }
 
 function exportPDF(){
   if(!formula.length){showToast("No formula to export");return;}
-  var title = document.getElementById("fmlTitle").textContent;
-  var notes = document.getElementById("fmlNotes").textContent;
-  var total = 0;
-  formula.forEach(function(f){total+=f.pct;});
-  
-  var html2 = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>'+title+'</title><style>'
-    +'body{font-family:Georgia,serif;max-width:800px;margin:40px auto;padding:0 20px;color:#1a1a1a}'
-    +'h1{font-size:2rem;font-weight:300;border-bottom:2px solid #C8A96E;padding-bottom:12px;margin-bottom:8px}'
-    +'.sub{font-size:0.75rem;letter-spacing:0.2em;color:#7A6240;text-transform:uppercase;margin-bottom:32px}'
-    +'table{width:100%;border-collapse:collapse;margin-bottom:32px;font-size:0.85rem}'
-    +'th{background:#1A1A26;color:#C8A96E;font-family:monospace;font-size:0.65rem;letter-spacing:0.1em;padding:10px 12px;text-align:left;text-transform:uppercase}'
-    +'td{padding:10px 12px;border-bottom:1px solid #eee}'
-    +'tr:nth-child(even) td{background:#fafafa}'
-    +'.total{font-weight:bold;background:#f5f0e8!important;font-family:monospace}'
-    +'.top{color:#2a8a2a}.heart{color:#8a2a2a}.base{color:#2a4a8a}'
-    +'.notes{background:#f9f7f2;border-left:3px solid #C8A96E;padding:20px;font-style:italic;line-height:1.8;font-size:0.9rem}'
-    +'.footer{margin-top:40px;font-size:0.7rem;color:#999;letter-spacing:0.1em;text-transform:uppercase}'
-    +'</style></head><body>'
-    +'<h1>'+title+'</h1>'
-    +'<div class="sub">RK Perfumery Lab &nbsp;·&nbsp; Fine Fragrance Formulation &nbsp;·&nbsp; '+new Date().toLocaleDateString('en-IN',{year:'numeric',month:'long',day:'numeric'})+'</div>'
-    +'<table><thead><tr><th>Ingredient</th><th>Brand/Source</th><th>Note</th><th>Concentration %</th><th>Per 10g (drops)</th><th>IFRA Max %</th><th>Status</th></tr></thead><tbody>';
-  
+  var title=getTitle(), total=0;
+  var notes=document.getElementById("fnotes").textContent;
+  var rows="";
   formula.forEach(function(f){
+    total+=f.pct;
     var drops=Math.round(f.pct/100*10*20);
     var ok=f.pct<=f.ifra;
-    html2+='<tr><td><strong>'+f.name+'</strong></td><td>'+f.src+'</td>'
-      +'<td class="'+f.note+'">'+f.note.toUpperCase()+'</td>'
-      +'<td style="font-family:monospace">'+f.pct.toFixed(2)+'%</td>'
-      +'<td style="font-family:monospace">~'+drops+' drops</td>'
-      +'<td style="font-family:monospace">'+f.ifra+'%</td>'
-      +'<td>'+(ok?'&#10003; Safe':'&#9888; Over limit')+'</td></tr>';
+    rows+="<tr><td><strong>"+f.name+"</strong></td><td>"+f.src+"</td><td>"+f.note.toUpperCase()+"</td><td>"+f.pct.toFixed(2)+"%</td><td>~"+drops+" drops</td><td>"+f.ifra+"%</td><td>"+(ok?"&#10003; Safe":"&#9888; Over")+"</td></tr>";
   });
-  
-  html2+='<tr class="total"><td colspan="3"><strong>TOTAL CONCENTRATE</strong></td>'
-    +'<td style="font-family:monospace"><strong>'+total.toFixed(2)+'%</strong></td>'
-    +'<td colspan="3"></td></tr>'
-    +'</tbody></table>';
-  
-  if(notes){html2+='<div class="notes"><strong>Perfumer's Notes</strong><br><br>'+notes+'</div>';}
-  html2+='<div class="footer">Generated by RK Perfumery Lab &nbsp;·&nbsp; Confidential Formulation Document</div>'
-    +'</body></html>';
-  
+  var date=new Date().toLocaleDateString("en-IN",{year:"numeric",month:"long",day:"numeric"});
+  var h="<!DOCTYPE html><html><head><meta charset=UTF-8><title>"+title+"</title><style>"
+    +"body{font-family:Georgia,serif;max-width:820px;margin:40px auto;padding:0 24px;color:#111}"
+    +"h1{font-size:2rem;font-weight:300;border-bottom:2px solid #C8A96E;padding-bottom:10px;margin-bottom:6px}"
+    +".sub{font-size:0.7rem;letter-spacing:0.18em;color:#7A6240;text-transform:uppercase;margin-bottom:28px}"
+    +"table{width:100%;border-collapse:collapse;font-size:0.82rem;margin-bottom:28px}"
+    +"th{background:#1A1A26;color:#C8A96E;font-family:monospace;font-size:0.6rem;letter-spacing:0.1em;padding:9px 11px;text-align:left;text-transform:uppercase}"
+    +"td{padding:9px 11px;border-bottom:1px solid #eee}"
+    +"tr:nth-child(even) td{background:#fafafa}"
+    +".tot{background:#f5f0e8!important;font-weight:bold;font-family:monospace}"
+    +".notes{background:#f9f7f2;border-left:3px solid #C8A96E;padding:18px;font-style:italic;line-height:1.8;font-size:0.88rem;margin-bottom:24px}"
+    +".footer{font-size:0.65rem;color:#aaa;letter-spacing:0.1em;text-transform:uppercase}"
+    +"</style></head><body>"
+    +"<h1>"+title+"</h1>"
+    +"<div class=sub>RK Perfumery Lab &nbsp;&middot;&nbsp; Fine Fragrance Formulation &nbsp;&middot;&nbsp; "+date+"</div>"
+    +"<table><thead><tr><th>Ingredient</th><th>Brand</th><th>Note</th><th>Conc %</th><th>Per 10g</th><th>IFRA %</th><th>Status</th></tr></thead>"
+    +"<tbody>"+rows+"</tbody>"
+    +"<tfoot><tr class=tot><td colspan=3><strong>TOTAL</strong></td><td><strong>"+total.toFixed(2)+"%</strong></td><td colspan=3></td></tr></tfoot>"
+    +"</table>"
+    +(notes?"<div class=notes><strong>Perfumer's Notes</strong><br><br>"+notes+"</div>":"")
+    +"<div class=footer>Generated by RK Perfumery Lab &nbsp;&middot;&nbsp; Confidential</div>"
+    +"</body></html>";
   var w=window.open("","_blank");
-  w.document.write(html2);
-  w.document.close();
-  setTimeout(function(){w.print();},500);
-  showToast("PDF ready — use Print > Save as PDF");
+  if(w){w.document.write(h);w.document.close();setTimeout(function(){w.print();},600);}
+  else{showToast("Allow popups to use PDF export");}
+}
+
+function dl(content, type, filename){
+  var a=document.createElement("a");
+  a.href=URL.createObjectURL(new Blob([content],{type:type}));
+  a.download=filename;
+  a.click();
 }
 
 function showToast(msg){
