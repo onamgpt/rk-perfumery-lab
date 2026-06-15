@@ -176,6 +176,31 @@ tr:hover td{background:var(--panel)}
     </div>
   </div>
 
+  <!-- INLINE FORMULA (shown after visualise) -->
+  <div id="fmlInline" style="display:none">
+    <div class="sec-lbl">03 &nbsp; Generated Formula</div>
+    <div class="fml">
+      <div class="fml-hdr">
+        <div class="fml-title" id="fmlTitle">Working Formula</div>
+        <div class="fml-btns">
+          <button class="btn-ghost" onclick="exportCSV()">&#8681; CSV</button>
+          <button class="btn-ghost" onclick="exportPDF()">&#8681; PDF</button>
+          <button class="btn-ghost" onclick="exportFormula()">&#8681; TXT</button>
+          <button class="btn-gold" onclick="aiFormula()">Regenerate</button>
+        </div>
+      </div>
+      <div id="fmlEmpty" class="empty"><span class="empty-i">⚗</span><div class="empty-t">Generating formula...</div></div>
+      <div id="fmlTable" style="display:none">
+        <table>
+          <thead><tr><th>Ingredient</th><th>Brand</th><th>Note</th><th>Odour Profile</th><th>Conc %</th><th>Per 10g</th><th>IFRA %</th><th>Status</th><th></th></tr></thead>
+          <tbody id="fmlBody"></tbody>
+          <tfoot><tr class="total-row"><td colspan="4">TOTAL CONCENTRATE</td><td id="totalPct">0.00%</td><td></td><td></td><td></td><td></td></tr></tfoot>
+        </table>
+        <div class="notes-box"><div class="notes-lbl">Perfumer's Notes</div><div class="notes-txt" id="fmlNotes"></div></div>
+      </div>
+    </div>
+  </div>
+
   <!-- DATABASE -->
   <div id="sec-db" style="display:none">
     <div class="sec-lbl">02 &nbsp; Aroma Chemical Database · 300+ Compounds</div>
@@ -463,12 +488,54 @@ async function doViz(){
     if(s>=0 && e>s){ txt = txt.substring(s,e+1); }
     vizResult = JSON.parse(txt);
     renderViz(vizResult);
+    setStatus("busy","Generating professional formula...");
+    await autoFormula(vizResult, prompt);
     setStatus("idle","Analysis complete — " + vizResult.name);
   }catch(err){
     setStatus("off","Analysis failed: " + err.message);
     showToast("Error: " + err.message);
   }
   btn.disabled = false; btn.textContent = "Visualise";
+}
+
+async function autoFormula(d, prompt){
+  try{
+    var src = "Create a professional perfumer formula for this fragrance: " + prompt
+      + ". Single complex note target: " + (d.singleNoteCharacter||"")
+      + ". Accords: " + JSON.stringify(d.accords||{})
+      + ". Use ONLY chemicals from this database: " + DB.map(function(m){return m.name+"("+m.src+","+m.note+",IFRA:"+m.ifra+"%)";}).join(", ")
+      + ". Give 8-14 ingredients with precise concentrations summing to 90-100%.";
+    var res = await fetch("/.netlify/functions/claude",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        max_tokens:1500,
+        system:"You are a master perfumer. Return ONLY raw JSON — no markdown, no backticks, no explanation. Start with { end with }. Schema: {\"formula\":[{\"ingredient\":\"exact name\",\"pct\":number}],\"name\":\"creative fragrance name\",\"perfumerNote\":\"expert 4-sentence note on structure, evolution, materials chosen, and the single-note complexity achieved\"}",
+        messages:[{role:"user",content:src}]
+      })
+    });
+    var data = await res.json();
+    if(!data.content||!data.content[0]) throw new Error(data.error?data.error.message:"No response");
+    var txt = data.content[0].text;
+    var s=txt.indexOf("{"),e=txt.lastIndexOf("}");
+    if(s>=0&&e>s){txt=txt.substring(s,e+1);}
+    var result = JSON.parse(txt);
+    formula=[];
+    (result.formula||[]).forEach(function(item){
+      var mol=DB.find(function(m){
+        var mn=m.name.toLowerCase(), rn=item.ingredient.toLowerCase();
+        return mn===rn||mn.indexOf(rn)>=0||rn.indexOf(mn.split(" ")[0])>=0;
+      });
+      if(mol){formula.push({id:mol.id,name:mol.name,src:mol.src,note:mol.note,odor:mol.odor,ifra:mol.ifra,pct:item.pct});}
+    });
+    if(result.name){document.getElementById("fmlTitle").textContent=result.name;}
+    document.getElementById("fmlNotes").textContent=result.perfumerNote||"";
+    renderFormula();
+    // Show formula section below viz
+    document.getElementById("fmlInline").style.display="block";
+  }catch(err){
+    showToast("Formula error: "+err.message);
+  }
 }
 
 function renderViz(d){
@@ -756,6 +823,57 @@ function exportFormula(){
   a.download="RK-Perfumery-Formula.txt";
   a.click();
   showToast("Exported TXT");
+}
+
+function exportPDF(){
+  if(!formula.length){showToast("No formula to export");return;}
+  var title = document.getElementById("fmlTitle").textContent;
+  var notes = document.getElementById("fmlNotes").textContent;
+  var total = 0;
+  formula.forEach(function(f){total+=f.pct;});
+  
+  var html2 = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>'+title+'</title><style>'
+    +'body{font-family:Georgia,serif;max-width:800px;margin:40px auto;padding:0 20px;color:#1a1a1a}'
+    +'h1{font-size:2rem;font-weight:300;border-bottom:2px solid #C8A96E;padding-bottom:12px;margin-bottom:8px}'
+    +'.sub{font-size:0.75rem;letter-spacing:0.2em;color:#7A6240;text-transform:uppercase;margin-bottom:32px}'
+    +'table{width:100%;border-collapse:collapse;margin-bottom:32px;font-size:0.85rem}'
+    +'th{background:#1A1A26;color:#C8A96E;font-family:monospace;font-size:0.65rem;letter-spacing:0.1em;padding:10px 12px;text-align:left;text-transform:uppercase}'
+    +'td{padding:10px 12px;border-bottom:1px solid #eee}'
+    +'tr:nth-child(even) td{background:#fafafa}'
+    +'.total{font-weight:bold;background:#f5f0e8!important;font-family:monospace}'
+    +'.top{color:#2a8a2a}.heart{color:#8a2a2a}.base{color:#2a4a8a}'
+    +'.notes{background:#f9f7f2;border-left:3px solid #C8A96E;padding:20px;font-style:italic;line-height:1.8;font-size:0.9rem}'
+    +'.footer{margin-top:40px;font-size:0.7rem;color:#999;letter-spacing:0.1em;text-transform:uppercase}'
+    +'</style></head><body>'
+    +'<h1>'+title+'</h1>'
+    +'<div class="sub">RK Perfumery Lab &nbsp;·&nbsp; Fine Fragrance Formulation &nbsp;·&nbsp; '+new Date().toLocaleDateString('en-IN',{year:'numeric',month:'long',day:'numeric'})+'</div>'
+    +'<table><thead><tr><th>Ingredient</th><th>Brand/Source</th><th>Note</th><th>Concentration %</th><th>Per 10g (drops)</th><th>IFRA Max %</th><th>Status</th></tr></thead><tbody>';
+  
+  formula.forEach(function(f){
+    var drops=Math.round(f.pct/100*10*20);
+    var ok=f.pct<=f.ifra;
+    html2+='<tr><td><strong>'+f.name+'</strong></td><td>'+f.src+'</td>'
+      +'<td class="'+f.note+'">'+f.note.toUpperCase()+'</td>'
+      +'<td style="font-family:monospace">'+f.pct.toFixed(2)+'%</td>'
+      +'<td style="font-family:monospace">~'+drops+' drops</td>'
+      +'<td style="font-family:monospace">'+f.ifra+'%</td>'
+      +'<td>'+(ok?'&#10003; Safe':'&#9888; Over limit')+'</td></tr>';
+  });
+  
+  html2+='<tr class="total"><td colspan="3"><strong>TOTAL CONCENTRATE</strong></td>'
+    +'<td style="font-family:monospace"><strong>'+total.toFixed(2)+'%</strong></td>'
+    +'<td colspan="3"></td></tr>'
+    +'</tbody></table>';
+  
+  if(notes){html2+='<div class="notes"><strong>Perfumer's Notes</strong><br><br>'+notes+'</div>';}
+  html2+='<div class="footer">Generated by RK Perfumery Lab &nbsp;·&nbsp; Confidential Formulation Document</div>'
+    +'</body></html>';
+  
+  var w=window.open("","_blank");
+  w.document.write(html2);
+  w.document.close();
+  setTimeout(function(){w.print();},500);
+  showToast("PDF ready — use Print > Save as PDF");
 }
 
 function showToast(msg){
