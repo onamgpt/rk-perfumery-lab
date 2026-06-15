@@ -5,13 +5,19 @@ exports.handler = async function(event) {
   if(event.httpMethod !== 'POST'){
     return {statusCode:405,body:'Method Not Allowed'};
   }
+  
+  var apiKey = process.env.ANTHROPIC_API_KEY;
+  if(!apiKey){
+    return {statusCode:500,headers:{'Access-Control-Allow-Origin':'*'},body:JSON.stringify({error:{message:'ANTHROPIC_API_KEY not set in environment variables'}})};
+  }
+
   try {
     var body = JSON.parse(event.body);
     var response = await fetch('https://api.anthropic.com/v1/messages',{
       method:'POST',
       headers:{
         'Content-Type':'application/json',
-        'x-api-key': process.env.ANTHROPIC_API_KEY,
+        'x-api-key': apiKey,
         'anthropic-version':'2023-06-01'
       },
       body: JSON.stringify({
@@ -24,13 +30,10 @@ exports.handler = async function(event) {
     var data = await response.json();
     return {
       statusCode: 200,
-      headers: {
-        'Content-Type':'application/json',
-        'Access-Control-Allow-Origin':'*'
-      },
+      headers: {'Content-Type':'application/json','Access-Control-Allow-Origin':'*'},
       body: JSON.stringify(data)
     };
   } catch(e) {
-    return {statusCode:500,headers:{'Access-Control-Allow-Origin':'*'},body:JSON.stringify({error:e.message})};
+    return {statusCode:500,headers:{'Access-Control-Allow-Origin':'*'},body:JSON.stringify({error:{message:e.message}})};
   }
 };
